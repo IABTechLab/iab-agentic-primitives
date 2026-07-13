@@ -1,0 +1,252 @@
+{
+  "$defs": {
+    "ConsentContext": {
+      "description": "Privacy consent signals that travel with a deal (flagged decision FD-10).\n\nMinimal placeholder per the ratified decision: regime identifiers plus\ndiligence status. Full build-out (validated GPP \u2014 Global Privacy\nPlatform \u2014 sections, TCF \u2014 Transparency & Consent Framework \u2014 vendor\nchecks) is a later bead; the slot exists on Deal, Quote, and Order now\nso the wire shape does not have to break when it lands.",
+      "properties": {
+        "applicable_regimes": {
+          "description": "Privacy regime identifiers in scope (e.g. 'GDPR', 'CCPA').",
+          "items": {
+            "type": "string"
+          },
+          "title": "Applicable Regimes",
+          "type": "array"
+        },
+        "diligence_status": {
+          "$ref": "#/$defs/DiligenceStatus",
+          "default": "unknown",
+          "description": "Counterparty diligence status (IAB Diligence Platform)."
+        },
+        "gpp_section_ids": {
+          "description": "GPP section ids present in the string.",
+          "items": {
+            "type": "integer"
+          },
+          "title": "Gpp Section Ids",
+          "type": "array"
+        },
+        "gpp_string": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "GPP (Global Privacy Platform) consent string.",
+          "title": "Gpp String"
+        },
+        "tcf_string": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "TCF (Transparency & Consent Framework) TC string, when GDPR applies.",
+          "title": "Tcf String"
+        },
+        "verified_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Timezone-aware timestamp of the last diligence verification, if any.",
+          "title": "Verified At"
+        }
+      },
+      "title": "ConsentContext",
+      "type": "object"
+    },
+    "DiligenceStatus": {
+      "description": "Status of counterparty privacy diligence (IAB Diligence Platform).",
+      "enum": [
+        "unknown",
+        "pending",
+        "passed",
+        "failed"
+      ],
+      "title": "DiligenceStatus",
+      "type": "string"
+    },
+    "Money": {
+      "description": "Exact money amount in integer micros (flagged decision FD-11).\n\n``1_000_000`` micros = 1 currency unit \u2014 the ad-industry convention\n(Google Ad Manager, among others, prices in micros). Float is BANNED on\nthe wire for money: IEEE 754 floating point is non-deterministic for\nmoney math (``0.1 + 0.2 != 0.3``, and repeated CPM \u2014 cost per mille \u2014\narithmetic accumulates error), and the two source repos used ``float``\nend-to-end; that defect must not be fossilized into the spec. Every\nprice, rate, budget, and offer in the shared contract is a ``Money``.\n\n``amount_micros`` is a strict integer: float inputs are rejected at\nvalidation time rather than silently truncated.",
+      "properties": {
+        "amount_micros": {
+          "description": "Amount in micros; 1,000,000 micros = 1 currency unit.",
+          "title": "Amount Micros",
+          "type": "integer"
+        },
+        "currency": {
+          "default": "USD",
+          "description": "ISO 4217 alpha-3 currency code.",
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount_micros"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "OrderStatus": {
+      "description": "ONE order status vocabulary.\n\nAdopts the seller's unified ``order_state_machine.OrderStatus`` (which\nalready merged the seller's workflow and ad-server vocabularies).\n\nRecorded aliases (retired values, NOT valid on the wire): buyer\nOpenDirect ``PENDING`` -> ``pending_approval``; ``APPROVED``/``REJECTED``\n(uppercase) -> lowercase; seller ``ExecutionOrderStatus.proposed`` ->\n``submitted``; ``canceled`` -> ``cancelled``. The seller-internal\n``syncing`` ad-server state is dropped from the wire vocabulary.",
+      "enum": [
+        "draft",
+        "submitted",
+        "pending_approval",
+        "approved",
+        "rejected",
+        "in_progress",
+        "booked",
+        "unbooked",
+        "completed",
+        "failed",
+        "cancelled"
+      ],
+      "title": "OrderStatus",
+      "type": "string"
+    }
+  },
+  "description": "Campaign container (insertion order) holding one or more lines.\n\nMerges the buyer's OpenDirect ``Order`` with the seller's\n``ExecutionOrder``. Per flagged decision FD-8, the seller's record is\nauthoritative for order/fulfillment state.\n\nID minting: ``order_id`` is seller-issued (created via the seller's\nAPI on buyer request).",
+  "properties": {
+    "account_id": {
+      "description": "Seller-issued account identifier.",
+      "title": "Account Id",
+      "type": "string"
+    },
+    "budget": {
+      "$ref": "#/$defs/Money",
+      "description": "Estimated budget (exact micros; FD-11)."
+    },
+    "consent_context": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ConsentContext"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Privacy consent signals riding with the order (FD-10)."
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "deal_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Deal this order fulfils, if deal-led.",
+      "title": "Deal Id"
+    },
+    "end_date": {
+      "format": "date",
+      "title": "End Date",
+      "type": "string"
+    },
+    "ext": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Ext"
+    },
+    "external_ids": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Ad-server order references (e.g. GAM order id).",
+      "title": "External Ids"
+    },
+    "name": {
+      "maxLength": 200,
+      "title": "Name",
+      "type": "string"
+    },
+    "order_id": {
+      "description": "Seller-issued order identifier.",
+      "title": "Order Id",
+      "type": "string"
+    },
+    "proposal_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Proposal this order materializes, if any.",
+      "title": "Proposal Id"
+    },
+    "start_date": {
+      "format": "date",
+      "title": "Start Date",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/OrderStatus",
+      "default": "draft"
+    },
+    "updated_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Updated At"
+    }
+  },
+  "required": [
+    "order_id",
+    "account_id",
+    "name",
+    "budget",
+    "start_date",
+    "end_date"
+  ],
+  "title": "Order",
+  "type": "object"
+}

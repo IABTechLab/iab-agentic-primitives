@@ -1,0 +1,282 @@
+{
+  "$defs": {
+    "BuyerIdentity": {
+      "description": "Buyer identity revealed progressively to unlock better pricing.\n\nSuperset of the buyer repo's ``BuyerIdentity`` and the seller repo's\n``BuyerIdentity``/``QuoteBuyerIdentity``; every field is optional so a\npartially revealed identity is always representable. The tier derived\nfrom these fields is capped server-side by the registry-verified trust\nstatus of the calling agent \u2014 it is never self-asserted.",
+      "properties": {
+        "advertiser_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Advertiser Id"
+        },
+        "advertiser_industry": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Advertiser Industry"
+        },
+        "advertiser_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Advertiser Name"
+        },
+        "agency_holding_company": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Agency Holding Company"
+        },
+        "agency_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Agency Id"
+        },
+        "agency_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Agency Name"
+        },
+        "campaign_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional campaign scope for campaign-specific deals.",
+          "title": "Campaign Id"
+        },
+        "campaign_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Campaign Name"
+        },
+        "dsp_platform": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "DSP platform slug (e.g. 'ttd', 'dv360').",
+          "title": "Dsp Platform"
+        },
+        "seat_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "DSP seat identifier.",
+          "title": "Seat Id"
+        },
+        "seat_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "DSP platform display name.",
+          "title": "Seat Name"
+        }
+      },
+      "title": "BuyerIdentity",
+      "type": "object"
+    },
+    "SessionMessage": {
+      "description": "A single message in a session conversation.",
+      "properties": {
+        "content": {
+          "title": "Content",
+          "type": "string"
+        },
+        "message_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "\"pricing\", \"deal\", \"availability\", \"general\".",
+          "title": "Message Type"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "title": "Metadata",
+          "type": "object"
+        },
+        "role": {
+          "description": "\"user\" or \"assistant\".",
+          "title": "Role",
+          "type": "string"
+        },
+        "timestamp": {
+          "format": "date-time",
+          "title": "Timestamp",
+          "type": "string"
+        }
+      },
+      "required": [
+        "role",
+        "content"
+      ],
+      "title": "SessionMessage",
+      "type": "object"
+    },
+    "SessionStatus": {
+      "description": "Lifecycle status of a session.",
+      "enum": [
+        "active",
+        "expired",
+        "closed"
+      ],
+      "title": "SessionStatus",
+      "type": "string"
+    }
+  },
+  "description": "A persistent multi-turn buyer conversation with a seller.\n\nThe seller repo's internal flow-threading and negotiation-funnel state\nstay seller-local; the shared primitive links the conversation to its\nnegotiations and deals by id.\n\nID minting: ``session_id`` is seller-issued.",
+  "properties": {
+    "active_deal_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Active Deal Ids",
+      "type": "array"
+    },
+    "active_negotiation_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Active Negotiation Ids",
+      "type": "array"
+    },
+    "buyer_identity": {
+      "$ref": "#/$defs/BuyerIdentity"
+    },
+    "closed_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Closed At"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "expires_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Expires At"
+    },
+    "messages": {
+      "items": {
+        "$ref": "#/$defs/SessionMessage"
+      },
+      "title": "Messages",
+      "type": "array"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "title": "Metadata",
+      "type": "object"
+    },
+    "session_id": {
+      "description": "Seller-issued session identifier.",
+      "title": "Session Id",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/SessionStatus",
+      "default": "active"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "session_id"
+  ],
+  "title": "Session",
+  "type": "object"
+}

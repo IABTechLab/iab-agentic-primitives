@@ -1,0 +1,43 @@
+"""Drift guard: checked-in JSON-Schema files must match the live models.
+
+If this test fails, a model changed without regenerating the spec:
+run ``uv run python spec/generate_schemas.py`` and commit the diff
+(remember: a wire-shape change is a breaking change — see the semver
+policy in README.md).
+"""
+
+import json
+import sys
+from pathlib import Path
+
+import pytest
+
+from iab_agentic_primitives.primitives import WIRE_PRIMITIVES
+
+REPO_ROOT = Path(__file__).parent.parent
+SCHEMA_DIR = REPO_ROOT / "spec" / "jsonschema"
+
+sys.path.insert(0, str(REPO_ROOT / "spec"))
+from generate_schemas import render_schema  # noqa: E402
+
+
+def test_schema_files_exactly_cover_primitives() -> None:
+    on_disk = {p.stem for p in SCHEMA_DIR.glob("*.json")}
+    assert on_disk == set(WIRE_PRIMITIVES), (
+        "spec/jsonschema/ contents must exactly match WIRE_PRIMITIVES; "
+        "run `uv run python spec/generate_schemas.py`"
+    )
+
+
+@pytest.mark.parametrize("name", sorted(WIRE_PRIMITIVES))
+def test_checked_in_schema_matches_model(name: str) -> None:
+    path = SCHEMA_DIR / f"{name}.json"
+    assert path.exists(), f"missing {path}; run `uv run python spec/generate_schemas.py`"
+    on_disk = json.loads(path.read_text())
+    fresh = WIRE_PRIMITIVES[name].model_json_schema()
+    assert on_disk == fresh, (
+        f"{name} schema drifted from the model; "
+        "run `uv run python spec/generate_schemas.py` and review the diff"
+    )
+    # Text-level stability too (formatting is part of the checked-in artifact).
+    assert path.read_text() == render_schema(WIRE_PRIMITIVES[name])

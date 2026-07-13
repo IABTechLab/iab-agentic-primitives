@@ -1,0 +1,81 @@
+{
+  "$defs": {
+    "DiligenceStatus": {
+      "description": "Status of counterparty privacy diligence (IAB Diligence Platform).",
+      "enum": [
+        "unknown",
+        "pending",
+        "passed",
+        "failed"
+      ],
+      "title": "DiligenceStatus",
+      "type": "string"
+    }
+  },
+  "description": "Privacy consent signals that travel with a deal (flagged decision FD-10).\n\nMinimal placeholder per the ratified decision: regime identifiers plus\ndiligence status. Full build-out (validated GPP \u2014 Global Privacy\nPlatform \u2014 sections, TCF \u2014 Transparency & Consent Framework \u2014 vendor\nchecks) is a later bead; the slot exists on Deal, Quote, and Order now\nso the wire shape does not have to break when it lands.",
+  "properties": {
+    "applicable_regimes": {
+      "description": "Privacy regime identifiers in scope (e.g. 'GDPR', 'CCPA').",
+      "items": {
+        "type": "string"
+      },
+      "title": "Applicable Regimes",
+      "type": "array"
+    },
+    "diligence_status": {
+      "$ref": "#/$defs/DiligenceStatus",
+      "default": "unknown",
+      "description": "Counterparty diligence status (IAB Diligence Platform)."
+    },
+    "gpp_section_ids": {
+      "description": "GPP section ids present in the string.",
+      "items": {
+        "type": "integer"
+      },
+      "title": "Gpp Section Ids",
+      "type": "array"
+    },
+    "gpp_string": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "GPP (Global Privacy Platform) consent string.",
+      "title": "Gpp String"
+    },
+    "tcf_string": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "TCF (Transparency & Consent Framework) TC string, when GDPR applies.",
+      "title": "Tcf String"
+    },
+    "verified_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Timezone-aware timestamp of the last diligence verification, if any.",
+      "title": "Verified At"
+    }
+  },
+  "title": "ConsentContext",
+  "type": "object"
+}

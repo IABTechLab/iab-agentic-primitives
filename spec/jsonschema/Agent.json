@@ -1,0 +1,274 @@
+{
+  "$defs": {
+    "AgentAuthentication": {
+      "description": "Authentication requirements for interacting with an agent.",
+      "properties": {
+        "credentials_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Credentials Url"
+        },
+        "schemes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Schemes",
+          "type": "array"
+        }
+      },
+      "title": "AgentAuthentication",
+      "type": "object"
+    },
+    "AgentCapabilities": {
+      "description": "Protocol and feature capabilities of an agent.",
+      "properties": {
+        "protocols": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Protocols",
+          "type": "array"
+        },
+        "push_notifications": {
+          "default": false,
+          "title": "Push Notifications",
+          "type": "boolean"
+        },
+        "streaming": {
+          "default": false,
+          "title": "Streaming",
+          "type": "boolean"
+        }
+      },
+      "title": "AgentCapabilities",
+      "type": "object"
+    },
+    "AgentProvider": {
+      "description": "Organization operating the agent.",
+      "properties": {
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Url"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "AgentProvider",
+      "type": "object"
+    },
+    "AgentSkill": {
+      "description": "A declared capability of an agent.",
+      "properties": {
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description"
+      ],
+      "title": "AgentSkill",
+      "type": "object"
+    },
+    "AgentType": {
+      "description": "Type of agent in the registry.",
+      "enum": [
+        "buyer",
+        "seller",
+        "tool_provider",
+        "data_provider",
+        "other"
+      ],
+      "title": "AgentType",
+      "type": "string"
+    },
+    "TrustStatus": {
+      "description": "Registry-verified trust status of an agent.\n\nDetermines the maximum :class:`AccessTier` an agent can claim. Per the\nremediation plan's registry-native corollary, trust is verified against\nthe AAMP registry (the IAB Tech Lab agent discovery and trust registry),\nnever self-asserted.",
+      "enum": [
+        "unknown",
+        "registered",
+        "approved",
+        "preferred",
+        "blocked"
+      ],
+      "title": "TrustStatus",
+      "type": "string"
+    }
+  },
+  "description": "An advertising agent: A2A (agent-to-agent protocol) card plus registry identity.\n\nUnifies the seller repo's ``AgentCard`` and ``RegisteredAgent`` (the\nbuyer repo shipped an incompatible card schema; this model is the single\nreplacement for both).\n\nID minting: ``agent_id`` is issued by the AAMP registry (the IAB Tech\nLab agent discovery and trust registry) when the agent registers.",
+  "properties": {
+    "agent_id": {
+      "description": "Registry-issued agent identifier.",
+      "title": "Agent Id",
+      "type": "string"
+    },
+    "agent_type": {
+      "$ref": "#/$defs/AgentType",
+      "default": "buyer"
+    },
+    "audience_capabilities": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Audience capability discovery block. Kept as an open object here; the typed model lands with the audience-plan bead.",
+      "title": "Audience Capabilities"
+    },
+    "authentication": {
+      "$ref": "#/$defs/AgentAuthentication"
+    },
+    "capabilities": {
+      "$ref": "#/$defs/AgentCapabilities"
+    },
+    "contact": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Contact"
+    },
+    "description": {
+      "title": "Description",
+      "type": "string"
+    },
+    "inventory_types": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Inventory Types",
+      "type": "array"
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "organization_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Registry-issued id of the operating organization.",
+      "title": "Organization Id"
+    },
+    "provider": {
+      "$ref": "#/$defs/AgentProvider"
+    },
+    "skills": {
+      "items": {
+        "$ref": "#/$defs/AgentSkill"
+      },
+      "title": "Skills",
+      "type": "array"
+    },
+    "supported_deal_types": {
+      "description": "DealType wire values the agent supports: 'PG' (Programmatic Guaranteed), 'PD' (Preferred Deal), 'PA' (Private Auction).",
+      "items": {
+        "type": "string"
+      },
+      "title": "Supported Deal Types",
+      "type": "array"
+    },
+    "tos_url": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Terms-of-service URL.",
+      "title": "Tos Url"
+    },
+    "trust_status": {
+      "$ref": "#/$defs/TrustStatus",
+      "default": "unknown",
+      "description": "Registry-verified trust status. Caps the effective AccessTier; never self-asserted by the agent."
+    },
+    "url": {
+      "description": "A2A service endpoint.",
+      "title": "Url",
+      "type": "string"
+    },
+    "version": {
+      "default": "1.0.0",
+      "title": "Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "agent_id",
+    "name",
+    "description",
+    "url",
+    "provider"
+  ],
+  "title": "Agent",
+  "type": "object"
+}

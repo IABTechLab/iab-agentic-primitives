@@ -1,0 +1,94 @@
+{
+  "$defs": {
+    "OrganizationRole": {
+      "description": "Role of an organization in the advertising ecosystem.\n\n- ``buyer``: purchases advertising, selects products, provides creatives\n- ``seller``: owns/controls inventory, approves creatives, executes delivery\n- ``agent``: negotiates on behalf of a buyer or seller\n- ``curator``: packages inventory (does not own or execute)\n- ``platform``: execution/infrastructure provider",
+      "enum": [
+        "buyer",
+        "seller",
+        "agent",
+        "curator",
+        "platform"
+      ],
+      "title": "OrganizationRole",
+      "type": "string"
+    },
+    "OrganizationStatus": {
+      "description": "Status of an organization.",
+      "enum": [
+        "active",
+        "suspended"
+      ],
+      "title": "OrganizationStatus",
+      "type": "string"
+    }
+  },
+  "description": "Legal/commercial entity participating in the ecosystem.\n\nID minting: ``organization_id`` is issued by the organization's system\nof record when it registers with the AAMP registry (the IAB Tech Lab\nagent discovery and trust registry; IAB = Interactive Advertising\nBureau). Both agents treat it as an opaque identifier.",
+  "properties": {
+    "address": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Address"
+    },
+    "contacts": {
+      "anyOf": [
+        {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Contacts"
+    },
+    "ext": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Extension slot.",
+      "title": "Ext"
+    },
+    "name": {
+      "maxLength": 128,
+      "title": "Name",
+      "type": "string"
+    },
+    "organization_id": {
+      "description": "Registry-issued organization identifier.",
+      "title": "Organization Id",
+      "type": "string"
+    },
+    "role": {
+      "$ref": "#/$defs/OrganizationRole"
+    },
+    "status": {
+      "$ref": "#/$defs/OrganizationStatus",
+      "default": "active"
+    }
+  },
+  "required": [
+    "organization_id",
+    "name",
+    "role"
+  ],
+  "title": "Organization",
+  "type": "object"
+}

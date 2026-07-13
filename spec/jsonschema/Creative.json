@@ -1,0 +1,328 @@
+{
+  "$defs": {
+    "AdProfile": {
+      "description": "Type of creative profile.\n\nAdCOM = Advertising Common Object Model (the IAB \u2014 Interactive\nAdvertising Bureau \u2014 object model shared by OpenRTB and OpenDirect).",
+      "enum": [
+        "metadata_only",
+        "full_adcom"
+      ],
+      "title": "AdProfile",
+      "type": "string"
+    },
+    "ContentPolicy": {
+      "description": "Content adjacency restrictions for a creative.",
+      "properties": {
+        "allowed_categories": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Allowed Categories"
+        },
+        "blocked_categories": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Blocked Categories"
+        }
+      },
+      "title": "ContentPolicy",
+      "type": "object"
+    },
+    "CreativeAsset": {
+      "description": "Individual asset within a creative manifest.",
+      "properties": {
+        "asset_id": {
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "asset_url": {
+          "title": "Asset Url",
+          "type": "string"
+        },
+        "height": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Height"
+        },
+        "mime_type": {
+          "title": "Mime Type",
+          "type": "string"
+        },
+        "role": {
+          "description": "\"main\", \"companion\", \"icon\", \"endcard\", \"subtitle\".",
+          "title": "Role",
+          "type": "string"
+        },
+        "width": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Width"
+        }
+      },
+      "required": [
+        "asset_id",
+        "asset_url",
+        "mime_type",
+        "role"
+      ],
+      "title": "CreativeAsset",
+      "type": "object"
+    },
+    "CreativeManifest": {
+      "description": "Creative metadata manifest \u2014 metadata only, no executable markup.",
+      "properties": {
+        "assets": {
+          "items": {
+            "$ref": "#/$defs/CreativeAsset"
+          },
+          "title": "Assets",
+          "type": "array"
+        },
+        "declared_advertiser_domains": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Declared Advertiser Domains"
+        },
+        "duration_ms": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Duration Ms"
+        },
+        "file_size_bytes": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "File Size Bytes"
+        },
+        "landing_page_urls": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Landing Page Urls"
+        }
+      },
+      "title": "CreativeManifest",
+      "type": "object"
+    },
+    "ReviewStatus": {
+      "description": "Seller-side creative review status.",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "title": "ReviewStatus",
+      "type": "string"
+    }
+  },
+  "description": "Creative metadata for an advertising asset.\n\nMetadata only \u2014 never executable markup \u2014 so creative management stays\nplatform-agnostic and counterparty text can never smuggle executable\ncontent across the wire. The buyer supplies the creative; the seller\nowns ``review_status``.\n\nID minting: ``creative_id`` is seller-issued when the buyer registers\nthe creative through the seller's API.",
+  "properties": {
+    "account_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Seller-issued account the creative belongs to.",
+      "title": "Account Id"
+    },
+    "ad_product_taxonomy": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "IAB Ad Product Taxonomy classification.",
+      "title": "Ad Product Taxonomy"
+    },
+    "ad_profile": {
+      "$ref": "#/$defs/AdProfile",
+      "default": "metadata_only"
+    },
+    "audience_taxonomy": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "IAB Audience Taxonomy classification.",
+      "title": "Audience Taxonomy"
+    },
+    "click_url": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Click Url"
+    },
+    "content_policy": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ContentPolicy"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "creative_id": {
+      "description": "Seller-issued creative identifier.",
+      "title": "Creative Id",
+      "type": "string"
+    },
+    "creative_manifest": {
+      "$ref": "#/$defs/CreativeManifest"
+    },
+    "ext": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Extension slot.",
+      "title": "Ext"
+    },
+    "is_placeholder": {
+      "default": false,
+      "title": "Is Placeholder",
+      "type": "boolean"
+    },
+    "language": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "ISO 639-1 language code.",
+      "title": "Language"
+    },
+    "name": {
+      "anyOf": [
+        {
+          "maxLength": 255,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Name"
+    },
+    "placeholder_type": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Placeholder Type"
+    },
+    "review_status": {
+      "$ref": "#/$defs/ReviewStatus",
+      "default": "pending",
+      "description": "Seller-side approval state (plan \u00a74.4)."
+    }
+  },
+  "required": [
+    "creative_id"
+  ],
+  "title": "Creative",
+  "type": "object"
+}

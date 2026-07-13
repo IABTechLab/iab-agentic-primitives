@@ -1,0 +1,353 @@
+{
+  "$defs": {
+    "Money": {
+      "description": "Exact money amount in integer micros (flagged decision FD-11).\n\n``1_000_000`` micros = 1 currency unit \u2014 the ad-industry convention\n(Google Ad Manager, among others, prices in micros). Float is BANNED on\nthe wire for money: IEEE 754 floating point is non-deterministic for\nmoney math (``0.1 + 0.2 != 0.3``, and repeated CPM \u2014 cost per mille \u2014\narithmetic accumulates error), and the two source repos used ``float``\nend-to-end; that defect must not be fossilized into the spec. Every\nprice, rate, budget, and offer in the shared contract is a ``Money``.\n\n``amount_micros`` is a strict integer: float inputs are rejected at\nvalidation time rather than silently truncated.",
+      "properties": {
+        "amount_micros": {
+          "description": "Amount in micros; 1,000,000 micros = 1 currency unit.",
+          "title": "Amount Micros",
+          "type": "integer"
+        },
+        "currency": {
+          "default": "USD",
+          "description": "ISO 4217 alpha-3 currency code.",
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount_micros"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "Package": {
+      "description": "Curated inventory package for media kit discovery.\n\nA curation layer on top of products. Taxonomy fields use IAB\n(Interactive Advertising Bureau) standard identifiers as canonical\nvalues; human-readable descriptions are derived at presentation time.\n\nID minting: ``package_id`` is seller-issued.",
+      "properties": {
+        "ad_formats": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Ad Formats",
+          "type": "array"
+        },
+        "audience_capabilities": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Audience capability declaration. Kept as an open object here; the typed model lands with the audience-plan bead.",
+          "title": "Audience Capabilities"
+        },
+        "base_price": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Public/blended list price, if disclosed."
+        },
+        "cat": {
+          "description": "IAB Content Taxonomy category ids, e.g. [\"IAB19\"].",
+          "items": {
+            "type": "string"
+          },
+          "title": "Cat",
+          "type": "array"
+        },
+        "cattax": {
+          "default": 2,
+          "description": "Content taxonomy version: 1=CT1.0, 2=CT2.0, 3=CT3.0.",
+          "title": "Cattax",
+          "type": "integer"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "device_types": {
+          "description": "AdCOM DeviceType integers.",
+          "items": {
+            "type": "integer"
+          },
+          "title": "Device Types",
+          "type": "array"
+        },
+        "geo_targets": {
+          "description": "ISO 3166-2 codes, e.g. [\"US\", \"US-NY\"].",
+          "items": {
+            "type": "string"
+          },
+          "title": "Geo Targets",
+          "type": "array"
+        },
+        "is_featured": {
+          "default": false,
+          "title": "Is Featured",
+          "type": "boolean"
+        },
+        "layer": {
+          "$ref": "#/$defs/PackageLayer",
+          "default": "curated"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "package_id": {
+          "description": "Seller-issued package identifier.",
+          "title": "Package Id",
+          "type": "string"
+        },
+        "placements": {
+          "items": {
+            "$ref": "#/$defs/PackagePlacement"
+          },
+          "title": "Placements",
+          "type": "array"
+        },
+        "pricing_model": {
+          "$ref": "#/$defs/PricingModel",
+          "default": "cpm"
+        },
+        "pricing_type": {
+          "$ref": "#/$defs/PricingType",
+          "default": "fixed"
+        },
+        "seasonal_label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Seasonal Label"
+        },
+        "status": {
+          "$ref": "#/$defs/PackageStatus",
+          "default": "draft"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        },
+        "updated_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Updated At"
+        }
+      },
+      "required": [
+        "package_id",
+        "name"
+      ],
+      "title": "Package",
+      "type": "object"
+    },
+    "PackageLayer": {
+      "description": "How a package was created.",
+      "enum": [
+        "synced",
+        "curated",
+        "dynamic"
+      ],
+      "title": "PackageLayer",
+      "type": "string"
+    },
+    "PackagePlacement": {
+      "description": "A product within a package with its inventory characteristics.",
+      "properties": {
+        "ad_formats": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Ad Formats",
+          "type": "array"
+        },
+        "device_types": {
+          "description": "AdCOM (Advertising Common Object Model) DeviceType integers (1=Mobile, 2=PC, 3=CTV \u2014 connected television, ...).",
+          "items": {
+            "type": "integer"
+          },
+          "title": "Device Types",
+          "type": "array"
+        },
+        "product_id": {
+          "description": "Seller-issued product identifier.",
+          "title": "Product Id",
+          "type": "string"
+        },
+        "product_name": {
+          "title": "Product Name",
+          "type": "string"
+        },
+        "weight": {
+          "default": 1.0,
+          "description": "Relative weight in the package.",
+          "title": "Weight",
+          "type": "number"
+        }
+      },
+      "required": [
+        "product_id",
+        "product_name"
+      ],
+      "title": "PackagePlacement",
+      "type": "object"
+    },
+    "PackageStatus": {
+      "description": "Lifecycle status of a package.",
+      "enum": [
+        "draft",
+        "active",
+        "archived"
+      ],
+      "title": "PackageStatus",
+      "type": "string"
+    },
+    "PricingModel": {
+      "description": "Unit of pricing. Union of the buyer's ``RateType`` and the seller's\n``PricingModel`` plus the linear TV additions.\n\n- ``cpm``: cost per mille (thousand impressions)\n- ``cpmv``: cost per thousand viewable impressions\n- ``cpv``: cost per view\n- ``cpc``: cost per click\n- ``cpcv``: cost per completed view\n- ``cpd``: cost per day\n- ``cpp``: cost per (gross rating) point \u2014 linear TV\n- ``flat_fee``: flat fee (buyer repo's ``FlatRate`` maps here)\n- ``unit_rate``: per-unit rate\n- ``hybrid``: mixed CPM/CPP pricing \u2014 linear TV",
+      "enum": [
+        "cpm",
+        "cpmv",
+        "cpv",
+        "cpc",
+        "cpcv",
+        "cpd",
+        "cpp",
+        "flat_fee",
+        "unit_rate",
+        "hybrid"
+      ],
+      "title": "PricingModel",
+      "type": "string"
+    },
+    "PricingType": {
+      "description": "How a price signal should be interpreted.\n\n- ``fixed``: price is set by the seller, use as-is\n- ``floor``: minimum price; negotiation expected above this level\n- ``on_request``: no price available; buyer must negotiate before any\n  pricing exists (pricing fields are None \u2014 buyers must never fabricate\n  a price for on_request inventory)",
+      "enum": [
+        "fixed",
+        "floor",
+        "on_request"
+      ],
+      "title": "PricingType",
+      "type": "string"
+    }
+  },
+  "description": "A seller's discoverable inventory catalog: the packages it offers buyers.\n\nThe media kit is the buyer-facing discovery document; tier-gated views\n(public price ranges vs. authenticated exact pricing) are derived from\nit by the seller at serving time and are not separate wire primitives.\n\nID minting: ``media_kit_id`` is seller-issued.",
+  "properties": {
+    "contact": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Contact"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "currency": {
+      "default": "USD",
+      "description": "ISO 4217 currency code.",
+      "title": "Currency",
+      "type": "string"
+    },
+    "description": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Description"
+    },
+    "media_kit_id": {
+      "description": "Seller-issued media kit identifier.",
+      "title": "Media Kit Id",
+      "type": "string"
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "packages": {
+      "items": {
+        "$ref": "#/$defs/Package"
+      },
+      "title": "Packages",
+      "type": "array"
+    },
+    "seller_organization_id": {
+      "description": "Registry-issued id of the publishing seller organization.",
+      "title": "Seller Organization Id",
+      "type": "string"
+    },
+    "updated_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Updated At"
+    }
+  },
+  "required": [
+    "media_kit_id",
+    "seller_organization_id",
+    "name"
+  ],
+  "title": "MediaKit",
+  "type": "object"
+}

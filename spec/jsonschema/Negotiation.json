@@ -1,0 +1,207 @@
+{
+  "$defs": {
+    "AccessTier": {
+      "description": "Access tier for tiered pricing, derived from revealed buyer identity.\n\n- ``public``: no identity \u2014 price ranges only\n- ``seat``: authenticated DSP (demand-side platform) seat\n- ``agency``: agency identity revealed\n- ``advertiser``: advertiser identity revealed (best rates)",
+      "enum": [
+        "public",
+        "seat",
+        "agency",
+        "advertiser"
+      ],
+      "title": "AccessTier",
+      "type": "string"
+    },
+    "Money": {
+      "description": "Exact money amount in integer micros (flagged decision FD-11).\n\n``1_000_000`` micros = 1 currency unit \u2014 the ad-industry convention\n(Google Ad Manager, among others, prices in micros). Float is BANNED on\nthe wire for money: IEEE 754 floating point is non-deterministic for\nmoney math (``0.1 + 0.2 != 0.3``, and repeated CPM \u2014 cost per mille \u2014\narithmetic accumulates error), and the two source repos used ``float``\nend-to-end; that defect must not be fossilized into the spec. Every\nprice, rate, budget, and offer in the shared contract is a ``Money``.\n\n``amount_micros`` is a strict integer: float inputs are rejected at\nvalidation time rather than silently truncated.",
+      "properties": {
+        "amount_micros": {
+          "description": "Amount in micros; 1,000,000 micros = 1 currency unit.",
+          "title": "Amount Micros",
+          "type": "integer"
+        },
+        "currency": {
+          "default": "USD",
+          "description": "ISO 4217 alpha-3 currency code.",
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount_micros"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "NegotiationAction": {
+      "description": "Action taken in a negotiation round.",
+      "enum": [
+        "accept",
+        "counter",
+        "reject",
+        "final_offer"
+      ],
+      "title": "NegotiationAction",
+      "type": "string"
+    },
+    "NegotiationRound": {
+      "description": "A single offer/counter round in a negotiation.",
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/NegotiationAction"
+        },
+        "buyer_price": {
+          "$ref": "#/$defs/Money",
+          "description": "What the buyer offered this round."
+        },
+        "concession_pct": {
+          "default": 0.0,
+          "description": "Seller concession this round (0-1).",
+          "title": "Concession Pct",
+          "type": "number"
+        },
+        "cumulative_concession_pct": {
+          "default": 0.0,
+          "description": "Total seller concession so far (0-1).",
+          "title": "Cumulative Concession Pct",
+          "type": "number"
+        },
+        "rationale": {
+          "default": "",
+          "title": "Rationale",
+          "type": "string"
+        },
+        "round_number": {
+          "minimum": 1,
+          "title": "Round Number",
+          "type": "integer"
+        },
+        "seller_price": {
+          "$ref": "#/$defs/Money",
+          "description": "What the seller countered (or accepted at) this round."
+        },
+        "timestamp": {
+          "format": "date-time",
+          "title": "Timestamp",
+          "type": "string"
+        }
+      },
+      "required": [
+        "round_number",
+        "buyer_price",
+        "seller_price",
+        "action"
+      ],
+      "title": "NegotiationRound",
+      "type": "object"
+    },
+    "NegotiationStatus": {
+      "description": "Status of a negotiation (typed; was a raw string in the seller repo).",
+      "enum": [
+        "active",
+        "accepted",
+        "rejected",
+        "expired"
+      ],
+      "title": "NegotiationStatus",
+      "type": "string"
+    }
+  },
+  "description": "Multi-turn offer history container for a buyer/seller negotiation.\n\nFrom the seller's ``NegotiationHistory``, minus everything that must\nNOT cross the wire: the seller's ``floor_price``, ``base_price``,\nstrategy, and concession limits are seller-internal guardrails and are\ndeliberately absent from the shared schema.\n\nID minting: ``negotiation_id`` is seller-issued.",
+  "properties": {
+    "buyer_tier": {
+      "$ref": "#/$defs/AccessTier",
+      "default": "public"
+    },
+    "completed_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Completed At"
+    },
+    "negotiation_id": {
+      "description": "Seller-issued negotiation identifier.",
+      "title": "Negotiation Id",
+      "type": "string"
+    },
+    "package_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Set when negotiating on a package.",
+      "title": "Package Id"
+    },
+    "product_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Product Id"
+    },
+    "proposal_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Proposal under negotiation, if proposal-led.",
+      "title": "Proposal Id"
+    },
+    "quote_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Quote under negotiation, if quote-led.",
+      "title": "Quote Id"
+    },
+    "rounds": {
+      "items": {
+        "$ref": "#/$defs/NegotiationRound"
+      },
+      "title": "Rounds",
+      "type": "array"
+    },
+    "started_at": {
+      "format": "date-time",
+      "title": "Started At",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/NegotiationStatus",
+      "default": "active"
+    }
+  },
+  "required": [
+    "negotiation_id"
+  ],
+  "title": "Negotiation",
+  "type": "object"
+}

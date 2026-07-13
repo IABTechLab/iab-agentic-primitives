@@ -1,0 +1,224 @@
+{
+  "$defs": {
+    "Money": {
+      "description": "Exact money amount in integer micros (flagged decision FD-11).\n\n``1_000_000`` micros = 1 currency unit \u2014 the ad-industry convention\n(Google Ad Manager, among others, prices in micros). Float is BANNED on\nthe wire for money: IEEE 754 floating point is non-deterministic for\nmoney math (``0.1 + 0.2 != 0.3``, and repeated CPM \u2014 cost per mille \u2014\narithmetic accumulates error), and the two source repos used ``float``\nend-to-end; that defect must not be fossilized into the spec. Every\nprice, rate, budget, and offer in the shared contract is a ``Money``.\n\n``amount_micros`` is a strict integer: float inputs are rejected at\nvalidation time rather than silently truncated.",
+      "properties": {
+        "amount_micros": {
+          "description": "Amount in micros; 1,000,000 micros = 1 currency unit.",
+          "title": "Amount Micros",
+          "type": "integer"
+        },
+        "currency": {
+          "default": "USD",
+          "description": "ISO 4217 alpha-3 currency code.",
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount_micros"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "PricingModel": {
+      "description": "Unit of pricing. Union of the buyer's ``RateType`` and the seller's\n``PricingModel`` plus the linear TV additions.\n\n- ``cpm``: cost per mille (thousand impressions)\n- ``cpmv``: cost per thousand viewable impressions\n- ``cpv``: cost per view\n- ``cpc``: cost per click\n- ``cpcv``: cost per completed view\n- ``cpd``: cost per day\n- ``cpp``: cost per (gross rating) point \u2014 linear TV\n- ``flat_fee``: flat fee (buyer repo's ``FlatRate`` maps here)\n- ``unit_rate``: per-unit rate\n- ``hybrid``: mixed CPM/CPP pricing \u2014 linear TV",
+      "enum": [
+        "cpm",
+        "cpmv",
+        "cpv",
+        "cpc",
+        "cpcv",
+        "cpd",
+        "cpp",
+        "flat_fee",
+        "unit_rate",
+        "hybrid"
+      ],
+      "title": "PricingModel",
+      "type": "string"
+    },
+    "RateCardEntry": {
+      "description": "One negotiated rate: a product/format mapped to an agreed price.",
+      "properties": {
+        "ad_format": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "OpenRTB (Open Real-Time Bidding) format: \"banner\", \"video\", \"native\", \"audio\".",
+          "title": "Ad Format"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "package_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Seller-issued package the rate applies to.",
+          "title": "Package Id"
+        },
+        "pricing_model": {
+          "$ref": "#/$defs/PricingModel",
+          "default": "cpm"
+        },
+        "product_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Seller-issued product the rate applies to.",
+          "title": "Product Id"
+        },
+        "rate": {
+          "$ref": "#/$defs/Money",
+          "description": "Agreed rate (exact micros; FD-11)."
+        }
+      },
+      "required": [
+        "rate"
+      ],
+      "title": "RateCardEntry",
+      "type": "object"
+    },
+    "RateCardStatus": {
+      "description": "Agreement status of a rate card.",
+      "enum": [
+        "proposed",
+        "active",
+        "expired",
+        "terminated"
+      ],
+      "title": "RateCardStatus",
+      "type": "string"
+    }
+  },
+  "description": "The private, negotiated rates a specific buyer/seller pair has agreed to.\n\nPer the ratified flagged decision FD-9: a rate card is a persisted,\nshared-schema object **private to the pair** \u2014 it is NEVER public and is\nnever disclosed to any other party. Quotes and deals book against it by\nreferencing ``rate_card_id``; they do not embed it. The seller's internal\nlist/default pricing is deliberately NOT modeled here \u2014 that remains\nseller-local configuration.\n\nID minting: ``rate_card_id`` is seller-issued when the negotiated\nagreement is recorded.",
+  "properties": {
+    "account_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Seller-issued account the agreement rides on, if any.",
+      "title": "Account Id"
+    },
+    "buyer_organization_id": {
+      "description": "Registry-issued id of the buyer party to the agreement.",
+      "title": "Buyer Organization Id",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "effective_from": {
+      "description": "First day the agreed rates apply.",
+      "format": "date",
+      "title": "Effective From",
+      "type": "string"
+    },
+    "effective_to": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Last day the agreed rates apply; None = open-ended.",
+      "title": "Effective To"
+    },
+    "entries": {
+      "description": "Negotiated product/format -> rate entries.",
+      "items": {
+        "$ref": "#/$defs/RateCardEntry"
+      },
+      "title": "Entries",
+      "type": "array"
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Notes"
+    },
+    "rate_card_id": {
+      "description": "Seller-issued rate card identifier.",
+      "title": "Rate Card Id",
+      "type": "string"
+    },
+    "seller_organization_id": {
+      "description": "Registry-issued id of the seller party to the agreement.",
+      "title": "Seller Organization Id",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/RateCardStatus",
+      "default": "proposed"
+    },
+    "updated_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Updated At"
+    }
+  },
+  "required": [
+    "rate_card_id",
+    "buyer_organization_id",
+    "seller_organization_id",
+    "effective_from"
+  ],
+  "title": "RateCard",
+  "type": "object"
+}

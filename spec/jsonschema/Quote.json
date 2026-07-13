@@ -1,0 +1,679 @@
+{
+  "$defs": {
+    "AccessTier": {
+      "description": "Access tier for tiered pricing, derived from revealed buyer identity.\n\n- ``public``: no identity \u2014 price ranges only\n- ``seat``: authenticated DSP (demand-side platform) seat\n- ``agency``: agency identity revealed\n- ``advertiser``: advertiser identity revealed (best rates)",
+      "enum": [
+        "public",
+        "seat",
+        "agency",
+        "advertiser"
+      ],
+      "title": "AccessTier",
+      "type": "string"
+    },
+    "CancellationTerms": {
+      "description": "Structured cancellation window for linear TV deals.",
+      "properties": {
+        "cancellable_pct": {
+          "description": "Portion of the deal that can be cancelled (0.0-1.0).",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Cancellable Pct",
+          "type": "number"
+        },
+        "deadline": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Absolute deadline for cancellation.",
+          "title": "Deadline"
+        },
+        "force_majeure": {
+          "default": true,
+          "description": "Whether force majeure exceptions apply.",
+          "title": "Force Majeure",
+          "type": "boolean"
+        },
+        "notice_days": {
+          "description": "Days of notice required before cancellation.",
+          "title": "Notice Days",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "notice_days",
+        "cancellable_pct"
+      ],
+      "title": "CancellationTerms",
+      "type": "object"
+    },
+    "ConsentContext": {
+      "description": "Privacy consent signals that travel with a deal (flagged decision FD-10).\n\nMinimal placeholder per the ratified decision: regime identifiers plus\ndiligence status. Full build-out (validated GPP \u2014 Global Privacy\nPlatform \u2014 sections, TCF \u2014 Transparency & Consent Framework \u2014 vendor\nchecks) is a later bead; the slot exists on Deal, Quote, and Order now\nso the wire shape does not have to break when it lands.",
+      "properties": {
+        "applicable_regimes": {
+          "description": "Privacy regime identifiers in scope (e.g. 'GDPR', 'CCPA').",
+          "items": {
+            "type": "string"
+          },
+          "title": "Applicable Regimes",
+          "type": "array"
+        },
+        "diligence_status": {
+          "$ref": "#/$defs/DiligenceStatus",
+          "default": "unknown",
+          "description": "Counterparty diligence status (IAB Diligence Platform)."
+        },
+        "gpp_section_ids": {
+          "description": "GPP section ids present in the string.",
+          "items": {
+            "type": "integer"
+          },
+          "title": "Gpp Section Ids",
+          "type": "array"
+        },
+        "gpp_string": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "GPP (Global Privacy Platform) consent string.",
+          "title": "Gpp String"
+        },
+        "tcf_string": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "TCF (Transparency & Consent Framework) TC string, when GDPR applies.",
+          "title": "Tcf String"
+        },
+        "verified_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Timezone-aware timestamp of the last diligence verification, if any.",
+          "title": "Verified At"
+        }
+      },
+      "title": "ConsentContext",
+      "type": "object"
+    },
+    "DealType": {
+      "description": "Programmatic deal types. The short wire encoding is canonical.\n\n- ``PG`` = Programmatic Guaranteed: fixed price, guaranteed impressions\n- ``PD`` = Preferred Deal: fixed price, non-guaranteed first look\n- ``PA`` = Private Auction: auction with floor price, invited buyers\n\nMapping from the seller repo's retired long-form encoding\n(``models/core.py``): ``programmaticguaranteed`` -> ``PG``,\n``preferreddeal`` -> ``PD``, ``privateauction`` -> ``PA``. The\nlong-form strings are NOT valid wire values.",
+      "enum": [
+        "PG",
+        "PD",
+        "PA"
+      ],
+      "title": "DealType",
+      "type": "string"
+    },
+    "DiligenceStatus": {
+      "description": "Status of counterparty privacy diligence (IAB Diligence Platform).",
+      "enum": [
+        "unknown",
+        "pending",
+        "passed",
+        "failed"
+      ],
+      "title": "DiligenceStatus",
+      "type": "string"
+    },
+    "LinearTVQuoteDetails": {
+      "description": "Linear-TV-specific quote details (seller-populated).\n\nNested under ``Quote.linear_tv`` when ``media_type == \"linear_tv\"``.",
+      "properties": {
+        "audience_estimate": {
+          "additionalProperties": true,
+          "description": "Audience estimates; expected keys \"demo\", \"universe\", \"impressions_equiv\".",
+          "title": "Audience Estimate",
+          "type": "object"
+        },
+        "cancellation_terms": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CancellationTerms"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "cpp": {
+          "$ref": "#/$defs/Money",
+          "description": "CPP (cost per point) offered by the seller."
+        },
+        "dayparts": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Dayparts",
+          "type": "array"
+        },
+        "estimated_grps": {
+          "description": "Estimated GRPs (gross rating points).",
+          "title": "Estimated Grps",
+          "type": "number"
+        },
+        "estimated_rating": {
+          "title": "Estimated Rating",
+          "type": "number"
+        },
+        "makegood_policy": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Makegood policy: \"standard\" (audience deficiency unit), \"negotiated\", or \"none\".",
+          "title": "Makegood Policy"
+        },
+        "measurement_currency": {
+          "title": "Measurement Currency",
+          "type": "string"
+        },
+        "networks": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Networks",
+          "type": "array"
+        },
+        "spot_length": {
+          "title": "Spot Length",
+          "type": "integer"
+        },
+        "spots_per_week": {
+          "title": "Spots Per Week",
+          "type": "integer"
+        },
+        "target_demo": {
+          "title": "Target Demo",
+          "type": "string"
+        },
+        "total_spots": {
+          "title": "Total Spots",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "target_demo",
+        "estimated_grps",
+        "estimated_rating",
+        "cpp",
+        "dayparts",
+        "networks",
+        "spots_per_week",
+        "total_spots",
+        "spot_length",
+        "measurement_currency"
+      ],
+      "title": "LinearTVQuoteDetails",
+      "type": "object"
+    },
+    "MediaType": {
+      "description": "Media type discriminator carried on quotes and deals.\n\nSellers that do not support ``linear_tv`` MUST return a structured\nrejection rather than silently mispricing (flagged decision FD-6);\nthe field exists on the shared schema so that rejection can be\nstructural.",
+      "enum": [
+        "digital",
+        "ctv",
+        "linear_tv"
+      ],
+      "title": "MediaType",
+      "type": "string"
+    },
+    "Money": {
+      "description": "Exact money amount in integer micros (flagged decision FD-11).\n\n``1_000_000`` micros = 1 currency unit \u2014 the ad-industry convention\n(Google Ad Manager, among others, prices in micros). Float is BANNED on\nthe wire for money: IEEE 754 floating point is non-deterministic for\nmoney math (``0.1 + 0.2 != 0.3``, and repeated CPM \u2014 cost per mille \u2014\narithmetic accumulates error), and the two source repos used ``float``\nend-to-end; that defect must not be fossilized into the spec. Every\nprice, rate, budget, and offer in the shared contract is a ``Money``.\n\n``amount_micros`` is a strict integer: float inputs are rejected at\nvalidation time rather than silently truncated.",
+      "properties": {
+        "amount_micros": {
+          "description": "Amount in micros; 1,000,000 micros = 1 currency unit.",
+          "title": "Amount Micros",
+          "type": "integer"
+        },
+        "currency": {
+          "default": "USD",
+          "description": "ISO 4217 alpha-3 currency code.",
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount_micros"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "PricingModel": {
+      "description": "Unit of pricing. Union of the buyer's ``RateType`` and the seller's\n``PricingModel`` plus the linear TV additions.\n\n- ``cpm``: cost per mille (thousand impressions)\n- ``cpmv``: cost per thousand viewable impressions\n- ``cpv``: cost per view\n- ``cpc``: cost per click\n- ``cpcv``: cost per completed view\n- ``cpd``: cost per day\n- ``cpp``: cost per (gross rating) point \u2014 linear TV\n- ``flat_fee``: flat fee (buyer repo's ``FlatRate`` maps here)\n- ``unit_rate``: per-unit rate\n- ``hybrid``: mixed CPM/CPP pricing \u2014 linear TV",
+      "enum": [
+        "cpm",
+        "cpmv",
+        "cpv",
+        "cpc",
+        "cpcv",
+        "cpd",
+        "cpp",
+        "flat_fee",
+        "unit_rate",
+        "hybrid"
+      ],
+      "title": "PricingModel",
+      "type": "string"
+    },
+    "PricingType": {
+      "description": "How a price signal should be interpreted.\n\n- ``fixed``: price is set by the seller, use as-is\n- ``floor``: minimum price; negotiation expected above this level\n- ``on_request``: no price available; buyer must negotiate before any\n  pricing exists (pricing fields are None \u2014 buyers must never fabricate\n  a price for on_request inventory)",
+      "enum": [
+        "fixed",
+        "floor",
+        "on_request"
+      ],
+      "title": "PricingType",
+      "type": "string"
+    },
+    "ProductRef": {
+      "description": "Lightweight product summary embedded in quotes and deals.",
+      "properties": {
+        "inventory_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Inventory Type"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "product_id": {
+          "description": "Seller-issued product identifier.",
+          "title": "Product Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "product_id",
+        "name"
+      ],
+      "title": "ProductRef",
+      "type": "object"
+    },
+    "QuoteAvailability": {
+      "description": "Inventory availability information in a quote.",
+      "properties": {
+        "competing_demand": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Competing Demand"
+        },
+        "estimated_fill_rate": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Estimated Fill Rate"
+        },
+        "inventory_available": {
+          "default": true,
+          "title": "Inventory Available",
+          "type": "boolean"
+        }
+      },
+      "title": "QuoteAvailability",
+      "type": "object"
+    },
+    "QuotePricing": {
+      "description": "Pricing breakdown on a quote or deal.\n\n``base_cpm``/``final_cpm`` are optional to support\n``pricing_type=on_request`` \u2014 when the seller has not provided pricing,\nthese fields are None. CPM = cost per mille (thousand impressions);\nCPP = cost per point (linear TV).",
+      "properties": {
+        "base_cpm": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "base_cpp": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Linear TV base CPP; None for digital/CTV."
+        },
+        "final_cpm": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "final_cpp": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Linear TV final CPP; None for digital/CTV."
+        },
+        "pricing_model": {
+          "$ref": "#/$defs/PricingModel",
+          "default": "cpm"
+        },
+        "pricing_type": {
+          "$ref": "#/$defs/PricingType",
+          "default": "fixed"
+        },
+        "rationale": {
+          "default": "",
+          "title": "Rationale",
+          "type": "string"
+        },
+        "tier_discount_pct": {
+          "default": 0.0,
+          "title": "Tier Discount Pct",
+          "type": "number"
+        },
+        "volume_discount_pct": {
+          "default": 0.0,
+          "title": "Volume Discount Pct",
+          "type": "number"
+        }
+      },
+      "title": "QuotePricing",
+      "type": "object"
+    },
+    "QuoteStatus": {
+      "description": "Status of a price quote (identical in both source repos).",
+      "enum": [
+        "available",
+        "booked",
+        "expired",
+        "declined"
+      ],
+      "title": "QuoteStatus",
+      "type": "string"
+    },
+    "QuoteTerms": {
+      "description": "Volume, flight, and guarantee terms on a quote or deal.",
+      "properties": {
+        "flight_end": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Flight End"
+        },
+        "flight_start": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Flight Start"
+        },
+        "grps": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Linear TV volume in GRPs (gross rating points).",
+          "title": "Grps"
+        },
+        "guaranteed": {
+          "default": false,
+          "title": "Guaranteed",
+          "type": "boolean"
+        },
+        "guaranteed_grps": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Guaranteed Grps"
+        },
+        "impressions": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Impressions"
+        },
+        "target_demo": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Linear TV target demographic.",
+          "title": "Target Demo"
+        }
+      },
+      "title": "QuoteTerms",
+      "type": "object"
+    }
+  },
+  "description": "A non-binding price quote from a seller (Deals API v1.0 quote phase).\n\nCarries ``media_type`` and optional ``linear_tv`` details on the shared\nschema (flagged decision FD-6) so sellers that do not support linear TV\ncan reject structurally instead of silently mispricing.\n\nID minting: ``quote_id`` is seller-issued.",
+  "properties": {
+    "availability": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/QuoteAvailability"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "buyer_tier": {
+      "$ref": "#/$defs/AccessTier",
+      "default": "public"
+    },
+    "consent_context": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ConsentContext"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Privacy consent signals riding with the quote (FD-10)."
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "deal_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Seller-issued deal id, set once the quote is booked.",
+      "title": "Deal Id"
+    },
+    "deal_type": {
+      "$ref": "#/$defs/DealType"
+    },
+    "expires_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Expires At"
+    },
+    "linear_tv": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/LinearTVQuoteDetails"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Linear TV details; None for digital/CTV."
+    },
+    "media_type": {
+      "$ref": "#/$defs/MediaType",
+      "default": "digital"
+    },
+    "pricing": {
+      "$ref": "#/$defs/QuotePricing"
+    },
+    "product": {
+      "$ref": "#/$defs/ProductRef"
+    },
+    "quote_id": {
+      "description": "Seller-issued quote identifier.",
+      "title": "Quote Id",
+      "type": "string"
+    },
+    "rate_card_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Seller-issued id of the private rate card this quote prices against, when the pair has one (FD-9). The rate card itself is never embedded.",
+      "title": "Rate Card Id"
+    },
+    "seller_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Registry-issued id of the quoting seller agent.",
+      "title": "Seller Id"
+    },
+    "status": {
+      "$ref": "#/$defs/QuoteStatus",
+      "default": "available"
+    },
+    "terms": {
+      "$ref": "#/$defs/QuoteTerms"
+    }
+  },
+  "required": [
+    "quote_id",
+    "deal_type",
+    "product",
+    "pricing",
+    "terms"
+  ],
+  "title": "Quote",
+  "type": "object"
+}

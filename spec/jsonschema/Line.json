@@ -1,0 +1,159 @@
+{
+  "$defs": {
+    "LineStatus": {
+      "description": "Line booking status. Keeps the OpenDirect (the IAB direct-buying API\nstandard) vocabulary and wire casing \u2014 the published standard wins.",
+      "enum": [
+        "Draft",
+        "PendingReservation",
+        "Reserved",
+        "PendingBooking",
+        "Booked",
+        "InFlight",
+        "Finished",
+        "Stopped",
+        "Cancelled",
+        "Expired"
+      ],
+      "title": "LineStatus",
+      "type": "string"
+    },
+    "Money": {
+      "description": "Exact money amount in integer micros (flagged decision FD-11).\n\n``1_000_000`` micros = 1 currency unit \u2014 the ad-industry convention\n(Google Ad Manager, among others, prices in micros). Float is BANNED on\nthe wire for money: IEEE 754 floating point is non-deterministic for\nmoney math (``0.1 + 0.2 != 0.3``, and repeated CPM \u2014 cost per mille \u2014\narithmetic accumulates error), and the two source repos used ``float``\nend-to-end; that defect must not be fossilized into the spec. Every\nprice, rate, budget, and offer in the shared contract is a ``Money``.\n\n``amount_micros`` is a strict integer: float inputs are rejected at\nvalidation time rather than silently truncated.",
+      "properties": {
+        "amount_micros": {
+          "description": "Amount in micros; 1,000,000 micros = 1 currency unit.",
+          "title": "Amount Micros",
+          "type": "integer"
+        },
+        "currency": {
+          "default": "USD",
+          "description": "ISO 4217 alpha-3 currency code.",
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount_micros"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "PricingModel": {
+      "description": "Unit of pricing. Union of the buyer's ``RateType`` and the seller's\n``PricingModel`` plus the linear TV additions.\n\n- ``cpm``: cost per mille (thousand impressions)\n- ``cpmv``: cost per thousand viewable impressions\n- ``cpv``: cost per view\n- ``cpc``: cost per click\n- ``cpcv``: cost per completed view\n- ``cpd``: cost per day\n- ``cpp``: cost per (gross rating) point \u2014 linear TV\n- ``flat_fee``: flat fee (buyer repo's ``FlatRate`` maps here)\n- ``unit_rate``: per-unit rate\n- ``hybrid``: mixed CPM/CPP pricing \u2014 linear TV",
+      "enum": [
+        "cpm",
+        "cpmv",
+        "cpv",
+        "cpc",
+        "cpcv",
+        "cpd",
+        "cpp",
+        "flat_fee",
+        "unit_rate",
+        "hybrid"
+      ],
+      "title": "PricingModel",
+      "type": "string"
+    }
+  },
+  "description": "Individual product booking within an order (OpenDirect Line).\n\nThe seller maps a line to its internal placement/ad-server entities;\n``Line`` is the only execution unit on the wire.\n\nID minting: ``line_id`` is seller-issued.",
+  "properties": {
+    "cost": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Money"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Calculated cost (read-only, seller-computed)."
+    },
+    "end_date": {
+      "format": "date",
+      "title": "End Date",
+      "type": "string"
+    },
+    "ext": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Ext"
+    },
+    "line_id": {
+      "description": "Seller-issued line identifier.",
+      "title": "Line Id",
+      "type": "string"
+    },
+    "name": {
+      "maxLength": 200,
+      "title": "Name",
+      "type": "string"
+    },
+    "order_id": {
+      "title": "Order Id",
+      "type": "string"
+    },
+    "pricing_model": {
+      "$ref": "#/$defs/PricingModel",
+      "default": "cpm"
+    },
+    "product_id": {
+      "title": "Product Id",
+      "type": "string"
+    },
+    "quantity": {
+      "description": "Target impressions or units.",
+      "minimum": 0,
+      "title": "Quantity",
+      "type": "integer"
+    },
+    "rate": {
+      "$ref": "#/$defs/Money",
+      "description": "Rate per pricing-model unit (exact micros; FD-11)."
+    },
+    "start_date": {
+      "format": "date",
+      "title": "Start Date",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/LineStatus",
+      "default": "Draft"
+    },
+    "targeting": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Targeting"
+    }
+  },
+  "required": [
+    "line_id",
+    "order_id",
+    "product_id",
+    "name",
+    "start_date",
+    "end_date",
+    "rate",
+    "quantity"
+  ],
+  "title": "Line",
+  "type": "object"
+}

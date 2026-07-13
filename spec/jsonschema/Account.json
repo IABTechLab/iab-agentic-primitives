@@ -1,0 +1,81 @@
+{
+  "$defs": {
+    "AccountStatus": {
+      "description": "Status of a buyer-seller account relationship.",
+      "enum": [
+        "active",
+        "suspended"
+      ],
+      "title": "AccountStatus",
+      "type": "string"
+    }
+  },
+  "description": "Commercial relationship between a specific buyer and seller organization.\n\nID minting: ``account_id`` is seller-issued (the seller's system of\nrecord manages the commercial relationship, consistent with OpenDirect,\nthe IAB direct-buying API standard, where the publisher API mints\nresource identifiers).",
+  "properties": {
+    "account_id": {
+      "description": "Seller-issued account identifier.",
+      "title": "Account Id",
+      "type": "string"
+    },
+    "advertiser_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Optional advertiser this account transacts for (buyer-supplied).",
+      "title": "Advertiser Id"
+    },
+    "buyer_organization_id": {
+      "description": "Registry-issued id of the buying organization.",
+      "title": "Buyer Organization Id",
+      "type": "string"
+    },
+    "ext": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Ext"
+    },
+    "name": {
+      "anyOf": [
+        {
+          "maxLength": 128,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Name"
+    },
+    "seller_organization_id": {
+      "description": "Registry-issued id of the selling organization.",
+      "title": "Seller Organization Id",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/AccountStatus",
+      "default": "active"
+    }
+  },
+  "required": [
+    "account_id",
+    "buyer_organization_id",
+    "seller_organization_id"
+  ],
+  "title": "Account",
+  "type": "object"
+}

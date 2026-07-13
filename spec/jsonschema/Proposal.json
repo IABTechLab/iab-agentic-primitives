@@ -1,0 +1,335 @@
+{
+  "$defs": {
+    "BillableEvent": {
+      "description": "Events that trigger billing.",
+      "enum": [
+        "impression",
+        "viewable_impression",
+        "click",
+        "completion"
+      ],
+      "title": "BillableEvent",
+      "type": "string"
+    },
+    "DealType": {
+      "description": "Programmatic deal types. The short wire encoding is canonical.\n\n- ``PG`` = Programmatic Guaranteed: fixed price, guaranteed impressions\n- ``PD`` = Preferred Deal: fixed price, non-guaranteed first look\n- ``PA`` = Private Auction: auction with floor price, invited buyers\n\nMapping from the seller repo's retired long-form encoding\n(``models/core.py``): ``programmaticguaranteed`` -> ``PG``,\n``preferreddeal`` -> ``PD``, ``privateauction`` -> ``PA``. The\nlong-form strings are NOT valid wire values.",
+      "enum": [
+        "PG",
+        "PD",
+        "PA"
+      ],
+      "title": "DealType",
+      "type": "string"
+    },
+    "DeliveryGoal": {
+      "description": "Delivery goal for a proposal line.",
+      "properties": {
+        "billable_event": {
+          "$ref": "#/$defs/BillableEvent"
+        },
+        "goal_amount": {
+          "minimum": 0,
+          "title": "Goal Amount",
+          "type": "integer"
+        },
+        "goal_type": {
+          "$ref": "#/$defs/GoalType"
+        }
+      },
+      "required": [
+        "goal_type",
+        "goal_amount",
+        "billable_event"
+      ],
+      "title": "DeliveryGoal",
+      "type": "object"
+    },
+    "GoalType": {
+      "description": "Types of delivery goals.",
+      "enum": [
+        "impressions",
+        "clicks",
+        "viewable_impressions",
+        "completions"
+      ],
+      "title": "GoalType",
+      "type": "string"
+    },
+    "Money": {
+      "description": "Exact money amount in integer micros (flagged decision FD-11).\n\n``1_000_000`` micros = 1 currency unit \u2014 the ad-industry convention\n(Google Ad Manager, among others, prices in micros). Float is BANNED on\nthe wire for money: IEEE 754 floating point is non-deterministic for\nmoney math (``0.1 + 0.2 != 0.3``, and repeated CPM \u2014 cost per mille \u2014\narithmetic accumulates error), and the two source repos used ``float``\nend-to-end; that defect must not be fossilized into the spec. Every\nprice, rate, budget, and offer in the shared contract is a ``Money``.\n\n``amount_micros`` is a strict integer: float inputs are rejected at\nvalidation time rather than silently truncated.",
+      "properties": {
+        "amount_micros": {
+          "description": "Amount in micros; 1,000,000 micros = 1 currency unit.",
+          "title": "Amount Micros",
+          "type": "integer"
+        },
+        "currency": {
+          "default": "USD",
+          "description": "ISO 4217 alpha-3 currency code.",
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount_micros"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "PricingModel": {
+      "description": "Unit of pricing. Union of the buyer's ``RateType`` and the seller's\n``PricingModel`` plus the linear TV additions.\n\n- ``cpm``: cost per mille (thousand impressions)\n- ``cpmv``: cost per thousand viewable impressions\n- ``cpv``: cost per view\n- ``cpc``: cost per click\n- ``cpcv``: cost per completed view\n- ``cpd``: cost per day\n- ``cpp``: cost per (gross rating) point \u2014 linear TV\n- ``flat_fee``: flat fee (buyer repo's ``FlatRate`` maps here)\n- ``unit_rate``: per-unit rate\n- ``hybrid``: mixed CPM/CPP pricing \u2014 linear TV",
+      "enum": [
+        "cpm",
+        "cpmv",
+        "cpv",
+        "cpc",
+        "cpcv",
+        "cpd",
+        "cpp",
+        "flat_fee",
+        "unit_rate",
+        "hybrid"
+      ],
+      "title": "PricingModel",
+      "type": "string"
+    },
+    "PricingTerms": {
+      "description": "Pricing terms for a proposal line.",
+      "properties": {
+        "price": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "pricing_model": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PricingModel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "pricing_type": {
+          "$ref": "#/$defs/PricingType",
+          "default": "fixed"
+        }
+      },
+      "title": "PricingTerms",
+      "type": "object"
+    },
+    "PricingType": {
+      "description": "How a price signal should be interpreted.\n\n- ``fixed``: price is set by the seller, use as-is\n- ``floor``: minimum price; negotiation expected above this level\n- ``on_request``: no price available; buyer must negotiate before any\n  pricing exists (pricing fields are None \u2014 buyers must never fabricate\n  a price for on_request inventory)",
+      "enum": [
+        "fixed",
+        "floor",
+        "on_request"
+      ],
+      "title": "PricingType",
+      "type": "string"
+    },
+    "ProposalLine": {
+      "description": "Individual line item within a proposal.",
+      "properties": {
+        "ad_product_targeting": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ad Product Targeting"
+        },
+        "audience_targeting": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Audience Targeting"
+        },
+        "content_targeting": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Content Targeting"
+        },
+        "deal_type": {
+          "$ref": "#/$defs/DealType"
+        },
+        "delivery_goal": {
+          "$ref": "#/$defs/DeliveryGoal"
+        },
+        "external_ids": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "External Ids"
+        },
+        "pricing": {
+          "$ref": "#/$defs/PricingTerms"
+        },
+        "product_id": {
+          "title": "Product Id",
+          "type": "string"
+        },
+        "proposal_id": {
+          "title": "Proposal Id",
+          "type": "string"
+        },
+        "proposal_line_id": {
+          "description": "Seller-issued proposal line identifier.",
+          "title": "Proposal Line Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "proposal_line_id",
+        "proposal_id",
+        "product_id",
+        "deal_type",
+        "delivery_goal",
+        "pricing"
+      ],
+      "title": "ProposalLine",
+      "type": "object"
+    },
+    "ProposalStatus": {
+      "description": "Status of a proposal (seller vocabulary; buyer had no proposal model).",
+      "enum": [
+        "draft",
+        "sent",
+        "countered",
+        "accepted",
+        "rejected",
+        "expired"
+      ],
+      "title": "ProposalStatus",
+      "type": "string"
+    }
+  },
+  "description": "A structured buy proposal under negotiation between the pair.\n\nThe seller repo's revision machinery (JSON Patch revisions, hashes)\nstays seller-local; the shared primitive is the current proposal state.\nMulti-turn offer history is the :class:`Negotiation` primitive.\n\nID minting: ``proposal_id`` is seller-issued (created via the seller's\nAPI on buyer request).",
+  "properties": {
+    "account_id": {
+      "description": "Seller-issued account identifier.",
+      "title": "Account Id",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "current_revision_number": {
+      "default": 1,
+      "minimum": 1,
+      "title": "Current Revision Number",
+      "type": "integer"
+    },
+    "end_date": {
+      "format": "date",
+      "title": "End Date",
+      "type": "string"
+    },
+    "ext": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Ext"
+    },
+    "lines": {
+      "items": {
+        "$ref": "#/$defs/ProposalLine"
+      },
+      "title": "Lines",
+      "type": "array"
+    },
+    "proposal_id": {
+      "description": "Seller-issued proposal identifier.",
+      "title": "Proposal Id",
+      "type": "string"
+    },
+    "proposal_thread_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Stable id across all revisions of this negotiation, if threaded.",
+      "title": "Proposal Thread Id"
+    },
+    "start_date": {
+      "format": "date",
+      "title": "Start Date",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/ProposalStatus",
+      "default": "draft"
+    },
+    "updated_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Updated At"
+    }
+  },
+  "required": [
+    "proposal_id",
+    "account_id",
+    "start_date",
+    "end_date"
+  ],
+  "title": "Proposal",
+  "type": "object"
+}

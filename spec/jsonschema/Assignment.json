@@ -1,0 +1,108 @@
+{
+  "$defs": {
+    "RotationMode": {
+      "description": "Creative rotation mode within an assignment.",
+      "enum": [
+        "even",
+        "weighted"
+      ],
+      "title": "RotationMode",
+      "type": "string"
+    }
+  },
+  "description": "Binds a creative to a line with rotation rules.\n\nThe wire-level execution unit is the Line; the seller repo's\nplacement-level binding is a seller-internal mapping.\n\nID minting: ``assignment_id`` is seller-issued (created via the\nseller's API on buyer request).",
+  "properties": {
+    "assignment_id": {
+      "description": "Seller-issued assignment identifier.",
+      "title": "Assignment Id",
+      "type": "string"
+    },
+    "creative_id": {
+      "title": "Creative Id",
+      "type": "string"
+    },
+    "effective_end_date": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Effective End Date"
+    },
+    "effective_start_date": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Effective Start Date"
+    },
+    "ext": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Ext"
+    },
+    "line_id": {
+      "description": "Seller-issued line the creative runs on.",
+      "title": "Line Id",
+      "type": "string"
+    },
+    "rotation_mode": {
+      "$ref": "#/$defs/RotationMode",
+      "default": "even"
+    },
+    "sov": {
+      "anyOf": [
+        {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Share of voice (0-1) for weighted rotation.",
+      "title": "Sov"
+    },
+    "status": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Free-form assignment status; the typed vocabulary lands with the EP-1.4 state-machine bead.",
+      "title": "Status"
+    }
+  },
+  "required": [
+    "assignment_id",
+    "creative_id",
+    "line_id"
+  ],
+  "title": "Assignment",
+  "type": "object"
+}
