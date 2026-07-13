@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/atc964/iab-agentic-primitives/spec/jsonschema/events/event.schema.json",
+  "$defs": {
+    "EventType": {
+      "description": "Canonical event vocabulary for the buyer/seller agent pair.\n\nValues are dot-namespaced, lowercase, and grouped by domain. Every\ngenuinely distinct concept from either source repo is preserved;\nsame-concept variants were merged (see ``EVENTS_RECONCILIATION.md``).",
+      "enum": [
+        "approval.requested",
+        "approval.granted",
+        "approval.rejected",
+        "approval.timed_out",
+        "budget.allocated",
+        "campaign.created",
+        "campaign.brief_validated",
+        "campaign.plan_generated",
+        "campaign.plan_approved",
+        "campaign.booking_started",
+        "campaign.booking_completed",
+        "campaign.ready",
+        "campaign.activated",
+        "campaign.completed",
+        "campaign.cancelled",
+        "creative.uploaded",
+        "creative.validated",
+        "creative.matched",
+        "creative.rotation_updated",
+        "creative.ad_server_pushed",
+        "deal.created",
+        "deal.registered",
+        "deal.synced",
+        "deal.booked",
+        "deal.cancelled",
+        "deal.imported",
+        "deal.template_created",
+        "deal.manual_action_required",
+        "execution.completed",
+        "inventory.discovered",
+        "negotiation.started",
+        "negotiation.round",
+        "negotiation.concluded",
+        "order.submitted",
+        "pacing.snapshot_taken",
+        "pacing.deviation_detected",
+        "pacing.reallocation_recommended",
+        "pacing.reallocation_applied",
+        "package.created",
+        "package.updated",
+        "package.synced",
+        "portfolio.inspected",
+        "proposal.received",
+        "proposal.evaluated",
+        "proposal.accepted",
+        "proposal.rejected",
+        "proposal.countered",
+        "quote.requested",
+        "quote.received",
+        "session.created",
+        "session.resumed",
+        "session.closed"
+      ],
+      "title": "EventType",
+      "type": "string"
+    }
+  },
+  "description": "The canonical event envelope emitted by both agents.\n\nCorrelation identifiers are all optional; an emitter sets whichever ones\nthe event relates to (for example, the seller sets ``proposal_id`` on\n``proposal.*`` events; the buyer sets ``campaign_id`` on ``campaign.*``\nevents; either side sets ``deal_id`` once a deal exists). Anything that\ndoes not fit a first-class field (including the legacy ``flow_id``,\n``flow_type``, and ``payload`` fields of the per-repo envelopes) travels\nin ``metadata``.",
+  "properties": {
+    "event_id": {
+      "title": "Event Id",
+      "type": "string"
+    },
+    "event_type": {
+      "$ref": "#/$defs/EventType"
+    },
+    "occurred_at": {
+      "format": "date-time",
+      "title": "Occurred At",
+      "type": "string"
+    },
+    "source_agent": {
+      "enum": [
+        "buyer",
+        "seller"
+      ],
+      "title": "Source Agent",
+      "type": "string"
+    },
+    "deal_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Deal Id"
+    },
+    "order_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Order Id"
+    },
+    "proposal_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Proposal Id"
+    },
+    "campaign_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Campaign Id"
+    },
+    "session_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Session Id"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "title": "Metadata",
+      "type": "object"
+    }
+  },
+  "required": [
+    "event_type",
+    "source_agent"
+  ],
+  "title": "Event",
+  "type": "object"
+}

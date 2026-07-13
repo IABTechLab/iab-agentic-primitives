@@ -8,3 +8,7 @@ future DecisionRecord/AuditEvent backfill reconstruct why money moved --
 which counterparty inputs and which model outputs drove a booking -- with
 both repos agreeing on the event shapes.
 """
+
+from .models import LEGACY_ALIASES, Event, EventType, utc_now
+
+__all__ = ["LEGACY_ALIASES", "Event", "EventType", "utc_now"]
