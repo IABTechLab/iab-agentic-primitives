@@ -13,10 +13,25 @@ dependencies = [
     "pydantic>=2",
 ]
 
+[project.optional-dependencies]
+# RegistryClient (httpx-based); the core primitives never require it.
+client = [
+    "httpx>=0.27",
+]
+# Local sandbox AAMP registry app; the core primitives never require it.
+sandbox = [
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+]
+
 [dependency-groups]
 dev = [
     "pytest",
     "ruff",
+    # test deps for the sandbox registry + registry client (the extras above)
+    "httpx>=0.27",
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
 ]
 
 [tool.hatch.build.targets.wheel]
