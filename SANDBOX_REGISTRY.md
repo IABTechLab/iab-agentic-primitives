@@ -1,131 +1,190 @@
-# Sandbox AAMP Registry (EP-5.3, owner decision FD-3)
+# Registry client + local registry (EP-5.4: realigned to the REAL registry)
 
-**This is a development stand-in for the IAB AAMP registry.** AAMP (Agentic
-Advertising Marketplace Protocol — the IAB Tech Lab agent discovery and trust
-registry protocol, as used throughout this project's plan) is the registry the
-buyer and seller agents use to find counterparties and verify their trust
-status. The real IAB sandbox registry is not yet available, so per owner
-decision FD-3 this library ships its own representative registry — faithful
-enough to develop against — plus one shared client whose backend is **pure
-configuration**, so moving to the real IAB registry later is a config change,
-never a code change.
+This library's `RegistryClient` speaks the **actual** IAB Tech Lab
+agent-registry API (github.com/IABTechLab/agent-registry, a Node.js
+service; production `https://registry.iabtechlab.com`). EP-5.3 had built the
+client and a Python "sandbox" against *assumed* API shapes; EP-5.4 realigns
+both to what the real registry does.
 
-Two pieces:
+**Acronyms.** AAMP = Agentic Advertising Marketplace Protocol (this
+project's umbrella name for the IAB agent discovery + trust flow). JWT =
+JSON Web Token. OAuth = Open Authorization. IAB = Interactive Advertising
+Bureau. A2A = Agent-to-Agent protocol. MCP = Model Context Protocol. SVG =
+Scalable Vector Graphics. GPP = Global Privacy Platform.
 
-- `iab_agentic_primitives.sandbox_registry` — a small FastAPI app + in-memory
-  store implementing the registry surface (requires the `sandbox` extra)
-- `iab_agentic_primitives.registry_client.RegistryClient` — the ONE client
-  class both agents adopt (requires the `client` extra: httpx)
+## The realigned client (endpoints + auth)
 
-## Running the sandbox
+`iab_agentic_primitives.registry_client.RegistryClient` — one async
+(`httpx`) client, backend chosen by config. Requires the `client` extra.
+
+**Base path** is `/api/agents` (the EP-5.3 client used `/agents`).
+
+**Auth** is a JWT bearer token: `Authorization: Bearer <token>` (HS256,
+issuer `IAB`). You supply an already-issued token
+(`AAMP_REGISTRY_TOKEN` / `auth_token=`); the client does not log in for you.
+The registry proxies login to IAB OAuth
+(`POST /api/auth/login` → `api.iabtechlab.com/oauth/authmobile`, username +
+password → token). When the registry returns a refreshed token in the
+**`X-New-Token`** response header, the client absorbs it automatically and
+uses it for subsequent requests (`client.token` reflects the current one).
+
+Success bodies are enveloped `{"success": true, "data": ...}` (a list is
+`{"data": {"agents": [...], "count": N, ...}}`); the client unwraps `data`.
+Errors are `{"success": false, "error": "<message>"}`, mapped by HTTP status
+onto the shared `ErrorCode` vocabulary and raised as structured
+`RegistryError` (carrying an `ErrorDetail`).
+
+| Client method | Real endpoint | Auth |
+| --- | --- | --- |
+| `register_agent(agent)` | `POST /api/agents` | authenticated; JWT company domain must match `primary_domain` |
+| `list_agents(**filters)` | `GET /api/agents` | authenticated |
+| `get_agent(id)` | `GET /api/agents/:id` | authenticated |
+| `update_agent(id, **fields)` | `PUT /api/agents/:id` | **admin** |
+| `delete_agent(id)` | `DELETE /api/agents/:id` | **admin** |
+| `verify_health(id)` | `POST /api/agents/:id/verify-health` | **admin** |
+| `validate_domain(domain)` | `POST /api/agents/validate/domain` | public |
+| `validate_agent(domain, url)` | `POST /api/agents/validate/agent` | public |
+| `verification_badge(id)` | `GET /api/agents/:id/verification-badge` | public (SVG) |
+| `verified_trust(id)` | `get_agent` + `verification-badge` | authenticated |
+
+`verified_trust(id)` is the **real trust check** (what the bead calls
+"verify_trust"): it maps the registry's real signals —
+`verification_status` (`active`/`pending`), `domain_verified`, `iab_member`,
+and whether the public verification badge is served — into a single
+`VerifiedTrust` verdict (`verified == verification_status == "active"`).
+
+> **Deviation — method name `verify_trust`.** The bead asked for the real
+> method to be named `verify_trust`. That name is occupied by the **legacy
+> AAMP trust-tier** method the EP-7.1 interop harness still calls (see
+> below), which this bead's scope does not permit editing. The real verdict
+> is therefore exposed as **`verified_trust`**; `verify_trust` remains the
+> legacy trust-tier call. When the harness migrates off the trust-tier
+> model, `verified_trust` should be renamed to `verify_trust`.
+
+The registry has **no self-asserted access-tier / trust-tier enum** — trust
+is the `verification_status` + `domain_verified` + `iab_member` triplet.
+
+```python
+from iab_agentic_primitives.registry_client import RegistryClient, RegistryAgent
+
+async with RegistryClient() as reg:                    # backend from env
+    agent = await reg.register_agent(RegistryAgent(
+        agent_name="Acme Seller",
+        primary_domain="acme.example",                 # must match your JWT domain
+        type="remote", protocol_type="a2a",
+        endpoint_url="https://acme.example/a2a",
+    ))
+    trust = await reg.verified_trust(agent.id)
+    if trust.verified:
+        ...                                            # active in the registry
+```
+
+## How `LOCAL` runs the REAL registry (vs the old Python fake)
+
+**Before (EP-5.3):** `LOCAL_SANDBOX` pointed at a Python FastAPI
+*reimplementation* of an assumed registry — a divergent fake.
+
+**Now (EP-5.4):** the `LOCAL` backend points at the **real Node
+agent-registry** run locally via
+`sandbox_registry/docker-compose.yml`, which builds the actual upstream repo
+and binds it on `127.0.0.1:3001` (the `LOCAL` default URL):
 
 ```bash
-uv sync --extra sandbox   # or: pip install 'iab-agentic-primitives[sandbox]'
-uvicorn --factory iab_agentic_primitives.sandbox_registry.app:create_app --port 8020
+docker compose -f src/iab_agentic_primitives/sandbox_registry/docker-compose.yml up --build
+export AAMP_REGISTRY_BACKEND=LOCAL           # default; URL defaults to http://127.0.0.1:3001
+export AAMP_REGISTRY_TOKEN=<JWT from the IAB Tools portal>
 ```
 
-Environment:
+> **Upstream gap.** The agent-registry repo does not ship a DB schema
+> migration for a fresh database (its `db:init` references an absent
+> `database/schema-sqlite.sql`; there is no Postgres `CREATE TABLE`). The
+> compose file wires a Postgres service and an `./initdb` mount for the
+> `agents` + `verification_logs` schema, which must be supplied out of band
+> (or point `DB_*` at an already-provisioned Postgres). This is why CI does
+> not hard-depend on the dockerized registry.
 
-| Variable | Effect |
-| --- | --- |
-| `AAMP_SANDBOX_SEED_PATH` | Seed JSON loaded at startup so a demo env comes up populated |
-| `AAMP_SANDBOX_PERSIST_PATH` | JSON file the in-memory store rewrites after every mutation and reloads at startup (no database) |
+**In-process test double (offline / no Docker).** For fast, deterministic
+unit tests, `sandbox_registry.create_registry_double()` is a **minimal test
+double faithful to the `/api/agents` shape** — enveloped responses, bearer
+auth (401), admin-gated `PUT`/`DELETE` (403), domain-scoped registration
+(403 on mismatch), the `X-New-Token` refresh, the public validate endpoints,
+and the SVG badge (members only, else 404). It is explicitly a **test
+double, not "the sandbox"**; the real registry is the LOCAL target.
 
-The persistence file uses the same shape as the seed file, so a persisted
-store can be reused directly as seed data.
+## Agent-card model alignment
 
-### Endpoints
+The real registry's agent record diverges sharply from this library's Agent
+Card (`primitives.Agent`, exported as `protocol.AgentCard`). Rather than
+break that card (heavily consumed across the lib), EP-5.4 adds a new,
+additive `RegistryAgent` wire model (in `registry_client`) that mirrors the
+real record; the Agent Card is unchanged. Key divergences:
 
-All bodies are typed against the shared `protocol`/`primitives` models; all
-errors use the canonical `ErrorEnvelope` (`{"detail": {"error": ..., "message": ...}}`).
+| Concept | This lib's `AgentCard` (`Agent`) | Real registry (`RegistryAgent`) |
+| --- | --- | --- |
+| Identifier | `agent_id` (string, registry-issued) | `id` (integer, auto-increment) |
+| Name | `name` | `agent_name` |
+| Endpoint | `url` (A2A) | `endpoint_url` (remote/private) or `repository_url` (local) |
+| Domain | — (via `provider`) | `primary_domain` (required; JWT-scoped) |
+| Kind | `agent_type` (buyer/seller/…) | `type` (local/remote/private) + `protocol_type` (a2a/mcp) |
+| Capabilities | typed `AgentCapabilities` + `skills[]` | flat `capabilities[]` (+ `iab_capabilities[]`, taxonomy) |
+| Provider | `provider` (`AgentProvider`) | `legal_name` / `contact_email` / `contact_website` |
+| Trust | `trust_status` enum + access-tier ceiling | `verification_status` + `domain_verified` + `iab_member` |
+| Privacy | — | `gpp_id` / `gpp_verified` |
 
-| Method & path | Purpose |
-| --- | --- |
-| `POST /agents` | Register an `AgentCard` (201; 409 `contention` on duplicate id). The registry never trusts a self-asserted `trust_status` — fresh registrations always come back `registered`. |
-| `GET /agents?agent_type=seller\|buyer` | Discovery listing (blocked agents are excluded) |
-| `GET /agents/{agent_id}` | Card fetch (404 `not_found`) |
-| `GET /agents/{agent_id}/trust` | `AgentTrustVerification` + `max_access_tier` (the access-tier ceiling the trust status allows) |
-| `PUT /agents/{agent_id}/trust` | **Admin convenience for testing**: set trust status and optionally an explicit tier ceiling |
-| `GET /healthz` | Liveness + registry id |
+`RegistryAgent` requires only `agent_name` + `primary_domain`; every other
+field is optional and unknown fields are ignored (the `WireModel`
+forward-compat rule), so partial records round-trip.
 
-Trust status caps the access tier an agent can be granted (never
-self-asserted): `unknown`/`blocked` → `public`, `registered` → `seat`,
-`approved` → `agency`, `preferred` → `advertiser`
-(`registry_client.TRUST_TIER_CEILING`). `PUT /agents/{id}/trust` may pin a
-lower ceiling explicitly.
-
-### Seed format
-
-```json
-{
-  "agents": [
-    {
-      "card": {
-        "agent_id": "demo-seller-1",
-        "name": "Demo Seller",
-        "description": "Demo seller agent",
-        "url": "https://seller.demo.example/a2a",
-        "agent_type": "seller",
-        "provider": {"name": "DemoPub"},
-        "supported_deal_types": ["PG", "PD"]
-      },
-      "trust_status": "approved",
-      "max_access_tier": "agency"
-    }
-  ]
-}
-```
-
-`trust_status` and `max_access_tier` are optional per entry: an agent present
-in a seed is at least `registered`, and the tier ceiling defaults to the
-canonical one for its status.
-
-## The config-swap story
-
-Agents construct `RegistryClient()` with no arguments; everything resolves
-from config/env:
+## Backend config (the swap is config, not code)
 
 | Variable | Values | Notes |
 | --- | --- | --- |
-| `AAMP_REGISTRY_BACKEND` | `LOCAL_SANDBOX` (default), `IAB_SANDBOX`, `IAB_PROD` | Which registry deployment to talk to |
-| `AAMP_REGISTRY_URL` | base URL | Required for `IAB_*`; defaults to `http://127.0.0.1:8020` for `LOCAL_SANDBOX` |
-| `AAMP_REGISTRY_AUTH_TOKEN` | bearer token | Sent as `Authorization: Bearer <token>` — the auth slot for when IAB access lands; the local sandbox ignores it |
-
-All three backends speak the **same HTTP protocol** (the sandbox implements
-it; the `IAB_*` backends just point at different base URLs plus the auth
-header), so the swap is literally:
+| `AAMP_REGISTRY_BACKEND` | `LOCAL` (default), `IAB_SANDBOX`, `IAB_PROD` | `LOCAL_SANDBOX` still accepted as an alias for `LOCAL` |
+| `AAMP_REGISTRY_URL` | base URL | Defaults: `http://127.0.0.1:3001` (LOCAL), `https://registry.iabtechlab.com` (IAB_PROD); required for `IAB_SANDBOX` |
+| `AAMP_REGISTRY_TOKEN` | bearer JWT | `Authorization: Bearer <token>`; legacy name `AAMP_REGISTRY_AUTH_TOKEN` still honored |
 
 ```bash
-# today
-export AAMP_REGISTRY_BACKEND=LOCAL_SANDBOX
+# local dev against the real registry (docker)
+export AAMP_REGISTRY_BACKEND=LOCAL
 
-# when IAB sandbox access lands — no code change
+# when the IAB sandbox is provisioned — no code change
 export AAMP_REGISTRY_BACKEND=IAB_SANDBOX
 export AAMP_REGISTRY_URL=https://<iab-sandbox-url>
-export AAMP_REGISTRY_AUTH_TOKEN=<issued-token>
+export AAMP_REGISTRY_TOKEN=<issued-jwt>
 ```
 
-Client methods (async, httpx-based, structured `RegistryError`s carrying the
-canonical `ErrorDetail`): `register(card)`, `discover(agent_type)`,
-`fetch_card(agent_id)`, `verify_trust(agent_id) -> TrustVerification`, plus
-the admin convenience `set_trust(...)` for sandbox testing.
+## Tests
 
-```python
-from iab_agentic_primitives.registry_client import RegistryClient
+`tests/test_registry_client.py` runs the **client's real method set**
+parameterized over backends:
 
-async with RegistryClient() as registry:          # backend from env
-    sellers = await registry.discover("seller")
-    trust = await registry.verify_trust(sellers[0].agent_id)
-    if trust.trust_status != "blocked":
-        tier_ceiling = trust.max_access_tier      # cap pricing tier here
-```
+- `LOCAL` — drives `create_registry_double()` in-process via
+  `httpx.ASGITransport` (register → list → get → admin update/delete →
+  `verified_trust` → badge → validate), plus deterministic checks for
+  missing-auth (401), domain-mismatch (403), admin-gating (403), and the
+  `X-New-Token` refresh.
+- `IAB_SANDBOX` / `IAB_PROD` — **skipped with reason** "URL+token not
+  provisioned — pending Mayank"; set `AAMP_REGISTRY_URL` +
+  `AAMP_REGISTRY_TOKEN` to run the identical suite against them.
 
-## Tests as the acceptance criterion
+Config resolution (backend/URL/token defaults, aliases, unknown-backend
+rejection) is covered without a server.
 
-`tests/test_registry_client.py` runs the **same suite parameterized over
-backends**: `LOCAL_SANDBOX` drives the sandbox app in-process via
-`httpx.ASGITransport` (register → discover → fetch → verify trust → admin
-tier change reflected); `IAB_SANDBOX` is skipped-with-reason until the real
-URL exists — set `AAMP_REGISTRY_URL` and the identical suite runs against it.
-That parameterization is the proof that swapping registries is config, not
-code.
+## Legacy AAMP trust-tier surface (retained for the EP-7.1 harness)
+
+The EP-7.1 in-process interop harness (`harness/scenario.py`, out of this
+bead's editable scope) models an AAMP **trust-tier** registry that the real
+registry does not implement: register an `AgentCard`, `set_trust(status)`,
+`discover(agent_type)`, and read an `AccessTier` ceiling from
+`verify_trust(id)`. To keep the full suite green without editing the
+harness, that surface is **retained as-is**:
+
+- `RegistryClient.register / discover / fetch_card / verify_trust /
+  set_trust` (the `/agents` trust-tier paths), returning `TrustVerification`
+  (status + `max_access_tier`, capped by `TRUST_TIER_CEILING`).
+- `sandbox_registry.create_app` + `AgentStore` — the legacy trust-tier app
+  (now clearly labeled legacy in its docstrings), still exercised by
+  `tests/test_sandbox_registry.py` and the harness.
+
+This is a compatibility layer, not part of the realigned real API; it should
+be removed once the harness migrates to the real trust signals.

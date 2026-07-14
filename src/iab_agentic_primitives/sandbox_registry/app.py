@@ -1,8 +1,12 @@
-"""FastAPI app implementing the local sandbox AAMP registry surface.
+"""LEGACY EP-5.3 AAMP trust-tier sandbox (``/agents`` surface).
 
-A development stand-in for the IAB AAMP registry (owner decision FD-3):
-faithful enough to develop against, and swapped for the real registry by
-configuration only (see :mod:`iab_agentic_primitives.registry_client`).
+NOT the real registry and NOT the ``LOCAL`` backend target. This app
+implements the EP-5.3 access-tier trust model (register a card, set a trust
+status, read a tier ceiling) that the REAL agent-registry does not have. It
+is retained ONLY for the EP-7.1 in-process interop harness, which is built
+on those trust-tier semantics. For the real ``/api/agents`` API use the
+docker-compose runner (SANDBOX_REGISTRY.md) or the test double in
+:mod:`.real_double`.
 
 Run it::
 
