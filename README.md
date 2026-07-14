@@ -1,5 +1,11 @@
 # iab-agentic-primitives
 
+> ⚠️ **WORK IN PROGRESS — NOT YET RELEASED.** This library is under active
+> construction as part of the buyer/seller agent remediation. APIs, schemas,
+> and package layout are unstable and will change without notice. It is **not
+> yet an official IAB Tech Lab release** and should not be depended on for
+> production use until this notice is removed.
+
 Shared contract library for IAB Tech Lab agentic advertising: the single
 source of truth for every cross-agent primitive, wire message, state
 machine, and event type shared by the
