@@ -20,9 +20,14 @@ versa.
     mispriced.
 
 :class:`ReferenceBuyer`
-    Picks the cheapest quoted product under its ``max_cpm`` ceiling, can send
-    a counter and accept within budget, and enforces a HARD budget ceiling
-    before booking (walks away cleanly — no exception — rather than overspend).
+    Picks the cheapest quoted product within its negotiation band (at/below
+    ``max_cpm`` books directly; above the ceiling but within
+    ``negotiation_band_per_mille`` is negotiable, not discarded), can send a
+    counter and accept within budget, and enforces TWO hard guardrails before
+    booking: it never books above ``max_cpm`` (an above-ceiling quote books
+    only if negotiation brings the agreed price down to the ceiling) and never
+    exceeds ``budget`` (walks away cleanly — no exception — rather than
+    overspend).
 
 Acronyms: CPM = cost per mille; FD = flagged decision; A2A = agent-to-agent
 protocol; PG = Programmatic Guaranteed.
@@ -96,6 +101,12 @@ _SUPPORTED_MEDIA: frozenset[MediaType] = frozenset({MediaType.DIGITAL, MediaType
 #: Bounded negotiation: the seller walks after this many rounds rather than
 #: looping 'active' forever (the historical infinite-negotiation failure).
 MAX_SELLER_ROUNDS = 6
+
+#: Default buyer negotiation band, in per-mille of ``max_cpm`` (integer math;
+#: FD-11 no float on the money path). 1250 = quotes up to 25% above the
+#: buyer's ceiling are NEGOTIABLE rather than discarded; 1000 restores the
+#: strict legacy filter (above-ceiling quotes skipped outright).
+DEFAULT_NEGOTIATION_BAND_PER_MILLE = 1250
 
 
 def _err(code: ErrorCode, message: str, unsupported: list[UnsupportedItem] | None = None) -> ErrorEnvelope:
@@ -360,6 +371,17 @@ class ReferenceSeller(SellerRole):
             neg.status = NegotiationStatus.ACCEPTED
             return self._record_round(neg, round_number, bp, bp, NegotiationAction.ACCEPT, currency)
         if round_number >= MAX_SELLER_ROUNDS:
+            if bp >= neg.floor_micros:
+                # Terminal round with the buyer's standing price at/above the
+                # private floor: taking the profitable offer beats walking.
+                # (Without this, the midpoint concession — which approaches a
+                # holding buyer's price from above but never reaches it —
+                # would walk away from money above the floor.)
+                neg.status = NegotiationStatus.ACCEPTED
+                neg.seller_price = bp
+                return self._record_round(
+                    neg, round_number, bp, bp, NegotiationAction.ACCEPT, currency
+                )
             neg.status = NegotiationStatus.REJECTED
             return self._record_round(
                 neg, round_number, bp, neg.seller_price, NegotiationAction.REJECT, currency
@@ -432,13 +454,29 @@ class ReferenceSeller(SellerRole):
         deal_id = self._mint("deal")
         transitions = self._drive_machines(deal_id)
         quote = qstate.quote
+        pricing = quote.pricing
+        neg_id = self._neg_by_quote.get(request.quote_id)
+        if neg_id is not None:
+            neg = self._negotiations[neg_id]
+            if neg.status is NegotiationStatus.ACCEPTED and neg.rounds:
+                # An ACCEPTED negotiation reprices the booking: the deal is
+                # struck at the agreed price (the final round's seller price
+                # — the seller's own record is authoritative), not the
+                # pre-negotiation quote price.
+                agreed = neg.rounds[-1].seller_price
+                pricing = pricing.model_copy(
+                    update={
+                        "final_cpm": agreed,
+                        "rationale": f"{pricing.rationale}; negotiated to agreed price",
+                    }
+                )
         deal = Deal(
             deal_id=deal_id,
             deal_type=quote.deal_type,
             status=DealStatus.BOOKED,
             quote_id=quote.quote_id,
             product=quote.product,
-            pricing=quote.pricing,
+            pricing=pricing,
             terms=quote.terms,
             buyer_tier=effective,
             seller_id=self._agent_id,
@@ -491,7 +529,25 @@ class ReferenceSeller(SellerRole):
 
 
 class ReferenceBuyer(BuyerRole):
-    """Deterministic buyer: cheapest quote under the CPM ceiling, hard budget ceiling."""
+    """Deterministic buyer: cheapest quote within the negotiation band, hard ceilings.
+
+    Quote selection and the two guardrail invariants:
+
+    - a quote at/below ``max_cpm`` books directly (negotiation only if the
+      brief asks for it) — unchanged legacy behavior;
+    - a quote ABOVE ``max_cpm`` but within the negotiation band
+      (``final_cpm <= max_cpm * negotiation_band_per_mille / 1000``) is
+      negotiable: the buyer MUST negotiate it down to its ceiling to book.
+      Deterministic policy: open at ``max_cpm`` (the true ceiling), never bid
+      above it, accept the seller's counter iff it is <= ``max_cpm``, and walk
+      once the seller's bounded rounds are exhausted;
+    - a quote beyond the band is filtered outright, exactly like the legacy
+      above-ceiling filter.
+
+    The buyer NEVER books above ``max_cpm`` and NEVER exceeds ``budget`` (both
+    checked at the EFFECTIVE price — the negotiated price when a negotiation
+    was accepted, the quoted price otherwise).
+    """
 
     #: Buyer walks after this many rounds; the seller's cap (6) fires first.
     MAX_BUYER_ROUNDS = 8
@@ -502,10 +558,17 @@ class ReferenceBuyer(BuyerRole):
         name: str = "Reference Buyer",
         *,
         organization_id: str = "org-ref-buyer",
+        negotiation_band_per_mille: int = DEFAULT_NEGOTIATION_BAND_PER_MILLE,
     ) -> None:
+        if negotiation_band_per_mille < 1000:
+            raise ValueError(
+                "negotiation_band_per_mille must be >= 1000 (1000 = strict "
+                f"max_cpm filter); got {negotiation_band_per_mille}"
+            )
         self._agent_id = agent_id
         self._name = name
         self._org_id = organization_id
+        self._band_per_mille = negotiation_band_per_mille
 
     def agent_card(self) -> AgentCard:
         return AgentCard(
@@ -531,16 +594,40 @@ class ReferenceBuyer(BuyerRole):
         seller_id = channel.seller_card.agent_id
         outcome = BuyerOutcome(seller_id=seller_id, quote=quote)
 
-        if brief.negotiate:
-            negotiation, agreed = self._negotiate(brief, channel, quote)
+        # An above-ceiling (in-band) quote is only bookable if negotiation
+        # brings it down to the ceiling, so negotiation is REQUIRED for it —
+        # the brief's ``negotiate`` flag only governs voluntary negotiation
+        # on quotes already at/below the ceiling.
+        must_negotiate = (
+            quote.pricing.final_cpm.amount_micros > brief.max_cpm.amount_micros
+        )
+        effective_cpm = quote.pricing.final_cpm
+        if brief.negotiate or must_negotiate:
+            negotiation, agreed = self._negotiate(
+                brief, channel, quote, hold_at_ceiling=must_negotiate
+            )
             outcome.negotiation = negotiation
             if not agreed:
                 outcome.walked_away = True
                 outcome.walk_reason = "negotiation did not reach agreement"
                 return outcome
+            if negotiation.rounds:
+                # The agreed price is the final round's seller price (the
+                # seller's numbering and record are authoritative).
+                effective_cpm = negotiation.rounds[-1].seller_price
 
-        # Hard budget ceiling: the buyer walks rather than overspend.
-        cost = cpm_cost(quote.pricing.final_cpm, brief.impressions)
+        # Ceiling guarantee (guardrail invariant): NEVER book above max_cpm.
+        if effective_cpm.amount_micros > brief.max_cpm.amount_micros:
+            outcome.walked_away = True
+            outcome.walk_reason = (
+                f"cpm ceiling exceeded: effective {effective_cpm.amount_micros} "
+                f"> max_cpm {brief.max_cpm.amount_micros}"
+            )
+            return outcome
+
+        # Hard budget ceiling at the EFFECTIVE (post-negotiation) price: the
+        # buyer walks rather than overspend.
+        cost = cpm_cost(effective_cpm, brief.impressions)
         if cost.amount_micros > brief.budget.amount_micros:
             outcome.walked_away = True
             outcome.walk_reason = (
@@ -567,10 +654,17 @@ class ReferenceBuyer(BuyerRole):
             final = quote.pricing.final_cpm
             if final is None:
                 continue
-            if final.amount_micros <= brief.max_cpm.amount_micros:
+            # Within the negotiation band: at/below max_cpm books directly;
+            # above max_cpm but in-band is negotiable; beyond the band is
+            # filtered outright. Integer per-mille math (FD-11, no float).
+            band_limit = brief.max_cpm.amount_micros * self._band_per_mille // 1000
+            if final.amount_micros <= band_limit:
                 candidates.append((final.amount_micros, channel, quote))
         if not candidates:
             return None
+        # Cheapest wins; any in-band above-ceiling quote is by definition
+        # more expensive than every at/below-ceiling one, so at/below-ceiling
+        # quotes are always preferred when available.
         candidates.sort(key=lambda row: row[0])
         _, channel, quote = candidates[0]
         return channel, quote
@@ -608,14 +702,30 @@ class ReferenceBuyer(BuyerRole):
         )
 
     def _negotiate(
-        self, brief: CampaignBrief, channel: SellerChannel, quote
+        self,
+        brief: CampaignBrief,
+        channel: SellerChannel,
+        quote,
+        *,
+        hold_at_ceiling: bool = False,
     ) -> tuple[Negotiation, bool]:
         currency = quote.pricing.final_cpm.currency
-        opening = (
-            brief.counter_cpm.amount_micros
-            if brief.counter_cpm is not None
-            else quote.pricing.final_cpm.amount_micros * 85 // 100
-        )
+        ceiling = brief.max_cpm.amount_micros
+        if hold_at_ceiling:
+            # Above-ceiling quote: open at the TRUE ceiling (clamping any
+            # configured counter down to it) — the buyer never bids above
+            # max_cpm, so the ceiling guarantee holds by construction.
+            opening = (
+                min(brief.counter_cpm.amount_micros, ceiling)
+                if brief.counter_cpm is not None
+                else ceiling
+            )
+        else:
+            opening = (
+                brief.counter_cpm.amount_micros
+                if brief.counter_cpm is not None
+                else quote.pricing.final_cpm.amount_micros * 85 // 100
+            )
         bp = opening
         rounds: list[NegotiationRound] = []
         negotiation_id: str | None = None
@@ -640,7 +750,7 @@ class ReferenceBuyer(BuyerRole):
             if status in (NegotiationStatus.REJECTED, NegotiationStatus.EXPIRED):
                 break
             seller_price = response.round.seller_price.amount_micros
-            if seller_price <= brief.max_cpm.amount_micros:
+            if seller_price <= ceiling:
                 message = NegotiationMessage(
                     idempotency_key=f"neg-{self._agent_id}-{quote.quote_id}-{i}",
                     action=NegotiationAction.ACCEPT,
@@ -648,8 +758,22 @@ class ReferenceBuyer(BuyerRole):
                     buyer_identity=brief.buyer_identity,
                 )
                 continue
-            new_bp = min(brief.max_cpm.amount_micros, (bp + seller_price) // 2)
+            new_bp = min(ceiling, (bp + seller_price) // 2)
             if new_bp <= bp:
+                if hold_at_ceiling:
+                    # The buyer cannot bid higher (it is at its ceiling):
+                    # HOLD the standing price and let the seller spend its
+                    # remaining bounded rounds conceding toward it. The
+                    # seller's round cap guarantees termination; the buyer's
+                    # own round cap is the backstop.
+                    message = NegotiationMessage(
+                        idempotency_key=f"neg-{self._agent_id}-{quote.quote_id}-{i}",
+                        action=NegotiationAction.COUNTER,
+                        negotiation_id=negotiation_id,
+                        buyer_price=Money(amount_micros=bp, currency=currency),
+                        buyer_identity=brief.buyer_identity,
+                    )
+                    continue
                 message = NegotiationMessage(
                     idempotency_key=f"neg-{self._agent_id}-{quote.quote_id}-{i}",
                     action=NegotiationAction.REJECT,
@@ -667,6 +791,19 @@ class ReferenceBuyer(BuyerRole):
                 buyer_price=Money(amount_micros=bp, currency=currency),
                 buyer_identity=brief.buyer_identity,
             )
+        if status is NegotiationStatus.ACTIVE and negotiation_id is not None:
+            # Buyer rounds exhausted while the seller is still countering:
+            # close the negotiation honestly (a recorded walk-away round)
+            # instead of abandoning it 'active'.
+            channel.negotiate(
+                NegotiationMessage(
+                    idempotency_key=f"neg-{self._agent_id}-{quote.quote_id}-close",
+                    action=NegotiationAction.REJECT,
+                    negotiation_id=negotiation_id,
+                    buyer_identity=brief.buyer_identity,
+                )
+            )
+            status = NegotiationStatus.REJECTED
         negotiation = Negotiation(
             negotiation_id=negotiation_id or "unopened",
             quote_id=quote.quote_id,
@@ -701,4 +838,9 @@ class ReferenceBuyer(BuyerRole):
         return outcome
 
 
-__all__ = ["MAX_SELLER_ROUNDS", "ReferenceBuyer", "ReferenceSeller"]
+__all__ = [
+    "DEFAULT_NEGOTIATION_BAND_PER_MILLE",
+    "MAX_SELLER_ROUNDS",
+    "ReferenceBuyer",
+    "ReferenceSeller",
+]
