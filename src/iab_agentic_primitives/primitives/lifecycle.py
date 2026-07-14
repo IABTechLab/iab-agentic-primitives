@@ -30,6 +30,7 @@ from .pricing import (
     QuotePricing,
     QuoteTerms,
 )
+from .supply_chain import SupplyChain
 
 # ---------------------------------------------------------------------------
 # Canonical status vocabularies (ONE each — see RECONCILIATION.md)
@@ -329,6 +330,11 @@ class Deal(WireModel):
     consent_context: ConsentContext | None = Field(
         default=None, description="Privacy consent signals riding with the deal (FD-10)."
     )
+    supply_chain: SupplyChain | None = Field(
+        default=None,
+        description="OpenRTB supply chain (schain) for transparency (EP-10.3); "
+        "optional so pre-schain deals still validate.",
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -447,18 +453,50 @@ class FieldDiff(WireModel):
     new_value: Any = None
 
 
+class MakegoodStatus(str, Enum):
+    """Compensation status of a makegood (EP-10.2)."""
+
+    PROPOSED = "proposed"
+    ACCEPTED = "accepted"
+    SCHEDULED = "scheduled"
+    DELIVERED = "delivered"
+    REJECTED = "rejected"
+
+
 class MakegoodDetails(WireModel):
     """Makegood payload for a ChangeRequest of type ``makegood`` (FD-6).
 
-    Sent when audience delivery falls short of the guaranteed GRP (gross
-    rating point) level; the seller responds with replacement inventory.
+    Sent when delivery falls short of the guaranteed level; the seller
+    responds with replacement inventory. Carries the compensation terms:
+    what is owed (``shortfall_grps`` for linear TV, ``owed_impressions``
+    for digital), the proposed replacement flight, and the makegood
+    ``status``. The human-readable reason lives on the enclosing
+    :class:`ChangeRequest.reason` (not duplicated here). GRP = gross rating
+    point.
     """
 
-    shortfall_grps: float = Field(description="GRP shortfall that needs to be made up.")
+    shortfall_grps: float = Field(
+        description="GRP shortfall owed that needs to be made up (linear TV)."
+    )
     original_daypart: str = Field(description="Daypart where the underdelivery occurred.")
     target_demo: str = Field(description="Target demographic for makegood inventory.")
+    owed_impressions: int | None = Field(
+        default=None,
+        ge=0,
+        description="Impressions owed for a digital makegood; None for a pure-GRP makegood.",
+    )
     preferred_dayparts: list[str] | None = Field(
         default=None, description="Buyer's preferred dayparts for replacement inventory."
+    )
+    replacement_flight_start: date | None = Field(
+        default=None, description="Proposed start of the replacement flight."
+    )
+    replacement_flight_end: date | None = Field(
+        default=None, description="Proposed end of the replacement flight."
+    )
+    status: MakegoodStatus = Field(
+        default=MakegoodStatus.PROPOSED,
+        description="Compensation status of the makegood.",
     )
     notes: str | None = None
 
@@ -568,6 +606,7 @@ __all__ = [
     "Line",
     "LineStatus",
     "MakegoodDetails",
+    "MakegoodStatus",
     "Negotiation",
     "NegotiationAction",
     "NegotiationRound",

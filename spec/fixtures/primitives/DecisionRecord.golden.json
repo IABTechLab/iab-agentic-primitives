@@ -1,0 +1,241 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "primitives",
+  "target": "DecisionRecord",
+  "vectors": [
+    {
+      "data": {
+        "actor": {
+          "agent_id": "agent-seller-1",
+          "kind": "machine",
+          "on_behalf_of": "org-seller-1"
+        },
+        "correlation_id": "corr-001",
+        "decision_id": "dr-001",
+        "decision_type": "booking",
+        "ext": null,
+        "inputs": [
+          {
+            "description": "Buyer booking request",
+            "digest": "sha256:2c26b46b68ffc68ff99b453c1d304134",
+            "kind": "counterparty_message",
+            "ref": "msg-001"
+          },
+          {
+            "description": "Pricing model recommendation",
+            "digest": "sha256:fcde2b2edba56bf408601fb721fe9b5c",
+            "kind": "model_output",
+            "ref": null
+          }
+        ],
+        "money_effect": {
+          "amount_micros": 22500000000,
+          "currency": "USD"
+        },
+        "negotiation_id": null,
+        "occurred_at": "2026-07-01T12:00:00Z",
+        "rationale": {
+          "factors": [
+            "advertiser_tier",
+            "rate_card_match",
+            "inventory_available"
+          ],
+          "notes": null,
+          "policy_refs": [
+            "policy:auto-book-approved-tier"
+          ],
+          "summary": "Booked at the advertiser-tier rate card price"
+        },
+        "session_id": "sess-001",
+        "subject_id": "deal-001",
+        "subject_type": "deal"
+      },
+      "description": "Durable record of why a booking committed money (EP-10.1)",
+      "mode": "valid",
+      "name": "booking_decision"
+    },
+    {
+      "data": {
+        "actor": {
+          "agent_id": "human:trader-7",
+          "kind": "human",
+          "on_behalf_of": null
+        },
+        "correlation_id": null,
+        "decision_id": "dr-002",
+        "decision_type": "negotiation_concession",
+        "ext": null,
+        "inputs": [],
+        "money_effect": null,
+        "negotiation_id": "neg-001",
+        "occurred_at": "2026-07-02T09:30:00Z",
+        "rationale": {
+          "factors": [],
+          "notes": null,
+          "policy_refs": [],
+          "summary": "Conceded 3% to close within the buyer's ceiling"
+        },
+        "session_id": null,
+        "subject_id": "neg-001",
+        "subject_type": "negotiation"
+      },
+      "description": "Negotiation-concession decision by a human, no money effect yet",
+      "mode": "valid",
+      "name": "concession_minimal"
+    },
+    {
+      "data": {
+        "actor": {
+          "agent_id": "agent-seller-1",
+          "kind": "machine",
+          "on_behalf_of": "org-seller-1"
+        },
+        "correlation_id": "corr-001",
+        "decision_id": "dr-001",
+        "decision_type": "booking",
+        "ext": null,
+        "field_from_a_newer_spec_version": "must-be-ignored",
+        "inputs": [
+          {
+            "description": "Buyer booking request",
+            "digest": "sha256:2c26b46b68ffc68ff99b453c1d304134",
+            "kind": "counterparty_message",
+            "ref": "msg-001"
+          },
+          {
+            "description": "Pricing model recommendation",
+            "digest": "sha256:fcde2b2edba56bf408601fb721fe9b5c",
+            "kind": "model_output",
+            "ref": null
+          }
+        ],
+        "money_effect": {
+          "amount_micros": 22500000000,
+          "currency": "USD"
+        },
+        "negotiation_id": null,
+        "occurred_at": "2026-07-01T12:00:00Z",
+        "rationale": {
+          "factors": [
+            "advertiser_tier",
+            "rate_card_match",
+            "inventory_available"
+          ],
+          "notes": null,
+          "policy_refs": [
+            "policy:auto-book-approved-tier"
+          ],
+          "summary": "Booked at the advertiser-tier rate card price"
+        },
+        "session_id": "sess-001",
+        "subject_id": "deal-001",
+        "subject_type": "deal",
+        "x_vendor_ext": {
+          "partner": "example-dsp",
+          "trace": "abc-123"
+        }
+      },
+      "description": "FD-13: unknown + x_ fields on a decision record are ignored",
+      "expected": {
+        "actor": {
+          "agent_id": "agent-seller-1",
+          "kind": "machine",
+          "on_behalf_of": "org-seller-1"
+        },
+        "correlation_id": "corr-001",
+        "decision_id": "dr-001",
+        "decision_type": "booking",
+        "ext": null,
+        "inputs": [
+          {
+            "description": "Buyer booking request",
+            "digest": "sha256:2c26b46b68ffc68ff99b453c1d304134",
+            "kind": "counterparty_message",
+            "ref": "msg-001"
+          },
+          {
+            "description": "Pricing model recommendation",
+            "digest": "sha256:fcde2b2edba56bf408601fb721fe9b5c",
+            "kind": "model_output",
+            "ref": null
+          }
+        ],
+        "money_effect": {
+          "amount_micros": 22500000000,
+          "currency": "USD"
+        },
+        "negotiation_id": null,
+        "occurred_at": "2026-07-01T12:00:00Z",
+        "rationale": {
+          "factors": [
+            "advertiser_tier",
+            "rate_card_match",
+            "inventory_available"
+          ],
+          "notes": null,
+          "policy_refs": [
+            "policy:auto-book-approved-tier"
+          ],
+          "summary": "Booked at the advertiser-tier rate card price"
+        },
+        "session_id": "sess-001",
+        "subject_id": "deal-001",
+        "subject_type": "deal"
+      },
+      "mode": "must_ignore",
+      "name": "decision_with_unknown_fields"
+    },
+    {
+      "data": {
+        "actor": {
+          "agent_id": "agent-seller-1",
+          "kind": "machine",
+          "on_behalf_of": "org-seller-1"
+        },
+        "correlation_id": "corr-001",
+        "decision_id": "dr-001",
+        "decision_type": "booking",
+        "ext": null,
+        "inputs": [
+          {
+            "description": "Buyer booking request",
+            "digest": "sha256:2c26b46b68ffc68ff99b453c1d304134",
+            "kind": "counterparty_message",
+            "ref": "msg-001"
+          },
+          {
+            "description": "Pricing model recommendation",
+            "digest": "sha256:fcde2b2edba56bf408601fb721fe9b5c",
+            "kind": "model_output",
+            "ref": null
+          }
+        ],
+        "money_effect": {
+          "amount_micros": 22500000000.5,
+          "currency": "USD"
+        },
+        "negotiation_id": null,
+        "occurred_at": "2026-07-01T12:00:00Z",
+        "rationale": {
+          "factors": [
+            "advertiser_tier",
+            "rate_card_match",
+            "inventory_available"
+          ],
+          "notes": null,
+          "policy_refs": [
+            "policy:auto-book-approved-tier"
+          ],
+          "summary": "Booked at the advertiser-tier rate card price"
+        },
+        "session_id": "sess-001",
+        "subject_id": "deal-001",
+        "subject_type": "deal"
+      },
+      "description": "FD-11: float-typed money_effect must be rejected",
+      "expected_error": "Input should be a valid integer",
+      "mode": "invalid",
+      "name": "float_money_effect_rejected"
+    }
+  ]
+}

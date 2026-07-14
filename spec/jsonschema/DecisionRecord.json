@@ -1,0 +1,297 @@
+{
+  "$defs": {
+    "ActorKind": {
+      "description": "Whether the deciding actor is a human or a machine agent.",
+      "enum": [
+        "human",
+        "machine"
+      ],
+      "title": "ActorKind",
+      "type": "string"
+    },
+    "DecisionActor": {
+      "description": "Who made the decision.",
+      "properties": {
+        "agent_id": {
+          "description": "Registry-issued id of the agent (or a 'human:<id>' actor id).",
+          "title": "Agent Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/ActorKind",
+          "default": "machine",
+          "description": "Human-or-machine discriminator for the acting party."
+        },
+        "on_behalf_of": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Org/human id the actor acted for, when a machine acts on behalf of one.",
+          "title": "On Behalf Of"
+        }
+      },
+      "required": [
+        "agent_id"
+      ],
+      "title": "DecisionActor",
+      "type": "object"
+    },
+    "DecisionInputRef": {
+      "description": "A reference/hash to ONE input that drove the decision.\n\nNever the raw content: ``ref`` is an id/URI pointer and ``digest`` is a\ncontent hash (e.g. ``sha256:...``). Store one or both; the raw\ncounterparty prompt or model output stays out of the record.",
+      "properties": {
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Short human-readable label for the input.",
+          "title": "Description"
+        },
+        "digest": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Content hash of the raw input (e.g. 'sha256:...'); never the raw content.",
+          "title": "Digest"
+        },
+        "kind": {
+          "description": "Input kind, e.g. 'counterparty_message', 'model_output', 'quote', 'rate_card', 'negotiation_round'.",
+          "title": "Kind",
+          "type": "string"
+        },
+        "ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Opaque id/URI reference to the input, if addressable.",
+          "title": "Ref"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "DecisionInputRef",
+      "type": "object"
+    },
+    "DecisionRationale": {
+      "description": "Structured rationale \u2014 not free-text-only.\n\n``summary`` is a one-line human summary; ``factors`` and ``policy_refs``\nmake the reasoning machine-inspectable so an auditor can filter by\nfactor or applied policy rather than parsing prose.",
+      "properties": {
+        "factors": {
+          "description": "Named factors that drove the decision (machine-inspectable).",
+          "items": {
+            "type": "string"
+          },
+          "title": "Factors",
+          "type": "array"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional additional detail.",
+          "title": "Notes"
+        },
+        "policy_refs": {
+          "description": "Ids of policies/rules applied.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Policy Refs",
+          "type": "array"
+        },
+        "summary": {
+          "description": "One-line human summary of the decision.",
+          "title": "Summary",
+          "type": "string"
+        }
+      },
+      "required": [
+        "summary"
+      ],
+      "title": "DecisionRationale",
+      "type": "object"
+    },
+    "DecisionType": {
+      "description": "Category of money/state decision being recorded.",
+      "enum": [
+        "booking",
+        "negotiation_concession",
+        "approval",
+        "rejection",
+        "pricing",
+        "makegood",
+        "cancellation",
+        "other"
+      ],
+      "title": "DecisionType",
+      "type": "string"
+    },
+    "Money": {
+      "description": "Exact money amount in integer micros (flagged decision FD-11).\n\n``1_000_000`` micros = 1 currency unit \u2014 the ad-industry convention\n(Google Ad Manager, among others, prices in micros). Float is BANNED on\nthe wire for money: IEEE 754 floating point is non-deterministic for\nmoney math (``0.1 + 0.2 != 0.3``, and repeated CPM \u2014 cost per mille \u2014\narithmetic accumulates error), and the two source repos used ``float``\nend-to-end; that defect must not be fossilized into the spec. Every\nprice, rate, budget, and offer in the shared contract is a ``Money``.\n\n``amount_micros`` is a strict integer: float inputs are rejected at\nvalidation time rather than silently truncated.",
+      "properties": {
+        "amount_micros": {
+          "description": "Amount in micros; 1,000,000 micros = 1 currency unit.",
+          "title": "Amount Micros",
+          "type": "integer"
+        },
+        "currency": {
+          "default": "USD",
+          "description": "ISO 4217 alpha-3 currency code.",
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount_micros"
+      ],
+      "title": "Money",
+      "type": "object"
+    }
+  },
+  "description": "A durable record of why a money/state decision was made (EP-10.1).\n\nPersisted domain object (distinct from the transient Event envelope).\nReferences its subject by id \u2014 it is never embedded on the Deal/Order/\nQuote; those objects point back to nothing, and the audit store joins\non ``subject_id`` / ``correlation_id``.\n\nID minting: ``decision_id`` is minted by the agent that made the\ndecision when the record is written to its audit store.",
+  "properties": {
+    "actor": {
+      "$ref": "#/$defs/DecisionActor"
+    },
+    "correlation_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Correlation id linking related records/events.",
+      "title": "Correlation Id"
+    },
+    "decision_id": {
+      "description": "Id of this decision record (minted by the decider).",
+      "title": "Decision Id",
+      "type": "string"
+    },
+    "decision_type": {
+      "$ref": "#/$defs/DecisionType"
+    },
+    "ext": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Extension slot.",
+      "title": "Ext"
+    },
+    "inputs": {
+      "description": "References/hashes of the counterparty inputs and model outputs that drove the decision (never raw prompts).",
+      "items": {
+        "$ref": "#/$defs/DecisionInputRef"
+      },
+      "title": "Inputs",
+      "type": "array"
+    },
+    "money_effect": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Money"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Money movement this decision caused, if any (exact micros; FD-11)."
+    },
+    "negotiation_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Negotiation the decision belongs to, if any.",
+      "title": "Negotiation Id"
+    },
+    "occurred_at": {
+      "description": "Timezone-aware UTC timestamp of when the decision was made.",
+      "format": "date-time",
+      "title": "Occurred At",
+      "type": "string"
+    },
+    "rationale": {
+      "$ref": "#/$defs/DecisionRationale"
+    },
+    "session_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Session the decision occurred in, if any.",
+      "title": "Session Id"
+    },
+    "subject_id": {
+      "description": "Id of the deal/quote/order/... the decision concerns.",
+      "title": "Subject Id",
+      "type": "string"
+    },
+    "subject_type": {
+      "description": "Type of the subject: 'deal', 'quote', 'order', 'negotiation', 'change_request'.",
+      "title": "Subject Type",
+      "type": "string"
+    }
+  },
+  "required": [
+    "decision_id",
+    "subject_type",
+    "subject_id",
+    "decision_type",
+    "actor",
+    "rationale"
+  ],
+  "title": "DecisionRecord",
+  "type": "object"
+}
