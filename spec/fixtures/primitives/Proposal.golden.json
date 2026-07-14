@@ -1,0 +1,67 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "primitives",
+  "target": "Proposal",
+  "vectors": [
+    {
+      "data": {
+        "account_id": "acct-001",
+        "created_at": "2026-07-01T12:00:00Z",
+        "current_revision_number": 1,
+        "end_date": "2026-08-31",
+        "ext": null,
+        "lines": [
+          {
+            "ad_product_targeting": null,
+            "audience_targeting": null,
+            "content_targeting": null,
+            "deal_type": "PD",
+            "delivery_goal": {
+              "billable_event": "impression",
+              "goal_amount": 1000000,
+              "goal_type": "impressions"
+            },
+            "external_ids": null,
+            "pricing": {
+              "price": {
+                "amount_micros": 22500000,
+                "currency": "USD"
+              },
+              "pricing_model": "cpm",
+              "pricing_type": "fixed"
+            },
+            "product_id": "prod-001",
+            "proposal_id": "prop-001",
+            "proposal_line_id": "pl-001"
+          }
+        ],
+        "proposal_id": "prop-001",
+        "proposal_thread_id": null,
+        "start_date": "2026-08-01",
+        "status": "sent",
+        "updated_at": null
+      },
+      "description": "Sent proposal with one PD line",
+      "mode": "valid",
+      "name": "sent_with_lines"
+    },
+    {
+      "data": {
+        "account_id": "acct-001",
+        "created_at": "2026-07-01T12:00:00Z",
+        "current_revision_number": 3,
+        "end_date": "2026-09-30",
+        "ext": null,
+        "lines": [],
+        "proposal_id": "prop-002",
+        "proposal_thread_id": "thread-77",
+        "start_date": "2026-09-01",
+        "status": "countered",
+        "updated_at": "2026-07-02T09:30:00Z"
+      },
+      "description": "Threaded proposal on its third revision",
+      "mode": "valid",
+      "name": "countered_revision_3"
+    }
+  ]
+}

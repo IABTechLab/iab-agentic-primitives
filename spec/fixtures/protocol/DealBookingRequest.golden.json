@@ -1,0 +1,142 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "protocol",
+  "target": "DealBookingRequest",
+  "vectors": [
+    {
+      "data": {
+        "audience_plan": null,
+        "buyer_identity": {
+          "advertiser_id": "adv-cola",
+          "advertiser_industry": null,
+          "advertiser_name": null,
+          "agency_holding_company": null,
+          "agency_id": null,
+          "agency_name": null,
+          "campaign_id": null,
+          "campaign_name": null,
+          "dsp_platform": null,
+          "seat_id": "ttd-seat-123",
+          "seat_name": null
+        },
+        "consent_context": {
+          "applicable_regimes": [
+            "GDPR",
+            "CCPA"
+          ],
+          "diligence_status": "passed",
+          "gpp_section_ids": [
+            2,
+            6
+          ],
+          "gpp_string": "DBABMA~CPXxRfAPXxRfAAfKABENB",
+          "tcf_string": "CPXxRfAPXxRfAAfKABENB",
+          "verified_at": "2026-07-01T12:00:00Z"
+        },
+        "idempotency_key": "00000000-0000-4000-8000-000000000005",
+        "notes": "Book at quoted terms",
+        "quote_id": "q-pg-001"
+      },
+      "description": "Commit-point booking of a quote",
+      "mode": "valid",
+      "name": "book_quoted_deal"
+    },
+    {
+      "data": {
+        "audience_plan": {
+          "plan_id": "ap-9",
+          "segments": [
+            {
+              "id": "1001",
+              "role": "reach"
+            }
+          ]
+        },
+        "buyer_identity": null,
+        "consent_context": null,
+        "idempotency_key": "00000000-0000-4000-8000-000000000006",
+        "notes": null,
+        "quote_id": "q-pg-001"
+      },
+      "description": "Booking that freezes an audience plan snapshot",
+      "mode": "valid",
+      "name": "booking_with_audience_plan"
+    },
+    {
+      "data": {
+        "audience_plan": null,
+        "buyer_identity": {
+          "advertiser_id": "adv-cola",
+          "advertiser_industry": null,
+          "advertiser_name": null,
+          "agency_holding_company": null,
+          "agency_id": null,
+          "agency_name": null,
+          "campaign_id": null,
+          "campaign_name": null,
+          "dsp_platform": null,
+          "seat_id": "ttd-seat-123",
+          "seat_name": null
+        },
+        "consent_context": {
+          "applicable_regimes": [
+            "GDPR",
+            "CCPA"
+          ],
+          "diligence_status": "passed",
+          "gpp_section_ids": [
+            2,
+            6
+          ],
+          "gpp_string": "DBABMA~CPXxRfAPXxRfAAfKABENB",
+          "tcf_string": "CPXxRfAPXxRfAAfKABENB",
+          "verified_at": "2026-07-01T12:00:00Z"
+        },
+        "field_from_a_newer_spec_version": "must-be-ignored",
+        "idempotency_key": "00000000-0000-4000-8000-000000000005",
+        "notes": "Book at quoted terms",
+        "quote_id": "q-pg-001",
+        "x_vendor_ext": {
+          "partner": "example-dsp",
+          "trace": "abc-123"
+        }
+      },
+      "description": "FD-13: unknown + x_ fields on a booking request are ignored",
+      "expected": {
+        "audience_plan": null,
+        "buyer_identity": {
+          "advertiser_id": "adv-cola",
+          "advertiser_industry": null,
+          "advertiser_name": null,
+          "agency_holding_company": null,
+          "agency_id": null,
+          "agency_name": null,
+          "campaign_id": null,
+          "campaign_name": null,
+          "dsp_platform": null,
+          "seat_id": "ttd-seat-123",
+          "seat_name": null
+        },
+        "consent_context": {
+          "applicable_regimes": [
+            "GDPR",
+            "CCPA"
+          ],
+          "diligence_status": "passed",
+          "gpp_section_ids": [
+            2,
+            6
+          ],
+          "gpp_string": "DBABMA~CPXxRfAPXxRfAAfKABENB",
+          "tcf_string": "CPXxRfAPXxRfAAfKABENB",
+          "verified_at": "2026-07-01T12:00:00Z"
+        },
+        "idempotency_key": "00000000-0000-4000-8000-000000000005",
+        "notes": "Book at quoted terms",
+        "quote_id": "q-pg-001"
+      },
+      "mode": "must_ignore",
+      "name": "booking_with_unknown_fields"
+    }
+  ]
+}

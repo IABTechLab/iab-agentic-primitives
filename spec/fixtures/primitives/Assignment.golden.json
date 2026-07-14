@@ -1,0 +1,39 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "primitives",
+  "target": "Assignment",
+  "vectors": [
+    {
+      "data": {
+        "assignment_id": "asg-001",
+        "creative_id": "crv-001",
+        "effective_end_date": "2026-08-31",
+        "effective_start_date": "2026-08-01",
+        "ext": null,
+        "line_id": "line-001",
+        "rotation_mode": "weighted",
+        "sov": 0.6,
+        "status": null
+      },
+      "description": "Weighted creative-to-line binding with share of voice",
+      "mode": "valid",
+      "name": "weighted_rotation"
+    },
+    {
+      "data": {
+        "assignment_id": "asg-002",
+        "creative_id": "crv-002",
+        "effective_end_date": null,
+        "effective_start_date": null,
+        "ext": null,
+        "line_id": "line-002",
+        "rotation_mode": "even",
+        "sov": null,
+        "status": null
+      },
+      "description": "Even rotation with only required fields",
+      "mode": "valid",
+      "name": "even_minimal"
+    }
+  ]
+}

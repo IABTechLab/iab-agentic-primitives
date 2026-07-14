@@ -1,0 +1,61 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "protocol",
+  "target": "ChangeRequestCreate",
+  "vectors": [
+    {
+      "data": {
+        "change_type": "makegood",
+        "deal_id": "deal-ltv-002",
+        "idempotency_key": "00000000-0000-4000-8000-000000000007",
+        "makegood": {
+          "notes": "Week 2 audience under-delivery",
+          "original_daypart": "primetime",
+          "preferred_dayparts": [
+            "primetime",
+            "late_night"
+          ],
+          "shortfall_grps": 8.5,
+          "target_demo": "A18-49"
+        },
+        "order_id": null,
+        "proposed_values": {},
+        "reason": "GRP shortfall in week 2",
+        "severity": "material"
+      },
+      "description": "FD-6 makegood submitted as a typed change request",
+      "mode": "valid",
+      "name": "makegood_create"
+    },
+    {
+      "data": {
+        "change_type": "cancellation",
+        "deal_id": null,
+        "idempotency_key": "00000000-0000-4000-8000-000000000008",
+        "makegood": null,
+        "order_id": "ord-001",
+        "proposed_values": {
+          "cancel_pct": 1.0,
+          "effective_date": "2026-08-15",
+          "reason": "advertiser pause"
+        },
+        "reason": "Advertiser pause",
+        "severity": "critical"
+      },
+      "description": "Cancellation as a typed change request (retired per-deal cancel route)",
+      "mode": "valid",
+      "name": "cancellation_create"
+    },
+    {
+      "data": {
+        "change_type": "makegood",
+        "deal_id": "deal-ltv-002",
+        "idempotency_key": "00000000-0000-4000-8000-000000000009"
+      },
+      "description": "change_type makegood without a makegood payload must be rejected",
+      "expected_error": "requires makegood details",
+      "mode": "invalid",
+      "name": "makegood_missing_details"
+    }
+  ]
+}

@@ -1,0 +1,165 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "protocol",
+  "target": "NegotiationMessage",
+  "vectors": [
+    {
+      "data": {
+        "action": "counter",
+        "buyer_identity": {
+          "advertiser_id": null,
+          "advertiser_industry": null,
+          "advertiser_name": null,
+          "agency_holding_company": null,
+          "agency_id": null,
+          "agency_name": null,
+          "campaign_id": null,
+          "campaign_name": null,
+          "dsp_platform": null,
+          "seat_id": "ttd-seat-123",
+          "seat_name": null
+        },
+        "buyer_price": {
+          "amount_micros": 20000000,
+          "currency": "USD"
+        },
+        "idempotency_key": "00000000-0000-4000-8000-000000000010",
+        "negotiation_id": null,
+        "proposal_id": null,
+        "quote_id": "q-pg-001",
+        "rationale": "Opening offer below quoted CPM",
+        "round_number": null
+      },
+      "description": "Opening offer: counter with no negotiation_id (seller mints)",
+      "mode": "valid",
+      "name": "opening_counter"
+    },
+    {
+      "data": {
+        "action": "accept",
+        "buyer_identity": null,
+        "buyer_price": {
+          "amount_micros": 22000000,
+          "currency": "USD"
+        },
+        "idempotency_key": "00000000-0000-4000-8000-000000000011",
+        "negotiation_id": "neg-001",
+        "proposal_id": null,
+        "quote_id": null,
+        "rationale": "",
+        "round_number": 2
+      },
+      "description": "Terminal accept of the seller's last price",
+      "mode": "valid",
+      "name": "accept_terminal"
+    },
+    {
+      "data": {
+        "action": "reject",
+        "buyer_identity": null,
+        "buyer_price": null,
+        "idempotency_key": "00000000-0000-4000-8000-000000000012",
+        "negotiation_id": "neg-001",
+        "proposal_id": null,
+        "quote_id": null,
+        "rationale": "Above budget ceiling",
+        "round_number": 2
+      },
+      "description": "Terminal walk-away: reject carries no price",
+      "mode": "valid",
+      "name": "reject_walk_away"
+    },
+    {
+      "data": {
+        "action": "counter",
+        "buyer_identity": {
+          "advertiser_id": null,
+          "advertiser_industry": null,
+          "advertiser_name": null,
+          "agency_holding_company": null,
+          "agency_id": null,
+          "agency_name": null,
+          "campaign_id": null,
+          "campaign_name": null,
+          "dsp_platform": null,
+          "seat_id": "ttd-seat-123",
+          "seat_name": null
+        },
+        "buyer_price": {
+          "amount_micros": 20000000,
+          "currency": "USD"
+        },
+        "field_from_a_newer_spec_version": "must-be-ignored",
+        "idempotency_key": "00000000-0000-4000-8000-000000000010",
+        "negotiation_id": null,
+        "proposal_id": null,
+        "quote_id": "q-pg-001",
+        "rationale": "Opening offer below quoted CPM",
+        "round_number": null,
+        "x_vendor_ext": {
+          "partner": "example-dsp",
+          "trace": "abc-123"
+        }
+      },
+      "description": "FD-13: unknown + x_ fields on a negotiation message are ignored",
+      "expected": {
+        "action": "counter",
+        "buyer_identity": {
+          "advertiser_id": null,
+          "advertiser_industry": null,
+          "advertiser_name": null,
+          "agency_holding_company": null,
+          "agency_id": null,
+          "agency_name": null,
+          "campaign_id": null,
+          "campaign_name": null,
+          "dsp_platform": null,
+          "seat_id": "ttd-seat-123",
+          "seat_name": null
+        },
+        "buyer_price": {
+          "amount_micros": 20000000,
+          "currency": "USD"
+        },
+        "idempotency_key": "00000000-0000-4000-8000-000000000010",
+        "negotiation_id": null,
+        "proposal_id": null,
+        "quote_id": "q-pg-001",
+        "rationale": "Opening offer below quoted CPM",
+        "round_number": null
+      },
+      "mode": "must_ignore",
+      "name": "message_with_unknown_fields"
+    },
+    {
+      "data": {
+        "action": "reject",
+        "buyer_price": {
+          "amount_micros": 20000000,
+          "currency": "USD"
+        },
+        "idempotency_key": "00000000-0000-4000-8000-000000000013",
+        "negotiation_id": "neg-001"
+      },
+      "description": "reject must not carry buyer_price",
+      "expected_error": "must not carry buyer_price",
+      "mode": "invalid",
+      "name": "reject_with_price"
+    },
+    {
+      "data": {
+        "action": "counter",
+        "buyer_price": {
+          "amount_micros": 20000000.0,
+          "currency": "USD"
+        },
+        "idempotency_key": "00000000-0000-4000-8000-000000000014",
+        "negotiation_id": "neg-001"
+      },
+      "description": "FD-11: float-typed buyer price must be rejected",
+      "expected_error": "Input should be a valid integer",
+      "mode": "invalid",
+      "name": "float_buyer_price_rejected"
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "primitives",
+  "target": "Negotiation",
+  "vectors": [
+    {
+      "data": {
+        "buyer_tier": "advertiser",
+        "completed_at": null,
+        "negotiation_id": "neg-001",
+        "package_id": null,
+        "product_id": "prod-001",
+        "proposal_id": null,
+        "quote_id": "q-pg-001",
+        "rounds": [
+          {
+            "action": "counter",
+            "buyer_price": {
+              "amount_micros": 20000000,
+              "currency": "USD"
+            },
+            "concession_pct": 0.04,
+            "cumulative_concession_pct": 0.04,
+            "rationale": "meeting the buyer partway",
+            "round_number": 1,
+            "seller_price": {
+              "amount_micros": 23000000,
+              "currency": "USD"
+            },
+            "timestamp": "2026-07-01T12:00:00Z"
+          }
+        ],
+        "started_at": "2026-07-01T12:00:00Z",
+        "status": "active"
+      },
+      "description": "Quote-led negotiation after the first counter",
+      "mode": "valid",
+      "name": "active_round_1"
+    },
+    {
+      "data": {
+        "buyer_tier": "agency",
+        "completed_at": "2026-07-02T09:30:00Z",
+        "negotiation_id": "neg-002",
+        "package_id": "pkg-001",
+        "product_id": null,
+        "proposal_id": "prop-001",
+        "quote_id": null,
+        "rounds": [
+          {
+            "action": "counter",
+            "buyer_price": {
+              "amount_micros": 28000000,
+              "currency": "USD"
+            },
+            "concession_pct": 0.0,
+            "cumulative_concession_pct": 0.0,
+            "rationale": "",
+            "round_number": 1,
+            "seller_price": {
+              "amount_micros": 31000000,
+              "currency": "USD"
+            },
+            "timestamp": "2026-07-01T12:00:00Z"
+          },
+          {
+            "action": "accept",
+            "buyer_price": {
+              "amount_micros": 30000000,
+              "currency": "USD"
+            },
+            "concession_pct": 0.032,
+            "cumulative_concession_pct": 0.032,
+            "rationale": "",
+            "round_number": 2,
+            "seller_price": {
+              "amount_micros": 30000000,
+              "currency": "USD"
+            },
+            "timestamp": "2026-07-02T09:30:00Z"
+          }
+        ],
+        "started_at": "2026-07-01T12:00:00Z",
+        "status": "accepted"
+      },
+      "description": "Terminal accepted negotiation with full round history",
+      "mode": "valid",
+      "name": "accepted_terminal"
+    }
+  ]
+}

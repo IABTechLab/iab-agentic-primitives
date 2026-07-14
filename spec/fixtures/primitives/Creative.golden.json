@@ -1,0 +1,74 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "primitives",
+  "target": "Creative",
+  "vectors": [
+    {
+      "data": {
+        "account_id": "acct-001",
+        "ad_product_taxonomy": null,
+        "ad_profile": "metadata_only",
+        "audience_taxonomy": null,
+        "click_url": "https://example.com/summer",
+        "content_policy": null,
+        "creative_id": "crv-001",
+        "creative_manifest": {
+          "assets": [
+            {
+              "asset_id": "a-1",
+              "asset_url": "https://cdn.example.com/summer.mp4",
+              "height": 1080,
+              "mime_type": "video/mp4",
+              "role": "main",
+              "width": 1920
+            }
+          ],
+          "declared_advertiser_domains": [
+            "example.com"
+          ],
+          "duration_ms": 30000,
+          "file_size_bytes": 4500000,
+          "landing_page_urls": [
+            "https://example.com/summer"
+          ]
+        },
+        "ext": null,
+        "is_placeholder": false,
+        "language": "en",
+        "name": "Summer Video 30s",
+        "placeholder_type": null,
+        "review_status": "approved"
+      },
+      "description": "Approved video creative with a full manifest",
+      "mode": "valid",
+      "name": "video_approved"
+    },
+    {
+      "data": {
+        "account_id": null,
+        "ad_product_taxonomy": null,
+        "ad_profile": "metadata_only",
+        "audience_taxonomy": null,
+        "click_url": null,
+        "content_policy": null,
+        "creative_id": "crv-002",
+        "creative_manifest": {
+          "assets": [],
+          "declared_advertiser_domains": null,
+          "duration_ms": null,
+          "file_size_bytes": null,
+          "landing_page_urls": null
+        },
+        "ext": null,
+        "is_placeholder": true,
+        "language": null,
+        "name": "Q4 Placeholder",
+        "placeholder_type": "pending_asset",
+        "review_status": "pending"
+      },
+      "description": "Metadata-only placeholder awaiting seller review",
+      "mode": "valid",
+      "name": "placeholder_pending"
+    }
+  ]
+}

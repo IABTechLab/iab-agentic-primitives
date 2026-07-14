@@ -1,0 +1,91 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "primitives",
+  "target": "Line",
+  "vectors": [
+    {
+      "data": {
+        "cost": {
+          "amount_micros": 22500000000,
+          "currency": "USD"
+        },
+        "end_date": "2026-08-31",
+        "ext": null,
+        "line_id": "line-001",
+        "name": "Homepage Takeover Aug",
+        "order_id": "ord-001",
+        "pricing_model": "cpm",
+        "product_id": "prod-001",
+        "quantity": 1000000,
+        "rate": {
+          "amount_micros": 22500000,
+          "currency": "USD"
+        },
+        "start_date": "2026-08-01",
+        "status": "Booked",
+        "targeting": {
+          "geo": [
+            "US-NY"
+          ]
+        }
+      },
+      "description": "Booked line (OpenDirect wire casing: 'Booked')",
+      "mode": "valid",
+      "name": "booked_line"
+    },
+    {
+      "data": {
+        "cost": null,
+        "end_date": "2026-03-31",
+        "ext": null,
+        "line_id": "line-002",
+        "name": "CTV Prime March",
+        "order_id": "ord-002",
+        "pricing_model": "cpcv",
+        "product_id": "prod-002",
+        "quantity": 400000,
+        "rate": {
+          "amount_micros": 120000,
+          "currency": "USD"
+        },
+        "start_date": "2026-03-01",
+        "status": "Finished",
+        "targeting": null
+      },
+      "description": "Terminal finished line",
+      "mode": "valid",
+      "name": "finished_terminal"
+    },
+    {
+      "data": {
+        "cost": {
+          "amount_micros": 22500000000,
+          "currency": "USD"
+        },
+        "end_date": "2026-08-31",
+        "ext": null,
+        "line_id": "line-001",
+        "name": "Homepage Takeover Aug",
+        "order_id": "ord-001",
+        "pricing_model": "cpm",
+        "product_id": "prod-001",
+        "quantity": 1000000,
+        "rate": {
+          "amount_micros": 22500000.5,
+          "currency": "USD"
+        },
+        "start_date": "2026-08-01",
+        "status": "Booked",
+        "targeting": {
+          "geo": [
+            "US-NY"
+          ]
+        }
+      },
+      "description": "FD-11: float-typed line rate must be rejected",
+      "expected_error": "Input should be a valid integer",
+      "mode": "invalid",
+      "name": "float_rate_rejected"
+    }
+  ]
+}

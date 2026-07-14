@@ -1,0 +1,35 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "primitives",
+  "target": "Account",
+  "vectors": [
+    {
+      "data": {
+        "account_id": "acct-001",
+        "advertiser_id": "adv-cola",
+        "buyer_organization_id": "org-buyer-1",
+        "ext": null,
+        "name": "Acme x PremiumPub",
+        "seller_organization_id": "org-seller-1",
+        "status": "active"
+      },
+      "description": "Active buyer/seller commercial relationship",
+      "mode": "valid",
+      "name": "active_pair"
+    },
+    {
+      "data": {
+        "account_id": "acct-002",
+        "advertiser_id": null,
+        "buyer_organization_id": "org-buyer-2",
+        "ext": null,
+        "name": null,
+        "seller_organization_id": "org-seller-1",
+        "status": "suspended"
+      },
+      "description": "Suspended account with only required fields",
+      "mode": "valid",
+      "name": "suspended_minimal"
+    }
+  ]
+}

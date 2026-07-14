@@ -1,0 +1,214 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "primitives",
+  "target": "Agent",
+  "vectors": [
+    {
+      "data": {
+        "agent_id": "agent-seller-1",
+        "agent_type": "seller",
+        "audience_capabilities": null,
+        "authentication": {
+          "credentials_url": null,
+          "schemes": [
+            "api_key"
+          ]
+        },
+        "capabilities": {
+          "protocols": [
+            "a2a"
+          ],
+          "push_notifications": false,
+          "streaming": false
+        },
+        "contact": null,
+        "description": "Seller agent for PremiumPub inventory",
+        "inventory_types": [
+          "display",
+          "video",
+          "ctv"
+        ],
+        "name": "PremiumPub Seller Agent",
+        "organization_id": "org-seller-1",
+        "provider": {
+          "description": null,
+          "name": "PremiumPub",
+          "url": "https://premiumpub.example.com"
+        },
+        "skills": [
+          {
+            "description": "Price quotes for PG/PD/PA deals",
+            "id": "quote",
+            "name": "Quoting",
+            "tags": [
+              "deals"
+            ]
+          }
+        ],
+        "supported_deal_types": [
+          "PG",
+          "PD",
+          "PA"
+        ],
+        "tos_url": null,
+        "trust_status": "approved",
+        "url": "https://seller.example.com/a2a",
+        "version": "1.0.0"
+      },
+      "description": "Registry-approved seller agent card",
+      "mode": "valid",
+      "name": "seller_card"
+    },
+    {
+      "data": {
+        "agent_id": "agent-buyer-1",
+        "agent_type": "buyer",
+        "audience_capabilities": null,
+        "authentication": {
+          "credentials_url": null,
+          "schemes": [
+            "api_key"
+          ]
+        },
+        "capabilities": {
+          "protocols": [
+            "a2a"
+          ],
+          "push_notifications": false,
+          "streaming": false
+        },
+        "contact": null,
+        "description": "Buyer agent for Acme campaigns",
+        "inventory_types": [],
+        "name": "Acme Buyer Agent",
+        "organization_id": null,
+        "provider": {
+          "description": null,
+          "name": "Acme Media Buying",
+          "url": null
+        },
+        "skills": [],
+        "supported_deal_types": [],
+        "tos_url": null,
+        "trust_status": "unknown",
+        "url": "https://buyer.example.com/a2a",
+        "version": "1.0.0"
+      },
+      "description": "Self-served buyer card: trust_status stays 'unknown' until a registry lookup upgrades it",
+      "mode": "valid",
+      "name": "buyer_card_minimal"
+    },
+    {
+      "data": {
+        "agent_id": "agent-seller-1",
+        "agent_type": "seller",
+        "audience_capabilities": null,
+        "authentication": {
+          "credentials_url": null,
+          "schemes": [
+            "api_key"
+          ]
+        },
+        "capabilities": {
+          "protocols": [
+            "a2a"
+          ],
+          "push_notifications": false,
+          "streaming": false
+        },
+        "contact": null,
+        "description": "Seller agent for PremiumPub inventory",
+        "field_from_a_newer_spec_version": "must-be-ignored",
+        "inventory_types": [
+          "display",
+          "video",
+          "ctv"
+        ],
+        "name": "PremiumPub Seller Agent",
+        "organization_id": "org-seller-1",
+        "provider": {
+          "description": null,
+          "name": "PremiumPub",
+          "url": "https://premiumpub.example.com"
+        },
+        "skills": [
+          {
+            "description": "Price quotes for PG/PD/PA deals",
+            "id": "quote",
+            "name": "Quoting",
+            "tags": [
+              "deals"
+            ]
+          }
+        ],
+        "supported_deal_types": [
+          "PG",
+          "PD",
+          "PA"
+        ],
+        "tos_url": null,
+        "trust_status": "approved",
+        "url": "https://seller.example.com/a2a",
+        "version": "1.0.0",
+        "x_vendor_ext": {
+          "partner": "example-dsp",
+          "trace": "abc-123"
+        }
+      },
+      "description": "FD-13: unknown + x_ fields on an agent card are ignored",
+      "expected": {
+        "agent_id": "agent-seller-1",
+        "agent_type": "seller",
+        "audience_capabilities": null,
+        "authentication": {
+          "credentials_url": null,
+          "schemes": [
+            "api_key"
+          ]
+        },
+        "capabilities": {
+          "protocols": [
+            "a2a"
+          ],
+          "push_notifications": false,
+          "streaming": false
+        },
+        "contact": null,
+        "description": "Seller agent for PremiumPub inventory",
+        "inventory_types": [
+          "display",
+          "video",
+          "ctv"
+        ],
+        "name": "PremiumPub Seller Agent",
+        "organization_id": "org-seller-1",
+        "provider": {
+          "description": null,
+          "name": "PremiumPub",
+          "url": "https://premiumpub.example.com"
+        },
+        "skills": [
+          {
+            "description": "Price quotes for PG/PD/PA deals",
+            "id": "quote",
+            "name": "Quoting",
+            "tags": [
+              "deals"
+            ]
+          }
+        ],
+        "supported_deal_types": [
+          "PG",
+          "PD",
+          "PA"
+        ],
+        "tos_url": null,
+        "trust_status": "approved",
+        "url": "https://seller.example.com/a2a",
+        "version": "1.0.0"
+      },
+      "mode": "must_ignore",
+      "name": "card_with_unknown_fields"
+    }
+  ]
+}

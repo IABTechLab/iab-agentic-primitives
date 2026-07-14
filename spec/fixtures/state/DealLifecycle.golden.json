@@ -1,0 +1,91 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "state",
+  "machine": "deal",
+  "sequences": [
+    {
+      "description": "Propose -> negotiate -> accept -> book -> deliver -> complete",
+      "expect": "legal",
+      "name": "happy_path",
+      "states": [
+        "proposed",
+        "negotiating",
+        "accepted",
+        "booked",
+        "active",
+        "completed"
+      ]
+    },
+    {
+      "description": "Linear TV under-delivery: makegood_pending loops back to active (rework edge), then completes",
+      "expect": "legal",
+      "name": "makegood_cycle",
+      "states": [
+        "proposed",
+        "accepted",
+        "booked",
+        "active",
+        "makegood_pending",
+        "active",
+        "completed"
+      ]
+    },
+    {
+      "description": "Counter-offer re-propose loop, then a terminal walk-away",
+      "expect": "legal",
+      "name": "negotiation_rework_walkaway",
+      "states": [
+        "proposed",
+        "negotiating",
+        "proposed",
+        "negotiating",
+        "rejected"
+      ]
+    },
+    {
+      "description": "Booked units partially cancelled, remainder cancelled",
+      "expect": "legal",
+      "name": "partial_cancellation",
+      "states": [
+        "proposed",
+        "accepted",
+        "booked",
+        "partially_cancelled",
+        "cancelled"
+      ]
+    },
+    {
+      "description": "Terminal states have no outgoing transitions",
+      "expect": "illegal",
+      "fails_at": 1,
+      "name": "terminal_completed_reopened",
+      "states": [
+        "active",
+        "completed",
+        "active"
+      ]
+    },
+    {
+      "description": "A proposed deal cannot book without acceptance",
+      "expect": "illegal",
+      "fails_at": 0,
+      "name": "skip_acceptance",
+      "states": [
+        "proposed",
+        "booked"
+      ]
+    },
+    {
+      "description": "Booking is a commit point; no path back to negotiation",
+      "expect": "illegal",
+      "fails_at": 1,
+      "name": "booked_back_to_negotiating",
+      "states": [
+        "accepted",
+        "booked",
+        "negotiating"
+      ]
+    }
+  ],
+  "spec_export": "spec/jsonschema/state/DealLifecycle.json"
+}

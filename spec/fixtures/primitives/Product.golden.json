@@ -1,0 +1,173 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "primitives",
+  "target": "Product",
+  "vectors": [
+    {
+      "data": {
+        "ad_formats": [
+          "banner",
+          "video"
+        ],
+        "ad_product_targeting": null,
+        "audience_targeting": {
+          "segment_ids": [
+            "1001"
+          ]
+        },
+        "available_impressions": 5000000,
+        "base_price": {
+          "amount_micros": 25000000,
+          "currency": "USD"
+        },
+        "commercial_terms": {
+          "guarantee_allowed": true,
+          "makegood_allowed": null,
+          "minimum_deal_value": {
+            "amount_micros": 5000000000,
+            "currency": "USD"
+          },
+          "supported_deal_types": [
+            "PG",
+            "PD"
+          ],
+          "supported_pricing_models": [
+            "cpm"
+          ]
+        },
+        "content_targeting": null,
+        "delivery_type": "Guaranteed",
+        "description": "Above-the-fold homepage display",
+        "domain": null,
+        "ext": null,
+        "name": "Premium Homepage Takeover",
+        "pricing_model": "cpm",
+        "pricing_type": "fixed",
+        "product_id": "prod-001",
+        "seller_organization_id": "org-seller-1"
+      },
+      "description": "Fixed-price guaranteed display product",
+      "mode": "valid",
+      "name": "guaranteed_display"
+    },
+    {
+      "data": {
+        "ad_formats": [
+          "video"
+        ],
+        "ad_product_targeting": null,
+        "audience_targeting": null,
+        "available_impressions": null,
+        "base_price": null,
+        "commercial_terms": null,
+        "content_targeting": null,
+        "delivery_type": "PMP",
+        "description": null,
+        "domain": null,
+        "ext": null,
+        "name": "CTV Prime Video",
+        "pricing_model": "cpcv",
+        "pricing_type": "on_request",
+        "product_id": "prod-002",
+        "seller_organization_id": "org-seller-1"
+      },
+      "description": "pricing_type=on_request: no price fields are fabricated",
+      "mode": "valid",
+      "name": "on_request_video"
+    },
+    {
+      "data": {
+        "ad_formats": [
+          "banner",
+          "video"
+        ],
+        "ad_product_targeting": null,
+        "audience_targeting": {
+          "segment_ids": [
+            "1001"
+          ]
+        },
+        "available_impressions": 5000000,
+        "base_price": {
+          "amount_micros": 25000000,
+          "currency": "USD"
+        },
+        "commercial_terms": {
+          "guarantee_allowed": true,
+          "makegood_allowed": null,
+          "minimum_deal_value": {
+            "amount_micros": 5000000000,
+            "currency": "USD"
+          },
+          "supported_deal_types": [
+            "PG",
+            "PD"
+          ],
+          "supported_pricing_models": [
+            "cpm"
+          ]
+        },
+        "content_targeting": null,
+        "delivery_type": "Guaranteed",
+        "description": "Above-the-fold homepage display",
+        "domain": null,
+        "ext": null,
+        "field_from_a_newer_spec_version": "must-be-ignored",
+        "name": "Premium Homepage Takeover",
+        "pricing_model": "cpm",
+        "pricing_type": "fixed",
+        "product_id": "prod-001",
+        "seller_organization_id": "org-seller-1",
+        "x_vendor_ext": {
+          "partner": "example-dsp",
+          "trace": "abc-123"
+        }
+      },
+      "description": "FD-13: unknown + x_ fields on a product are ignored",
+      "expected": {
+        "ad_formats": [
+          "banner",
+          "video"
+        ],
+        "ad_product_targeting": null,
+        "audience_targeting": {
+          "segment_ids": [
+            "1001"
+          ]
+        },
+        "available_impressions": 5000000,
+        "base_price": {
+          "amount_micros": 25000000,
+          "currency": "USD"
+        },
+        "commercial_terms": {
+          "guarantee_allowed": true,
+          "makegood_allowed": null,
+          "minimum_deal_value": {
+            "amount_micros": 5000000000,
+            "currency": "USD"
+          },
+          "supported_deal_types": [
+            "PG",
+            "PD"
+          ],
+          "supported_pricing_models": [
+            "cpm"
+          ]
+        },
+        "content_targeting": null,
+        "delivery_type": "Guaranteed",
+        "description": "Above-the-fold homepage display",
+        "domain": null,
+        "ext": null,
+        "name": "Premium Homepage Takeover",
+        "pricing_model": "cpm",
+        "pricing_type": "fixed",
+        "product_id": "prod-001",
+        "seller_organization_id": "org-seller-1"
+      },
+      "mode": "must_ignore",
+      "name": "product_with_unknown_fields"
+    }
+  ]
+}

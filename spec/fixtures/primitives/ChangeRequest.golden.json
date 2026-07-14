@@ -1,0 +1,91 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "primitives",
+  "target": "ChangeRequest",
+  "vectors": [
+    {
+      "data": {
+        "applied_at": null,
+        "applied_by": null,
+        "approved_at": null,
+        "approved_by": null,
+        "availability_check": null,
+        "change_request_id": "cr-001",
+        "change_type": "makegood",
+        "deal_id": "deal-ltv-002",
+        "diffs": [],
+        "makegood": {
+          "notes": "Week 2 audience under-delivery",
+          "original_daypart": "primetime",
+          "preferred_dayparts": [
+            "primetime",
+            "late_night"
+          ],
+          "shortfall_grps": 8.5,
+          "target_demo": "A18-49"
+        },
+        "order_id": null,
+        "pricing_impact": null,
+        "proposed_values": {},
+        "reason": "GRP shortfall in week 2",
+        "rejection_reason": null,
+        "requested_at": "2026-07-02T09:30:00Z",
+        "requested_by": "agent:agent-buyer-1",
+        "severity": "material",
+        "status": "pending",
+        "validation_errors": []
+      },
+      "description": "FD-6 makegood as a typed ChangeRequest subtype",
+      "mode": "valid",
+      "name": "makegood_pending"
+    },
+    {
+      "data": {
+        "applied_at": "2026-07-02T09:30:00Z",
+        "applied_by": "system",
+        "approved_at": "2026-07-02T09:30:00Z",
+        "approved_by": "human:manager-7",
+        "availability_check": null,
+        "change_request_id": "cr-002",
+        "change_type": "cancellation",
+        "deal_id": null,
+        "diffs": [
+          {
+            "field": "status",
+            "new_value": "cancelled",
+            "old_value": "booked"
+          }
+        ],
+        "makegood": null,
+        "order_id": "ord-001",
+        "pricing_impact": null,
+        "proposed_values": {
+          "cancel_pct": 1.0,
+          "effective_date": "2026-08-15",
+          "reason": "advertiser pause"
+        },
+        "reason": "Campaign paused by advertiser",
+        "rejection_reason": null,
+        "requested_at": "2026-07-01T12:00:00Z",
+        "requested_by": "human:ops-42",
+        "severity": "critical",
+        "status": "applied",
+        "validation_errors": []
+      },
+      "description": "Terminal applied cancellation with field diffs",
+      "mode": "valid",
+      "name": "cancellation_applied"
+    },
+    {
+      "data": {
+        "change_request_id": "cr-bad",
+        "change_type": "pricing",
+        "requested_at": "2026-07-01T12:00:00Z"
+      },
+      "description": "A change request must reference an order or a deal",
+      "expected_error": "requires at least one of order_id or deal_id",
+      "mode": "invalid",
+      "name": "missing_target_rejected"
+    }
+  ]
+}

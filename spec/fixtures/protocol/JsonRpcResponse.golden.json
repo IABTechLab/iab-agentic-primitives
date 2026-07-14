@@ -1,0 +1,64 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "protocol",
+  "target": "JsonRpcResponse",
+  "vectors": [
+    {
+      "data": {
+        "error": null,
+        "id": "req-001",
+        "jsonrpc": "2.0",
+        "result": {
+          "contextId": "ctx-001",
+          "parts": [
+            {
+              "data": null,
+              "kind": "text",
+              "text": "We have 3 CTV packages."
+            }
+          ],
+          "role": "agent",
+          "taskId": "task-001"
+        }
+      },
+      "description": "Successful message/send result",
+      "mode": "valid",
+      "name": "result_response"
+    },
+    {
+      "data": {
+        "error": {
+          "code": -32601,
+          "data": null,
+          "message": "Method not found: 'call' (use 'message/send')"
+        },
+        "id": "req-003",
+        "jsonrpc": "2.0",
+        "result": null
+      },
+      "description": "-32601 for the retired seller 'call' dialect",
+      "mode": "valid",
+      "name": "method_not_found_error"
+    },
+    {
+      "data": {
+        "error": {
+          "code": -32601,
+          "message": "nope"
+        },
+        "id": "req-004",
+        "jsonrpc": "2.0",
+        "result": {
+          "contextId": "c",
+          "parts": [],
+          "role": "agent",
+          "taskId": "t"
+        }
+      },
+      "description": "Exactly one of result/error is required",
+      "expected_error": "exactly one of result/error",
+      "mode": "invalid",
+      "name": "result_and_error_rejected"
+    }
+  ]
+}

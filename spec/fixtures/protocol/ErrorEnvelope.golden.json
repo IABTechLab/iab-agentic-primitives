@@ -1,0 +1,85 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "protocol",
+  "target": "ErrorEnvelope",
+  "vectors": [
+    {
+      "data": {
+        "detail": {
+          "error": "unsupported_capability",
+          "message": "This seller does not transact linear TV inventory",
+          "unsupported": [
+            {
+              "capability": "linear_tv",
+              "path": "$.media_type",
+              "reason": "linear_tv is not a supported media_type"
+            }
+          ]
+        }
+      },
+      "description": "FD-6 structured rejection: unsupported_capability with the specific unsupported item",
+      "mode": "valid",
+      "name": "fd6_linear_tv_rejection"
+    },
+    {
+      "data": {
+        "detail": {
+          "error": "validation",
+          "message": "impressions is required for PG deals",
+          "unsupported": []
+        }
+      },
+      "description": "Schema/business validation failure",
+      "mode": "valid",
+      "name": "validation_error"
+    },
+    {
+      "data": {
+        "detail": {
+          "error": "idempotency_conflict",
+          "message": "idempotency_key was already used with a different request body",
+          "unsupported": []
+        }
+      },
+      "description": "FD-12: reused idempotency key with a different body",
+      "mode": "valid",
+      "name": "idempotency_conflict"
+    },
+    {
+      "data": {
+        "detail": {
+          "error": "unsupported_capability",
+          "message": "This seller does not transact linear TV inventory",
+          "unsupported": [
+            {
+              "capability": "linear_tv",
+              "path": "$.media_type",
+              "reason": "linear_tv is not a supported media_type"
+            }
+          ]
+        },
+        "field_from_a_newer_spec_version": "must-be-ignored",
+        "x_vendor_ext": {
+          "partner": "example-dsp",
+          "trace": "abc-123"
+        }
+      },
+      "description": "FD-13: unknown + x_ fields on the error envelope are ignored",
+      "expected": {
+        "detail": {
+          "error": "unsupported_capability",
+          "message": "This seller does not transact linear TV inventory",
+          "unsupported": [
+            {
+              "capability": "linear_tv",
+              "path": "$.media_type",
+              "reason": "linear_tv is not a supported media_type"
+            }
+          ]
+        }
+      },
+      "mode": "must_ignore",
+      "name": "error_with_unknown_fields"
+    }
+  ]
+}

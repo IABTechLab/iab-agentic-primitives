@@ -1,0 +1,23 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "protocol",
+  "target": "AgentDiscoveryRequest",
+  "vectors": [
+    {
+      "data": {
+        "agent_url": "https://seller.example.com"
+      },
+      "description": "Fetch and register a seller agent card by base URL",
+      "mode": "valid",
+      "name": "discover_seller"
+    },
+    {
+      "data": {
+        "agent_url": "https://buyer.example.com"
+      },
+      "description": "Fetch and register a buyer agent card by base URL",
+      "mode": "valid",
+      "name": "discover_buyer"
+    }
+  ]
+}
