@@ -1,0 +1,107 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "protocol",
+  "target": "JsonRpcRequest",
+  "vectors": [
+    {
+      "data": {
+        "id": "req-001",
+        "jsonrpc": "2.0",
+        "method": "message/send",
+        "params": {
+          "contextId": "ctx-001",
+          "message": {
+            "messageId": "msg-001",
+            "parts": [
+              {
+                "data": null,
+                "kind": "text",
+                "text": "What CTV inventory do you have?"
+              }
+            ],
+            "role": "user"
+          }
+        }
+      },
+      "description": "A2A message/send with a text part (camelCase wire aliases)",
+      "mode": "valid",
+      "name": "message_send_text"
+    },
+    {
+      "data": {
+        "id": "req-002",
+        "jsonrpc": "2.0",
+        "method": "message/send",
+        "params": {
+          "contextId": null,
+          "message": {
+            "messageId": "msg-002",
+            "parts": [
+              {
+                "data": {
+                  "quote_request": {
+                    "product_id": "prod-001"
+                  }
+                },
+                "kind": "data",
+                "text": null
+              }
+            ],
+            "role": "user"
+          }
+        }
+      },
+      "description": "A2A message/send carrying a structured data part",
+      "mode": "valid",
+      "name": "message_send_data"
+    },
+    {
+      "data": {
+        "field_from_a_newer_spec_version": "must-be-ignored",
+        "id": "req-001",
+        "jsonrpc": "2.0",
+        "method": "message/send",
+        "params": {
+          "contextId": "ctx-001",
+          "message": {
+            "messageId": "msg-001",
+            "parts": [
+              {
+                "data": null,
+                "kind": "text",
+                "text": "What CTV inventory do you have?"
+              }
+            ],
+            "role": "user"
+          }
+        },
+        "x_vendor_ext": {
+          "partner": "example-dsp",
+          "trace": "abc-123"
+        }
+      },
+      "description": "FD-13: unknown + x_ fields on the JSON-RPC envelope are ignored",
+      "expected": {
+        "id": "req-001",
+        "jsonrpc": "2.0",
+        "method": "message/send",
+        "params": {
+          "contextId": "ctx-001",
+          "message": {
+            "messageId": "msg-001",
+            "parts": [
+              {
+                "data": null,
+                "kind": "text",
+                "text": "What CTV inventory do you have?"
+              }
+            ],
+            "role": "user"
+          }
+        }
+      },
+      "mode": "must_ignore",
+      "name": "request_with_unknown_fields"
+    }
+  ]
+}

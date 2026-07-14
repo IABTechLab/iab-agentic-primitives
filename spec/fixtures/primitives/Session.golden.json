@@ -1,0 +1,79 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "primitives",
+  "target": "Session",
+  "vectors": [
+    {
+      "data": {
+        "active_deal_ids": [
+          "deal-001"
+        ],
+        "active_negotiation_ids": [
+          "neg-001"
+        ],
+        "buyer_identity": {
+          "advertiser_id": null,
+          "advertiser_industry": null,
+          "advertiser_name": null,
+          "agency_holding_company": null,
+          "agency_id": "omnicom-456",
+          "agency_name": null,
+          "campaign_id": null,
+          "campaign_name": null,
+          "dsp_platform": null,
+          "seat_id": "ttd-seat-123",
+          "seat_name": null
+        },
+        "closed_at": null,
+        "created_at": "2026-07-01T12:00:00Z",
+        "expires_at": "2026-07-15T00:00:00Z",
+        "messages": [
+          {
+            "content": "What CTV inventory do you have?",
+            "message_type": "availability",
+            "metadata": {},
+            "role": "user",
+            "timestamp": "2026-07-01T12:00:00Z"
+          }
+        ],
+        "metadata": {},
+        "session_id": "sess-001",
+        "status": "active",
+        "updated_at": "2026-07-01T12:00:00Z"
+      },
+      "description": "Active session with revealed buyer identity",
+      "mode": "valid",
+      "name": "active_conversation"
+    },
+    {
+      "data": {
+        "active_deal_ids": [],
+        "active_negotiation_ids": [],
+        "buyer_identity": {
+          "advertiser_id": null,
+          "advertiser_industry": null,
+          "advertiser_name": null,
+          "agency_holding_company": null,
+          "agency_id": null,
+          "agency_name": null,
+          "campaign_id": null,
+          "campaign_name": null,
+          "dsp_platform": null,
+          "seat_id": null,
+          "seat_name": null
+        },
+        "closed_at": "2026-07-02T09:30:00Z",
+        "created_at": "2026-07-01T12:00:00Z",
+        "expires_at": null,
+        "messages": [],
+        "metadata": {},
+        "session_id": "sess-002",
+        "status": "closed",
+        "updated_at": "2026-07-02T09:30:00Z"
+      },
+      "description": "Terminal closed session",
+      "mode": "valid",
+      "name": "closed_terminal"
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "protocol",
+  "target": "ProductListResponse",
+  "vectors": [
+    {
+      "data": {
+        "limit": 50,
+        "offset": 0,
+        "products": [
+          {
+            "ad_formats": [
+              "banner",
+              "video"
+            ],
+            "ad_product_targeting": null,
+            "audience_targeting": null,
+            "available_impressions": 5000000,
+            "base_price": {
+              "amount_micros": 25000000,
+              "currency": "USD"
+            },
+            "commercial_terms": null,
+            "content_targeting": null,
+            "delivery_type": "Guaranteed",
+            "description": null,
+            "domain": null,
+            "ext": null,
+            "name": "Premium Homepage Takeover",
+            "pricing_model": "cpm",
+            "pricing_type": "fixed",
+            "product_id": "prod-001",
+            "seller_organization_id": "org-seller-1"
+          }
+        ],
+        "total_count": 1
+      },
+      "description": "Catalog page with a single product",
+      "mode": "valid",
+      "name": "one_product"
+    },
+    {
+      "data": {
+        "limit": 50,
+        "offset": 0,
+        "products": [],
+        "total_count": 0
+      },
+      "description": "Empty catalog page",
+      "mode": "valid",
+      "name": "empty_catalog"
+    }
+  ]
+}

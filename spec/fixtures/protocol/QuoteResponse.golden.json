@@ -1,0 +1,300 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "protocol",
+  "target": "QuoteResponse",
+  "vectors": [
+    {
+      "data": {
+        "quote": {
+          "availability": {
+            "competing_demand": null,
+            "estimated_fill_rate": 0.95,
+            "inventory_available": true
+          },
+          "buyer_tier": "advertiser",
+          "consent_context": {
+            "applicable_regimes": [
+              "GDPR",
+              "CCPA"
+            ],
+            "diligence_status": "passed",
+            "gpp_section_ids": [
+              2,
+              6
+            ],
+            "gpp_string": "DBABMA~CPXxRfAPXxRfAAfKABENB",
+            "tcf_string": "CPXxRfAPXxRfAAfKABENB",
+            "verified_at": "2026-07-01T12:00:00Z"
+          },
+          "created_at": "2026-07-01T12:00:00Z",
+          "deal_id": null,
+          "deal_type": "PG",
+          "expires_at": "2026-07-15T00:00:00Z",
+          "linear_tv": null,
+          "media_type": "digital",
+          "pricing": {
+            "base_cpm": {
+              "amount_micros": 25000000,
+              "currency": "USD"
+            },
+            "base_cpp": null,
+            "final_cpm": {
+              "amount_micros": 22500000,
+              "currency": "USD"
+            },
+            "final_cpp": null,
+            "pricing_model": "cpm",
+            "pricing_type": "fixed",
+            "rationale": "advertiser tier discount",
+            "tier_discount_pct": 10.0,
+            "volume_discount_pct": 0.0
+          },
+          "product": {
+            "inventory_type": "display",
+            "name": "Premium Homepage Takeover",
+            "product_id": "prod-001"
+          },
+          "quote_id": "q-pg-001",
+          "rate_card_id": "rc-001",
+          "seller_id": "agent-seller-1",
+          "status": "available",
+          "terms": {
+            "flight_end": "2026-08-31",
+            "flight_start": "2026-08-01",
+            "grps": null,
+            "guaranteed": true,
+            "guaranteed_grps": null,
+            "impressions": 1000000,
+            "target_demo": null
+          }
+        }
+      },
+      "description": "Envelope wrapping a PG digital quote",
+      "mode": "valid",
+      "name": "digital_quote"
+    },
+    {
+      "data": {
+        "quote": {
+          "availability": null,
+          "buyer_tier": "agency",
+          "consent_context": null,
+          "created_at": "2026-07-01T12:00:00Z",
+          "deal_id": null,
+          "deal_type": "PG",
+          "expires_at": "2026-07-15T00:00:00Z",
+          "linear_tv": {
+            "audience_estimate": {
+              "demo": "A18-49",
+              "universe": 128000000
+            },
+            "cancellation_terms": {
+              "cancellable_pct": 0.5,
+              "deadline": "2026-09-15",
+              "force_majeure": true,
+              "notice_days": 14
+            },
+            "cpp": {
+              "amount_micros": 450000000,
+              "currency": "USD"
+            },
+            "dayparts": [
+              "primetime"
+            ],
+            "estimated_grps": 120.0,
+            "estimated_rating": 2.4,
+            "makegood_policy": "standard",
+            "measurement_currency": "nielsen",
+            "networks": [
+              "NBC",
+              "ESPN"
+            ],
+            "spot_length": 30,
+            "spots_per_week": 12,
+            "target_demo": "A18-49",
+            "total_spots": 48
+          },
+          "media_type": "linear_tv",
+          "pricing": {
+            "base_cpm": null,
+            "base_cpp": {
+              "amount_micros": 475000000,
+              "currency": "USD"
+            },
+            "final_cpm": null,
+            "final_cpp": {
+              "amount_micros": 450000000,
+              "currency": "USD"
+            },
+            "pricing_model": "cpp",
+            "pricing_type": "fixed",
+            "rationale": "upfront volume commitment",
+            "tier_discount_pct": 0.0,
+            "volume_discount_pct": 0.0
+          },
+          "product": {
+            "inventory_type": null,
+            "name": "Primetime National Spots",
+            "product_id": "prod-ltv-9"
+          },
+          "quote_id": "q-ltv-002",
+          "rate_card_id": null,
+          "seller_id": "agent-seller-1",
+          "status": "available",
+          "terms": {
+            "flight_end": "2026-09-28",
+            "flight_start": "2026-09-01",
+            "grps": 120,
+            "guaranteed": true,
+            "guaranteed_grps": 110,
+            "impressions": null,
+            "target_demo": "A18-49"
+          }
+        }
+      },
+      "description": "Envelope wrapping the FD-6 linear TV quote",
+      "mode": "valid",
+      "name": "linear_tv_quote"
+    },
+    {
+      "data": {
+        "field_from_a_newer_spec_version": "must-be-ignored",
+        "quote": {
+          "availability": {
+            "competing_demand": null,
+            "estimated_fill_rate": 0.95,
+            "inventory_available": true
+          },
+          "buyer_tier": "advertiser",
+          "consent_context": {
+            "applicable_regimes": [
+              "GDPR",
+              "CCPA"
+            ],
+            "diligence_status": "passed",
+            "gpp_section_ids": [
+              2,
+              6
+            ],
+            "gpp_string": "DBABMA~CPXxRfAPXxRfAAfKABENB",
+            "tcf_string": "CPXxRfAPXxRfAAfKABENB",
+            "verified_at": "2026-07-01T12:00:00Z"
+          },
+          "created_at": "2026-07-01T12:00:00Z",
+          "deal_id": null,
+          "deal_type": "PG",
+          "expires_at": "2026-07-15T00:00:00Z",
+          "linear_tv": null,
+          "media_type": "digital",
+          "pricing": {
+            "base_cpm": {
+              "amount_micros": 25000000,
+              "currency": "USD"
+            },
+            "base_cpp": null,
+            "final_cpm": {
+              "amount_micros": 22500000,
+              "currency": "USD"
+            },
+            "final_cpp": null,
+            "pricing_model": "cpm",
+            "pricing_type": "fixed",
+            "rationale": "advertiser tier discount",
+            "tier_discount_pct": 10.0,
+            "volume_discount_pct": 0.0
+          },
+          "product": {
+            "inventory_type": "display",
+            "name": "Premium Homepage Takeover",
+            "product_id": "prod-001"
+          },
+          "quote_id": "q-pg-001",
+          "rate_card_id": "rc-001",
+          "seller_id": "agent-seller-1",
+          "status": "available",
+          "terms": {
+            "flight_end": "2026-08-31",
+            "flight_start": "2026-08-01",
+            "grps": null,
+            "guaranteed": true,
+            "guaranteed_grps": null,
+            "impressions": 1000000,
+            "target_demo": null
+          }
+        },
+        "x_vendor_ext": {
+          "partner": "example-dsp",
+          "trace": "abc-123"
+        }
+      },
+      "description": "FD-13: unknown + x_ fields on a quote response are ignored",
+      "expected": {
+        "quote": {
+          "availability": {
+            "competing_demand": null,
+            "estimated_fill_rate": 0.95,
+            "inventory_available": true
+          },
+          "buyer_tier": "advertiser",
+          "consent_context": {
+            "applicable_regimes": [
+              "GDPR",
+              "CCPA"
+            ],
+            "diligence_status": "passed",
+            "gpp_section_ids": [
+              2,
+              6
+            ],
+            "gpp_string": "DBABMA~CPXxRfAPXxRfAAfKABENB",
+            "tcf_string": "CPXxRfAPXxRfAAfKABENB",
+            "verified_at": "2026-07-01T12:00:00Z"
+          },
+          "created_at": "2026-07-01T12:00:00Z",
+          "deal_id": null,
+          "deal_type": "PG",
+          "expires_at": "2026-07-15T00:00:00Z",
+          "linear_tv": null,
+          "media_type": "digital",
+          "pricing": {
+            "base_cpm": {
+              "amount_micros": 25000000,
+              "currency": "USD"
+            },
+            "base_cpp": null,
+            "final_cpm": {
+              "amount_micros": 22500000,
+              "currency": "USD"
+            },
+            "final_cpp": null,
+            "pricing_model": "cpm",
+            "pricing_type": "fixed",
+            "rationale": "advertiser tier discount",
+            "tier_discount_pct": 10.0,
+            "volume_discount_pct": 0.0
+          },
+          "product": {
+            "inventory_type": "display",
+            "name": "Premium Homepage Takeover",
+            "product_id": "prod-001"
+          },
+          "quote_id": "q-pg-001",
+          "rate_card_id": "rc-001",
+          "seller_id": "agent-seller-1",
+          "status": "available",
+          "terms": {
+            "flight_end": "2026-08-31",
+            "flight_start": "2026-08-01",
+            "grps": null,
+            "guaranteed": true,
+            "guaranteed_grps": null,
+            "impressions": 1000000,
+            "target_demo": null
+          }
+        }
+      },
+      "mode": "must_ignore",
+      "name": "response_with_unknown_fields"
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "primitives",
+  "target": "RateCard",
+  "vectors": [
+    {
+      "data": {
+        "account_id": "acct-001",
+        "buyer_organization_id": "org-buyer-1",
+        "created_at": "2026-07-01T12:00:00Z",
+        "effective_from": "2026-07-01",
+        "effective_to": "2026-12-31",
+        "entries": [
+          {
+            "ad_format": null,
+            "notes": "2026 upfront rate",
+            "package_id": null,
+            "pricing_model": "cpm",
+            "product_id": "prod-001",
+            "rate": {
+              "amount_micros": 21000000,
+              "currency": "USD"
+            }
+          },
+          {
+            "ad_format": "video",
+            "notes": null,
+            "package_id": null,
+            "pricing_model": "cpcv",
+            "product_id": null,
+            "rate": {
+              "amount_micros": 120000,
+              "currency": "USD"
+            }
+          }
+        ],
+        "notes": null,
+        "rate_card_id": "rc-001",
+        "seller_organization_id": "org-seller-1",
+        "status": "active",
+        "updated_at": null
+      },
+      "description": "Active private rate card between one buyer/seller pair (FD-9)",
+      "mode": "valid",
+      "name": "active_pair_card"
+    },
+    {
+      "data": {
+        "account_id": null,
+        "buyer_organization_id": "org-buyer-2",
+        "created_at": "2026-07-02T09:30:00Z",
+        "effective_from": "2026-08-01",
+        "effective_to": null,
+        "entries": [],
+        "notes": null,
+        "rate_card_id": "rc-002",
+        "seller_organization_id": "org-seller-1",
+        "status": "proposed",
+        "updated_at": null
+      },
+      "description": "Proposed card, open-ended effective window",
+      "mode": "valid",
+      "name": "proposed_minimal"
+    }
+  ]
+}

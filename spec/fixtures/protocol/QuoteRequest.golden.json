@@ -1,0 +1,231 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "protocol",
+  "target": "QuoteRequest",
+  "vectors": [
+    {
+      "data": {
+        "agent_url": "https://buyer.example.com/a2a",
+        "audience_plan": null,
+        "buyer_identity": {
+          "advertiser_id": "adv-cola",
+          "advertiser_industry": null,
+          "advertiser_name": "Cola Co",
+          "agency_holding_company": null,
+          "agency_id": "omnicom-456",
+          "agency_name": null,
+          "campaign_id": null,
+          "campaign_name": null,
+          "dsp_platform": null,
+          "seat_id": "ttd-seat-123",
+          "seat_name": null
+        },
+        "consent_context": {
+          "applicable_regimes": [
+            "GDPR",
+            "CCPA"
+          ],
+          "diligence_status": "passed",
+          "gpp_section_ids": [
+            2,
+            6
+          ],
+          "gpp_string": "DBABMA~CPXxRfAPXxRfAAfKABENB",
+          "tcf_string": "CPXxRfAPXxRfAAfKABENB",
+          "verified_at": "2026-07-01T12:00:00Z"
+        },
+        "deal_type": "PG",
+        "flight_end": "2026-08-31",
+        "flight_start": "2026-08-01",
+        "idempotency_key": "00000000-0000-4000-8000-000000000001",
+        "impressions": 1000000,
+        "linear_tv": null,
+        "media_type": "digital",
+        "product_id": "prod-001",
+        "rate_card_id": "rc-001",
+        "target_cpm": {
+          "amount_micros": 22000000,
+          "currency": "USD"
+        }
+      },
+      "description": "FD-12 money-mutating request with its required key",
+      "mode": "valid",
+      "name": "pg_with_idempotency_key"
+    },
+    {
+      "data": {
+        "agent_url": null,
+        "audience_plan": null,
+        "buyer_identity": null,
+        "consent_context": null,
+        "deal_type": "PG",
+        "flight_end": "2026-09-28",
+        "flight_start": "2026-09-01",
+        "idempotency_key": "00000000-0000-4000-8000-000000000002",
+        "impressions": null,
+        "linear_tv": {
+          "dayparts": [
+            "primetime"
+          ],
+          "dmas": null,
+          "grps_requested": 120,
+          "measurement_currency": "nielsen",
+          "networks": [
+            "NBC",
+            "ESPN"
+          ],
+          "rotation": "ros",
+          "spot_length": 30,
+          "target_cpp": {
+            "amount_micros": 450000000,
+            "currency": "USD"
+          },
+          "target_demo": "A18-49"
+        },
+        "media_type": "linear_tv",
+        "product_id": "prod-ltv-9",
+        "rate_card_id": null,
+        "target_cpm": null
+      },
+      "description": "FD-6 linear TV quote request with LinearTVParams",
+      "mode": "valid",
+      "name": "linear_tv_request"
+    },
+    {
+      "data": {
+        "agent_url": "https://buyer.example.com/a2a",
+        "audience_plan": null,
+        "buyer_identity": {
+          "advertiser_id": "adv-cola",
+          "advertiser_industry": null,
+          "advertiser_name": "Cola Co",
+          "agency_holding_company": null,
+          "agency_id": "omnicom-456",
+          "agency_name": null,
+          "campaign_id": null,
+          "campaign_name": null,
+          "dsp_platform": null,
+          "seat_id": "ttd-seat-123",
+          "seat_name": null
+        },
+        "consent_context": {
+          "applicable_regimes": [
+            "GDPR",
+            "CCPA"
+          ],
+          "diligence_status": "passed",
+          "gpp_section_ids": [
+            2,
+            6
+          ],
+          "gpp_string": "DBABMA~CPXxRfAPXxRfAAfKABENB",
+          "tcf_string": "CPXxRfAPXxRfAAfKABENB",
+          "verified_at": "2026-07-01T12:00:00Z"
+        },
+        "deal_type": "PG",
+        "field_from_a_newer_spec_version": "must-be-ignored",
+        "flight_end": "2026-08-31",
+        "flight_start": "2026-08-01",
+        "idempotency_key": "00000000-0000-4000-8000-000000000001",
+        "impressions": 1000000,
+        "linear_tv": null,
+        "media_type": "digital",
+        "product_id": "prod-001",
+        "rate_card_id": "rc-001",
+        "target_cpm": {
+          "amount_micros": 22000000,
+          "currency": "USD"
+        },
+        "x_vendor_ext": {
+          "partner": "example-dsp",
+          "trace": "abc-123"
+        }
+      },
+      "description": "FD-13: unknown + x_ fields on a quote request are ignored",
+      "expected": {
+        "agent_url": "https://buyer.example.com/a2a",
+        "audience_plan": null,
+        "buyer_identity": {
+          "advertiser_id": "adv-cola",
+          "advertiser_industry": null,
+          "advertiser_name": "Cola Co",
+          "agency_holding_company": null,
+          "agency_id": "omnicom-456",
+          "agency_name": null,
+          "campaign_id": null,
+          "campaign_name": null,
+          "dsp_platform": null,
+          "seat_id": "ttd-seat-123",
+          "seat_name": null
+        },
+        "consent_context": {
+          "applicable_regimes": [
+            "GDPR",
+            "CCPA"
+          ],
+          "diligence_status": "passed",
+          "gpp_section_ids": [
+            2,
+            6
+          ],
+          "gpp_string": "DBABMA~CPXxRfAPXxRfAAfKABENB",
+          "tcf_string": "CPXxRfAPXxRfAAfKABENB",
+          "verified_at": "2026-07-01T12:00:00Z"
+        },
+        "deal_type": "PG",
+        "flight_end": "2026-08-31",
+        "flight_start": "2026-08-01",
+        "idempotency_key": "00000000-0000-4000-8000-000000000001",
+        "impressions": 1000000,
+        "linear_tv": null,
+        "media_type": "digital",
+        "product_id": "prod-001",
+        "rate_card_id": "rc-001",
+        "target_cpm": {
+          "amount_micros": 22000000,
+          "currency": "USD"
+        }
+      },
+      "mode": "must_ignore",
+      "name": "request_with_unknown_fields"
+    },
+    {
+      "data": {
+        "deal_type": "PG",
+        "impressions": 1000000,
+        "product_id": "prod-001"
+      },
+      "description": "FD-12: a money-mutating request without idempotency_key must be rejected",
+      "expected_error": "idempotency_key",
+      "mode": "invalid",
+      "name": "missing_idempotency_key"
+    },
+    {
+      "data": {
+        "deal_type": "PG",
+        "idempotency_key": "00000000-0000-4000-8000-000000000003",
+        "product_id": "prod-001",
+        "target_cpm": {
+          "amount_micros": 22.5,
+          "currency": "USD"
+        }
+      },
+      "description": "FD-11: float-typed target CPM must be rejected",
+      "expected_error": "Input should be a valid integer",
+      "mode": "invalid",
+      "name": "float_target_cpm_rejected"
+    },
+    {
+      "data": {
+        "deal_type": "PG",
+        "idempotency_key": "00000000-0000-4000-8000-000000000004",
+        "media_type": "linear_tv",
+        "product_id": "prod-ltv-9"
+      },
+      "description": "FD-6: media_type linear_tv without linear_tv params must be rejected",
+      "expected_error": "requires linear_tv params",
+      "mode": "invalid",
+      "name": "linear_tv_missing_params"
+    }
+  ]
+}

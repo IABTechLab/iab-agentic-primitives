@@ -1,0 +1,86 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "primitives",
+  "target": "MediaKit",
+  "vectors": [
+    {
+      "data": {
+        "contact": "adops@example.com",
+        "created_at": "2026-07-01T12:00:00Z",
+        "currency": "USD",
+        "description": "All discoverable PremiumPub packages",
+        "media_kit_id": "mk-001",
+        "name": "PremiumPub 2026 Media Kit",
+        "packages": [
+          {
+            "ad_formats": [],
+            "audience_capabilities": null,
+            "base_price": {
+              "amount_micros": 32000000,
+              "currency": "USD"
+            },
+            "cat": [
+              "IAB19"
+            ],
+            "cattax": 2,
+            "created_at": "2026-07-01T12:00:00Z",
+            "description": "Cross-screen sports package",
+            "device_types": [],
+            "geo_targets": [
+              "US",
+              "US-NY"
+            ],
+            "is_featured": true,
+            "layer": "curated",
+            "name": "Sports Premium",
+            "package_id": "pkg-001",
+            "placements": [
+              {
+                "ad_formats": [
+                  "banner"
+                ],
+                "device_types": [
+                  2,
+                  3
+                ],
+                "product_id": "prod-001",
+                "product_name": "Premium Homepage Takeover",
+                "weight": 0.7
+              }
+            ],
+            "pricing_model": "cpm",
+            "pricing_type": "fixed",
+            "seasonal_label": null,
+            "status": "active",
+            "tags": [
+              "sports",
+              "premium"
+            ],
+            "updated_at": null
+          }
+        ],
+        "seller_organization_id": "org-seller-1",
+        "updated_at": null
+      },
+      "description": "Discoverable media kit with one active package",
+      "mode": "valid",
+      "name": "kit_with_packages"
+    },
+    {
+      "data": {
+        "contact": null,
+        "created_at": "2026-07-02T09:30:00Z",
+        "currency": "USD",
+        "description": null,
+        "media_kit_id": "mk-002",
+        "name": "Fresh Seller Kit",
+        "packages": [],
+        "seller_organization_id": "org-seller-2",
+        "updated_at": null
+      },
+      "description": "Media kit with no packages yet",
+      "mode": "valid",
+      "name": "empty_kit"
+    }
+  ]
+}

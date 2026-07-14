@@ -1,0 +1,110 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "primitives",
+  "target": "Order",
+  "vectors": [
+    {
+      "data": {
+        "account_id": "acct-001",
+        "budget": {
+          "amount_micros": 50000000000,
+          "currency": "USD"
+        },
+        "consent_context": {
+          "applicable_regimes": [
+            "GDPR",
+            "CCPA"
+          ],
+          "diligence_status": "passed",
+          "gpp_section_ids": [
+            2,
+            6
+          ],
+          "gpp_string": "DBABMA~CPXxRfAPXxRfAAfKABENB",
+          "tcf_string": "CPXxRfAPXxRfAAfKABENB",
+          "verified_at": "2026-07-01T12:00:00Z"
+        },
+        "created_at": "2026-07-01T12:00:00Z",
+        "deal_id": "deal-001",
+        "end_date": "2026-08-31",
+        "ext": null,
+        "external_ids": {
+          "gam_order_id": "gam-556677"
+        },
+        "name": "Q3 Awareness Push",
+        "order_id": "ord-001",
+        "proposal_id": null,
+        "start_date": "2026-08-01",
+        "status": "submitted",
+        "updated_at": null
+      },
+      "description": "Submitted insertion order",
+      "mode": "valid",
+      "name": "submitted_with_consent"
+    },
+    {
+      "data": {
+        "account_id": "acct-001",
+        "budget": {
+          "amount_micros": 12000000000,
+          "currency": "USD"
+        },
+        "consent_context": null,
+        "created_at": "2026-07-01T12:00:00Z",
+        "deal_id": null,
+        "end_date": "2026-03-31",
+        "ext": null,
+        "external_ids": null,
+        "name": "Spring Retargeting",
+        "order_id": "ord-002",
+        "proposal_id": null,
+        "start_date": "2026-03-01",
+        "status": "completed",
+        "updated_at": "2026-07-02T09:30:00Z"
+      },
+      "description": "Terminal completed order",
+      "mode": "valid",
+      "name": "completed_terminal"
+    },
+    {
+      "data": {
+        "account_id": "acct-001",
+        "budget": {
+          "amount_micros": 50000000000.5,
+          "currency": "USD"
+        },
+        "consent_context": {
+          "applicable_regimes": [
+            "GDPR",
+            "CCPA"
+          ],
+          "diligence_status": "passed",
+          "gpp_section_ids": [
+            2,
+            6
+          ],
+          "gpp_string": "DBABMA~CPXxRfAPXxRfAAfKABENB",
+          "tcf_string": "CPXxRfAPXxRfAAfKABENB",
+          "verified_at": "2026-07-01T12:00:00Z"
+        },
+        "created_at": "2026-07-01T12:00:00Z",
+        "deal_id": "deal-001",
+        "end_date": "2026-08-31",
+        "ext": null,
+        "external_ids": {
+          "gam_order_id": "gam-556677"
+        },
+        "name": "Q3 Awareness Push",
+        "order_id": "ord-001",
+        "proposal_id": null,
+        "start_date": "2026-08-01",
+        "status": "submitted",
+        "updated_at": null
+      },
+      "description": "FD-11: float-typed budget must be rejected",
+      "expected_error": "Input should be a valid integer",
+      "mode": "invalid",
+      "name": "float_budget_rejected"
+    }
+  ]
+}

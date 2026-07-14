@@ -1,0 +1,65 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "state",
+  "machine": "change_request",
+  "sequences": [
+    {
+      "description": "Minor severity: validating auto-approves, then applies",
+      "expect": "legal",
+      "name": "minor_auto_approved",
+      "states": [
+        "pending",
+        "validating",
+        "approved",
+        "applied"
+      ]
+    },
+    {
+      "description": "Material severity routes to human review; reviewer rejects",
+      "expect": "legal",
+      "name": "material_human_rejected",
+      "states": [
+        "pending",
+        "validating",
+        "pending_approval",
+        "rejected"
+      ]
+    },
+    {
+      "description": "Applying an approved change can fail (added edge)",
+      "expect": "legal",
+      "name": "approved_apply_failed",
+      "states": [
+        "pending",
+        "validating",
+        "pending_approval",
+        "approved",
+        "failed"
+      ]
+    },
+    {
+      "description": "applied is terminal; no path back to pending",
+      "expect": "illegal",
+      "fails_at": 3,
+      "name": "terminal_applied_reopened",
+      "states": [
+        "pending",
+        "validating",
+        "approved",
+        "applied",
+        "pending"
+      ]
+    },
+    {
+      "description": "A pending change request cannot approve without validating",
+      "expect": "illegal",
+      "fails_at": 0,
+      "name": "skip_validation",
+      "states": [
+        "pending",
+        "approved"
+      ]
+    }
+  ],
+  "spec_export": "spec/jsonschema/state/ChangeRequestLifecycle.json"
+}

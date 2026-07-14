@@ -1,0 +1,31 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "protocol",
+  "target": "AgentTrustVerification",
+  "vectors": [
+    {
+      "data": {
+        "agent_id": "agent-seller-1",
+        "agent_url": "https://seller.example.com",
+        "registry_id": "iab_aamp",
+        "trust_status": "approved",
+        "verified_at": "2026-07-01T12:00:00Z"
+      },
+      "description": "Registry-verified approved agent",
+      "mode": "valid",
+      "name": "approved_by_registry"
+    },
+    {
+      "data": {
+        "agent_id": null,
+        "agent_url": "https://stranger.example.com",
+        "registry_id": null,
+        "trust_status": "unknown",
+        "verified_at": null
+      },
+      "description": "Unregistered agent: trust stays unknown",
+      "mode": "valid",
+      "name": "unknown_unregistered"
+    }
+  ]
+}

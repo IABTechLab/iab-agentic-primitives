@@ -1,0 +1,95 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "events",
+  "target": "Event",
+  "vectors": [
+    {
+      "data": {
+        "campaign_id": null,
+        "deal_id": "deal-001",
+        "event_id": "evt-001",
+        "event_type": "deal.booked",
+        "metadata": {
+          "final_cpm_micros": 22500000
+        },
+        "occurred_at": "2026-07-01T12:00:00Z",
+        "order_id": "ord-001",
+        "proposal_id": null,
+        "session_id": null,
+        "source_agent": "buyer"
+      },
+      "description": "Buyer-emitted booking event",
+      "mode": "valid",
+      "name": "deal_booked"
+    },
+    {
+      "data": {
+        "campaign_id": null,
+        "deal_id": null,
+        "event_id": "evt-002",
+        "event_type": "negotiation.round",
+        "metadata": {
+          "round_number": 1
+        },
+        "occurred_at": "2026-07-02T09:30:00Z",
+        "order_id": null,
+        "proposal_id": "prop-001",
+        "session_id": "sess-001",
+        "source_agent": "seller"
+      },
+      "description": "Seller-emitted negotiation round event",
+      "mode": "valid",
+      "name": "negotiation_round"
+    },
+    {
+      "data": {
+        "campaign_id": null,
+        "deal_id": "deal-001",
+        "event_id": "evt-001",
+        "event_type": "deal.booked",
+        "field_from_a_newer_spec_version": "must-be-ignored",
+        "metadata": {
+          "final_cpm_micros": 22500000
+        },
+        "occurred_at": "2026-07-01T12:00:00Z",
+        "order_id": "ord-001",
+        "proposal_id": null,
+        "session_id": null,
+        "source_agent": "buyer",
+        "x_vendor_ext": {
+          "partner": "example-dsp",
+          "trace": "abc-123"
+        }
+      },
+      "description": "FD-13: unknown + x_ fields on an event are ignored",
+      "expected": {
+        "campaign_id": null,
+        "deal_id": "deal-001",
+        "event_id": "evt-001",
+        "event_type": "deal.booked",
+        "metadata": {
+          "final_cpm_micros": 22500000
+        },
+        "occurred_at": "2026-07-01T12:00:00Z",
+        "order_id": "ord-001",
+        "proposal_id": null,
+        "session_id": null,
+        "source_agent": "buyer"
+      },
+      "mode": "must_ignore",
+      "name": "event_with_unknown_fields"
+    },
+    {
+      "data": {
+        "event_id": "evt-bad",
+        "event_type": "deal.booked",
+        "occurred_at": "2026-07-01T12:00:00",
+        "source_agent": "buyer"
+      },
+      "description": "occurred_at must be timezone-aware UTC",
+      "expected_error": "timezone-aware",
+      "mode": "invalid",
+      "name": "naive_timestamp_rejected"
+    }
+  ]
+}

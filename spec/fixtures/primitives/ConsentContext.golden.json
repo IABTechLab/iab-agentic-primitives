@@ -1,0 +1,39 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "primitives",
+  "target": "ConsentContext",
+  "vectors": [
+    {
+      "data": {
+        "applicable_regimes": [
+          "GDPR",
+          "CCPA"
+        ],
+        "diligence_status": "passed",
+        "gpp_section_ids": [
+          2,
+          6
+        ],
+        "gpp_string": "DBABMA~CPXxRfAPXxRfAAfKABENB",
+        "tcf_string": "CPXxRfAPXxRfAAfKABENB",
+        "verified_at": "2026-07-01T12:00:00Z"
+      },
+      "description": "GDPR-scope consent with GPP + TCF strings and passed diligence",
+      "mode": "valid",
+      "name": "gdpr_gpp_passed"
+    },
+    {
+      "data": {
+        "applicable_regimes": [],
+        "diligence_status": "unknown",
+        "gpp_section_ids": [],
+        "gpp_string": null,
+        "tcf_string": null,
+        "verified_at": null
+      },
+      "description": "Empty consent context: unknown diligence, no signals",
+      "mode": "valid",
+      "name": "unknown_minimal"
+    }
+  ]
+}

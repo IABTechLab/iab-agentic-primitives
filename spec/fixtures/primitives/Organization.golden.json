@@ -1,0 +1,42 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "primitives",
+  "target": "Organization",
+  "vectors": [
+    {
+      "data": {
+        "address": null,
+        "contacts": null,
+        "ext": null,
+        "name": "Acme Media Buying",
+        "organization_id": "org-buyer-1",
+        "role": "buyer",
+        "status": "active"
+      },
+      "description": "Registered buying organization",
+      "mode": "valid",
+      "name": "buyer_org"
+    },
+    {
+      "data": {
+        "address": "1 Publisher Way, New York, NY",
+        "contacts": [
+          {
+            "email": "adops@example.com",
+            "name": "Ad Ops"
+          }
+        ],
+        "ext": {
+          "crm_id": "crm-778"
+        },
+        "name": "PremiumPub",
+        "organization_id": "org-seller-1",
+        "role": "seller",
+        "status": "active"
+      },
+      "description": "Selling organization with contacts and an extension slot",
+      "mode": "valid",
+      "name": "seller_org_with_ext"
+    }
+  ]
+}

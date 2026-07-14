@@ -1,0 +1,25 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "protocol",
+  "target": "ProductListRequest",
+  "vectors": [
+    {
+      "data": {
+        "limit": 50,
+        "offset": 0
+      },
+      "description": "Default pagination for GET /products",
+      "mode": "valid",
+      "name": "default_page"
+    },
+    {
+      "data": {
+        "limit": 500,
+        "offset": 500
+      },
+      "description": "Maximum page size at an offset",
+      "mode": "valid",
+      "name": "second_page_max"
+    }
+  ]
+}

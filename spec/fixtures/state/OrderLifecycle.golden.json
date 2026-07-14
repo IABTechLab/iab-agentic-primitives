@@ -1,0 +1,81 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "state",
+  "machine": "order",
+  "sequences": [
+    {
+      "description": "Draft -> submit -> human gate -> execute -> book -> complete",
+      "expect": "legal",
+      "name": "human_approval_path",
+      "states": [
+        "draft",
+        "submitted",
+        "pending_approval",
+        "approved",
+        "in_progress",
+        "booked",
+        "completed"
+      ]
+    },
+    {
+      "description": "No human gate: submitted auto-approves",
+      "expect": "legal",
+      "name": "auto_approval_path",
+      "states": [
+        "draft",
+        "submitted",
+        "approved",
+        "in_progress",
+        "booked",
+        "completed"
+      ]
+    },
+    {
+      "description": "Rejected orders recover to draft (rework edge), then cancel",
+      "expect": "legal",
+      "name": "rejection_recovery",
+      "states": [
+        "draft",
+        "submitted",
+        "pending_approval",
+        "rejected",
+        "draft",
+        "cancelled"
+      ]
+    },
+    {
+      "description": "Ad-server unbooking recovers to draft for resubmission",
+      "expect": "legal",
+      "name": "unbooked_recovery",
+      "states": [
+        "in_progress",
+        "booked",
+        "unbooked",
+        "draft",
+        "submitted"
+      ]
+    },
+    {
+      "description": "completed is terminal; no path back to draft",
+      "expect": "illegal",
+      "fails_at": 1,
+      "name": "terminal_completed_reopened",
+      "states": [
+        "booked",
+        "completed",
+        "draft"
+      ]
+    },
+    {
+      "description": "A draft order cannot book directly",
+      "expect": "illegal",
+      "fails_at": 0,
+      "name": "skip_execution",
+      "states": [
+        "draft",
+        "booked"
+      ]
+    }
+  ],
+  "spec_export": "spec/jsonschema/state/OrderLifecycle.json"
+}

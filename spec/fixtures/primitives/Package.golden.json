@@ -1,0 +1,89 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "primitives",
+  "target": "Package",
+  "vectors": [
+    {
+      "data": {
+        "ad_formats": [],
+        "audience_capabilities": null,
+        "base_price": {
+          "amount_micros": 32000000,
+          "currency": "USD"
+        },
+        "cat": [
+          "IAB19"
+        ],
+        "cattax": 2,
+        "created_at": "2026-07-01T12:00:00Z",
+        "description": "Cross-screen sports package",
+        "device_types": [],
+        "geo_targets": [
+          "US",
+          "US-NY"
+        ],
+        "is_featured": true,
+        "layer": "curated",
+        "name": "Sports Premium",
+        "package_id": "pkg-001",
+        "placements": [
+          {
+            "ad_formats": [
+              "banner"
+            ],
+            "device_types": [
+              2,
+              3
+            ],
+            "product_id": "prod-001",
+            "product_name": "Premium Homepage Takeover",
+            "weight": 0.7
+          }
+        ],
+        "pricing_model": "cpm",
+        "pricing_type": "fixed",
+        "seasonal_label": null,
+        "status": "active",
+        "tags": [
+          "sports",
+          "premium"
+        ],
+        "updated_at": null
+      },
+      "description": "Curated, active cross-screen package",
+      "mode": "valid",
+      "name": "curated_sports"
+    },
+    {
+      "data": {
+        "ad_formats": [
+          "video"
+        ],
+        "audience_capabilities": null,
+        "base_price": null,
+        "cat": [],
+        "cattax": 2,
+        "created_at": "2026-07-02T09:30:00Z",
+        "description": null,
+        "device_types": [
+          3
+        ],
+        "geo_targets": [],
+        "is_featured": false,
+        "layer": "dynamic",
+        "name": "Dynamic CTV Reach",
+        "package_id": "pkg-002",
+        "placements": [],
+        "pricing_model": "cpm",
+        "pricing_type": "floor",
+        "seasonal_label": null,
+        "status": "draft",
+        "tags": [],
+        "updated_at": null
+      },
+      "description": "Agent-assembled dynamic package, draft, no list price",
+      "mode": "valid",
+      "name": "dynamic_ctv_minimal"
+    }
+  ]
+}

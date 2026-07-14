@@ -1,0 +1,459 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "primitives",
+  "target": "Deal",
+  "vectors": [
+    {
+      "data": {
+        "activation_instructions": {
+          "dsp": "send deal id via OpenRTB"
+        },
+        "buyer_tier": "advertiser",
+        "consent_context": {
+          "applicable_regimes": [
+            "GDPR",
+            "CCPA"
+          ],
+          "diligence_status": "passed",
+          "gpp_section_ids": [
+            2,
+            6
+          ],
+          "gpp_string": "DBABMA~CPXxRfAPXxRfAAfKABENB",
+          "tcf_string": "CPXxRfAPXxRfAAfKABENB",
+          "verified_at": "2026-07-01T12:00:00Z"
+        },
+        "created_at": "2026-07-01T12:00:00Z",
+        "deal_id": "deal-001",
+        "deal_type": "PG",
+        "expires_at": null,
+        "linear_tv": null,
+        "media_type": "digital",
+        "openrtb_params": {
+          "at": 3,
+          "bidfloor": {
+            "amount_micros": 22500000,
+            "currency": "USD"
+          },
+          "id": "deal-001",
+          "wadomain": [
+            "example.com"
+          ],
+          "wseat": [
+            "seat-42"
+          ]
+        },
+        "pricing": {
+          "base_cpm": {
+            "amount_micros": 25000000,
+            "currency": "USD"
+          },
+          "base_cpp": null,
+          "final_cpm": {
+            "amount_micros": 22500000,
+            "currency": "USD"
+          },
+          "final_cpp": null,
+          "pricing_model": "cpm",
+          "pricing_type": "fixed",
+          "rationale": "",
+          "tier_discount_pct": 0.0,
+          "volume_discount_pct": 0.0
+        },
+        "product": {
+          "inventory_type": "display",
+          "name": "Premium Homepage Takeover",
+          "product_id": "prod-001"
+        },
+        "quote_id": "q-pg-001",
+        "rate_card_id": "rc-001",
+        "seller_id": "agent-seller-1",
+        "status": "booked",
+        "terms": {
+          "flight_end": "2026-08-31",
+          "flight_start": "2026-08-01",
+          "grps": null,
+          "guaranteed": true,
+          "guaranteed_grps": null,
+          "impressions": 1000000,
+          "target_demo": null
+        }
+      },
+      "description": "Booked PG deal with OpenRTB activation params",
+      "mode": "valid",
+      "name": "pg_booked_openrtb"
+    },
+    {
+      "data": {
+        "activation_instructions": {},
+        "buyer_tier": "agency",
+        "consent_context": null,
+        "created_at": "2026-07-01T12:00:00Z",
+        "deal_id": "deal-ltv-002",
+        "deal_type": "PG",
+        "expires_at": null,
+        "linear_tv": {
+          "audience_estimate": {
+            "demo": "A18-49",
+            "universe": 128000000
+          },
+          "cancellation_terms": {
+            "cancellable_pct": 0.5,
+            "deadline": "2026-09-15",
+            "force_majeure": true,
+            "notice_days": 14
+          },
+          "cpp": {
+            "amount_micros": 450000000,
+            "currency": "USD"
+          },
+          "dayparts": [
+            "primetime"
+          ],
+          "estimated_grps": 120.0,
+          "estimated_rating": 2.4,
+          "makegood_policy": "standard",
+          "measurement_currency": "nielsen",
+          "networks": [
+            "NBC",
+            "ESPN"
+          ],
+          "spot_length": 30,
+          "spots_per_week": 12,
+          "target_demo": "A18-49",
+          "total_spots": 48
+        },
+        "media_type": "linear_tv",
+        "openrtb_params": null,
+        "pricing": {
+          "base_cpm": null,
+          "base_cpp": {
+            "amount_micros": 475000000,
+            "currency": "USD"
+          },
+          "final_cpm": null,
+          "final_cpp": {
+            "amount_micros": 450000000,
+            "currency": "USD"
+          },
+          "pricing_model": "cpp",
+          "pricing_type": "fixed",
+          "rationale": "",
+          "tier_discount_pct": 0.0,
+          "volume_discount_pct": 0.0
+        },
+        "product": {
+          "inventory_type": null,
+          "name": "Primetime National Spots",
+          "product_id": "prod-ltv-9"
+        },
+        "quote_id": "q-ltv-002",
+        "rate_card_id": null,
+        "seller_id": "agent-seller-1",
+        "status": "makegood_pending",
+        "terms": {
+          "flight_end": null,
+          "flight_start": null,
+          "grps": 120,
+          "guaranteed": true,
+          "guaranteed_grps": 110,
+          "impressions": null,
+          "target_demo": "A18-49"
+        }
+      },
+      "description": "FD-6 linear TV deal in makegood_pending after GRP shortfall",
+      "mode": "valid",
+      "name": "linear_tv_makegood_pending"
+    },
+    {
+      "data": {
+        "activation_instructions": {},
+        "buyer_tier": "public",
+        "consent_context": null,
+        "created_at": "2026-07-02T09:30:00Z",
+        "deal_id": "deal-003",
+        "deal_type": "PD",
+        "expires_at": null,
+        "linear_tv": null,
+        "media_type": "digital",
+        "openrtb_params": null,
+        "pricing": {
+          "base_cpm": {
+            "amount_micros": 18000000,
+            "currency": "USD"
+          },
+          "base_cpp": null,
+          "final_cpm": null,
+          "final_cpp": null,
+          "pricing_model": "cpm",
+          "pricing_type": "fixed",
+          "rationale": "",
+          "tier_discount_pct": 0.0,
+          "volume_discount_pct": 0.0
+        },
+        "product": {
+          "inventory_type": "display",
+          "name": "Premium Homepage Takeover",
+          "product_id": "prod-001"
+        },
+        "quote_id": null,
+        "rate_card_id": null,
+        "seller_id": null,
+        "status": "cancelled",
+        "terms": {
+          "flight_end": null,
+          "flight_start": null,
+          "grps": null,
+          "guaranteed": false,
+          "guaranteed_grps": null,
+          "impressions": null,
+          "target_demo": null
+        }
+      },
+      "description": "Terminal cancelled deal",
+      "mode": "valid",
+      "name": "cancelled_terminal"
+    },
+    {
+      "data": {
+        "activation_instructions": {
+          "dsp": "send deal id via OpenRTB"
+        },
+        "buyer_tier": "advertiser",
+        "consent_context": {
+          "applicable_regimes": [
+            "GDPR",
+            "CCPA"
+          ],
+          "diligence_status": "passed",
+          "gpp_section_ids": [
+            2,
+            6
+          ],
+          "gpp_string": "DBABMA~CPXxRfAPXxRfAAfKABENB",
+          "tcf_string": "CPXxRfAPXxRfAAfKABENB",
+          "verified_at": "2026-07-01T12:00:00Z"
+        },
+        "created_at": "2026-07-01T12:00:00Z",
+        "deal_id": "deal-001",
+        "deal_type": "PG",
+        "expires_at": null,
+        "field_from_a_newer_spec_version": "must-be-ignored",
+        "linear_tv": null,
+        "media_type": "digital",
+        "openrtb_params": {
+          "at": 3,
+          "bidfloor": {
+            "amount_micros": 22500000,
+            "currency": "USD"
+          },
+          "id": "deal-001",
+          "wadomain": [
+            "example.com"
+          ],
+          "wseat": [
+            "seat-42"
+          ]
+        },
+        "pricing": {
+          "base_cpm": {
+            "amount_micros": 25000000,
+            "currency": "USD"
+          },
+          "base_cpp": null,
+          "final_cpm": {
+            "amount_micros": 22500000,
+            "currency": "USD"
+          },
+          "final_cpp": null,
+          "pricing_model": "cpm",
+          "pricing_type": "fixed",
+          "rationale": "",
+          "tier_discount_pct": 0.0,
+          "volume_discount_pct": 0.0
+        },
+        "product": {
+          "inventory_type": "display",
+          "name": "Premium Homepage Takeover",
+          "product_id": "prod-001"
+        },
+        "quote_id": "q-pg-001",
+        "rate_card_id": "rc-001",
+        "seller_id": "agent-seller-1",
+        "status": "booked",
+        "terms": {
+          "flight_end": "2026-08-31",
+          "flight_start": "2026-08-01",
+          "grps": null,
+          "guaranteed": true,
+          "guaranteed_grps": null,
+          "impressions": 1000000,
+          "target_demo": null
+        },
+        "x_vendor_ext": {
+          "partner": "example-dsp",
+          "trace": "abc-123"
+        }
+      },
+      "description": "FD-13: unknown + x_ fields on a deal are ignored",
+      "expected": {
+        "activation_instructions": {
+          "dsp": "send deal id via OpenRTB"
+        },
+        "buyer_tier": "advertiser",
+        "consent_context": {
+          "applicable_regimes": [
+            "GDPR",
+            "CCPA"
+          ],
+          "diligence_status": "passed",
+          "gpp_section_ids": [
+            2,
+            6
+          ],
+          "gpp_string": "DBABMA~CPXxRfAPXxRfAAfKABENB",
+          "tcf_string": "CPXxRfAPXxRfAAfKABENB",
+          "verified_at": "2026-07-01T12:00:00Z"
+        },
+        "created_at": "2026-07-01T12:00:00Z",
+        "deal_id": "deal-001",
+        "deal_type": "PG",
+        "expires_at": null,
+        "linear_tv": null,
+        "media_type": "digital",
+        "openrtb_params": {
+          "at": 3,
+          "bidfloor": {
+            "amount_micros": 22500000,
+            "currency": "USD"
+          },
+          "id": "deal-001",
+          "wadomain": [
+            "example.com"
+          ],
+          "wseat": [
+            "seat-42"
+          ]
+        },
+        "pricing": {
+          "base_cpm": {
+            "amount_micros": 25000000,
+            "currency": "USD"
+          },
+          "base_cpp": null,
+          "final_cpm": {
+            "amount_micros": 22500000,
+            "currency": "USD"
+          },
+          "final_cpp": null,
+          "pricing_model": "cpm",
+          "pricing_type": "fixed",
+          "rationale": "",
+          "tier_discount_pct": 0.0,
+          "volume_discount_pct": 0.0
+        },
+        "product": {
+          "inventory_type": "display",
+          "name": "Premium Homepage Takeover",
+          "product_id": "prod-001"
+        },
+        "quote_id": "q-pg-001",
+        "rate_card_id": "rc-001",
+        "seller_id": "agent-seller-1",
+        "status": "booked",
+        "terms": {
+          "flight_end": "2026-08-31",
+          "flight_start": "2026-08-01",
+          "grps": null,
+          "guaranteed": true,
+          "guaranteed_grps": null,
+          "impressions": 1000000,
+          "target_demo": null
+        }
+      },
+      "mode": "must_ignore",
+      "name": "deal_with_unknown_fields"
+    },
+    {
+      "data": {
+        "activation_instructions": {
+          "dsp": "send deal id via OpenRTB"
+        },
+        "buyer_tier": "advertiser",
+        "consent_context": {
+          "applicable_regimes": [
+            "GDPR",
+            "CCPA"
+          ],
+          "diligence_status": "passed",
+          "gpp_section_ids": [
+            2,
+            6
+          ],
+          "gpp_string": "DBABMA~CPXxRfAPXxRfAAfKABENB",
+          "tcf_string": "CPXxRfAPXxRfAAfKABENB",
+          "verified_at": "2026-07-01T12:00:00Z"
+        },
+        "created_at": "2026-07-01T12:00:00Z",
+        "deal_id": "deal-001",
+        "deal_type": "PG",
+        "expires_at": null,
+        "linear_tv": null,
+        "media_type": "digital",
+        "openrtb_params": {
+          "at": 3,
+          "bidfloor": {
+            "amount_micros": 22500000.0,
+            "currency": "USD"
+          },
+          "id": "deal-001",
+          "wadomain": [
+            "example.com"
+          ],
+          "wseat": [
+            "seat-42"
+          ]
+        },
+        "pricing": {
+          "base_cpm": {
+            "amount_micros": 25000000,
+            "currency": "USD"
+          },
+          "base_cpp": null,
+          "final_cpm": {
+            "amount_micros": 22500000,
+            "currency": "USD"
+          },
+          "final_cpp": null,
+          "pricing_model": "cpm",
+          "pricing_type": "fixed",
+          "rationale": "",
+          "tier_discount_pct": 0.0,
+          "volume_discount_pct": 0.0
+        },
+        "product": {
+          "inventory_type": "display",
+          "name": "Premium Homepage Takeover",
+          "product_id": "prod-001"
+        },
+        "quote_id": "q-pg-001",
+        "rate_card_id": "rc-001",
+        "seller_id": "agent-seller-1",
+        "status": "booked",
+        "terms": {
+          "flight_end": "2026-08-31",
+          "flight_start": "2026-08-01",
+          "grps": null,
+          "guaranteed": true,
+          "guaranteed_grps": null,
+          "impressions": 1000000,
+          "target_demo": null
+        }
+      },
+      "description": "FD-11: an integral float bid floor (22500000.0) is still a float and must be rejected",
+      "expected_error": "Input should be a valid integer",
+      "mode": "invalid",
+      "name": "float_bidfloor_rejected"
+    }
+  ]
+}

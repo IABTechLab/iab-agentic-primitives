@@ -1,0 +1,59 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "protocol",
+  "target": "NegotiationRoundResponse",
+  "vectors": [
+    {
+      "data": {
+        "negotiation_id": "neg-001",
+        "round": {
+          "action": "counter",
+          "buyer_price": {
+            "amount_micros": 20000000,
+            "currency": "USD"
+          },
+          "concession_pct": 0.04,
+          "cumulative_concession_pct": 0.04,
+          "rationale": "meeting the buyer partway",
+          "round_number": 1,
+          "seller_price": {
+            "amount_micros": 23000000,
+            "currency": "USD"
+          },
+          "timestamp": "2026-07-01T12:00:00Z"
+        },
+        "rounds_remaining": 2,
+        "status": "active"
+      },
+      "description": "Seller counters; negotiation stays active",
+      "mode": "valid",
+      "name": "counter_active"
+    },
+    {
+      "data": {
+        "negotiation_id": "neg-001",
+        "round": {
+          "action": "accept",
+          "buyer_price": {
+            "amount_micros": 22000000,
+            "currency": "USD"
+          },
+          "concession_pct": 0.0,
+          "cumulative_concession_pct": 0.12,
+          "rationale": "",
+          "round_number": 2,
+          "seller_price": {
+            "amount_micros": 22000000,
+            "currency": "USD"
+          },
+          "timestamp": "2026-07-02T09:30:00Z"
+        },
+        "rounds_remaining": null,
+        "status": "accepted"
+      },
+      "description": "Seller accepts; negotiation reaches a terminal status",
+      "mode": "valid",
+      "name": "accepted_terminal"
+    }
+  ]
+}
