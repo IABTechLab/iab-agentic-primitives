@@ -63,14 +63,23 @@ Deterministic, **no LLM**, no wall-clock/random branching on the money path:
 - **`ReferenceSeller`** — fixed catalog of `Product`s, a pricing engine that
   applies a per-tier discount but **never prices below the product's private
   floor**, a bounded concession rule for negotiation that is **guaranteed to
-  terminate** (`MAX_SELLER_ROUNDS`), idempotent booking (same
-  `idempotency_key` → one deal), a **seller-minted `deal_id`**, and it drives
-  the canonical **Deal** and **Order** state machines. Linear TV is rejected
-  **structurally** (`unsupported_capability` naming `linear_tv`), never
-  mispriced.
-- **`ReferenceBuyer`** — picks the **cheapest quote under `max_cpm`**, can send
-  a counter and accept within budget, and enforces a **hard budget ceiling**
-  (walks away cleanly, no exception, rather than overspend).
+  terminate** (`MAX_SELLER_ROUNDS`; on the terminal round it accepts the
+  buyer's standing price if it is at/above the floor, else walks), idempotent
+  booking (same `idempotency_key` → one deal), a **seller-minted `deal_id`**,
+  booking at the **negotiated price** when a negotiation was accepted, and it
+  drives the canonical **Deal** and **Order** state machines. Linear TV is
+  rejected **structurally** (`unsupported_capability` naming `linear_tv`),
+  never mispriced.
+- **`ReferenceBuyer`** — picks the **cheapest quote within its negotiation
+  band**: at/below `max_cpm` books directly; above the ceiling but within
+  `negotiation_band_per_mille` (default 1250 = 1.25×; 1000 restores the
+  strict filter) is **negotiable, not discarded** — the buyer opens at its
+  true ceiling, never bids above it, accepts iff the seller's counter is
+  ≤ `max_cpm`, and walks once the seller's bounded rounds are exhausted.
+  Beyond the band is filtered outright. Two hard guardrails, both checked at
+  the **effective (negotiated) price**: it **never books above `max_cpm`**
+  and **never exceeds `budget`** (walks away cleanly, no exception, rather
+  than overspend).
 
 These are the fixed point real agents are swapped against: a real seller is
 correct if it interoperates with `ReferenceBuyer` exactly as `ReferenceSeller`

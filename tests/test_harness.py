@@ -320,6 +320,167 @@ def test_linear_tv_rejected_structurally_not_mispriced() -> None:
 
 
 # ---------------------------------------------------------------------------
+# (g) Above-ceiling negotiation band (internal tracking)
+# ---------------------------------------------------------------------------
+#
+# A quote above the buyer's max_cpm ceiling but within its negotiation band
+# (default 1.25x) is NEGOTIABLE, not discarded: the buyer opens at its true
+# ceiling, accepts iff the seller comes down to <= max_cpm, and walks honestly
+# otherwise. The buyer NEVER books above its ceiling.
+
+
+def _premium_ctv_seller(floor: str) -> ReferenceSeller:
+    """One-product seller quoting 40.80 to a public-tier buyer (S2 numbers)."""
+    product = Product(
+        product_id="premium-ctv",
+        seller_organization_id="org-ctv",
+        name="Premium CTV",
+        base_price=Money.from_decimal_str("40.80"),
+        ad_formats=["video"],
+        available_impressions=10_000_000,
+        commercial_terms=CommercialTerms(
+            supported_deal_types=[DealType.PROGRAMMATIC_GUARANTEED]
+        ),
+    )
+    return ReferenceSeller(
+        "ctv-seller",
+        "CTV Seller",
+        organization_id="org-ctv",
+        catalog=[(product, Money.from_decimal_str(floor).amount_micros)],
+    )
+
+
+def _s2_brief(**overrides) -> CampaignBrief:
+    # Quote 40.80 > ceiling 36.00, within the default 1.25x band (45.00).
+    # Budget covers the NEGOTIATED price (36,000) but not the quoted one
+    # (40,800), so booking also proves the budget check uses the agreed price.
+    base = dict(
+        campaign_name="S2 negotiate-then-book",
+        deal_type=DealType.PROGRAMMATIC_GUARANTEED,
+        impressions=1_000_000,
+        max_cpm=Money.from_decimal_str("36.00"),
+        budget=Money.from_decimal_str("37000.00"),
+        ad_format="video",
+    )
+    base.update(overrides)
+    return CampaignBrief(**base)
+
+
+def _run_s2(brief: CampaignBrief, *, floor: str, buyer: ReferenceBuyer | None = None) -> TransactionResult:
+    result = run_scenario_sync(
+        buyers=[BuyerParticipant(buyer or ReferenceBuyer(), brief, TrustStatus.APPROVED)],
+        sellers=[SellerParticipant(_premium_ctv_seller(floor), TrustStatus.APPROVED)],
+    )
+    return result.transactions[0]
+
+
+def test_above_ceiling_quote_opens_negotiation_at_the_buyers_ceiling() -> None:
+    # (a) The buyer does not discard the 40.80 quote: it opens a REAL
+    # NegotiationMessage at its true ceiling (36.00), quote-led.
+    tx = _run_s2(_s2_brief(), floor="30.00")
+
+    opens = tx.exchanges("negotiation")
+    assert opens, "above-ceiling quote within the band did not open a negotiation"
+    first = opens[0].request
+    assert first.action.value == "counter"
+    assert first.quote_id == tx.quote.quote_id
+    assert first.negotiation_id is None  # opening move: the seller mints the id
+    assert first.buyer_price == Money.from_decimal_str("36.00")
+
+
+def test_seller_concedes_to_ceiling_books_at_negotiated_price() -> None:
+    # (b) Seller floor (30.00) is below the buyer ceiling: the seller's own
+    # concession logic reaches the buyer's standing 36.00 and the deal books
+    # AT the negotiated price with a seller-minted deal id.
+    tx = _run_s2(_s2_brief(), floor="30.00")
+
+    assert tx.negotiation is not None
+    assert tx.negotiation.status.value == "accepted"
+    assert tx.booked and not tx.walked_away
+    assert tx.deal is not None
+    assert tx.deal.deal_id.startswith("ctv-seller-")
+    # Booked at the NEGOTIATED price, never above the buyer's ceiling.
+    assert tx.deal.pricing.final_cpm == Money.from_decimal_str("36.00")
+    assert tx.deal.pricing.final_cpm.amount_micros <= tx.brief.max_cpm.amount_micros
+    assert_negotiation_terminates(tx)
+    assert_booking_has_seller_deal_id(tx)
+    assert_state_consistent(tx)
+
+
+def test_seller_refuses_to_reach_ceiling_buyer_walks() -> None:
+    # (c) Seller floor (38.00) is ABOVE the buyer ceiling: the seller can
+    # never legally reach 36.00, so the buyer walks — no deal, no exception.
+    tx = _run_s2(_s2_brief(), floor="38.00")
+
+    assert tx.walked_away is True
+    assert tx.booked is False
+    assert tx.deal is None
+    assert tx.negotiation is not None
+    assert tx.negotiation.status.value in {"rejected", "expired"}
+    assert_negotiation_terminates(tx)
+
+
+def test_quote_beyond_the_band_is_filtered_without_negotiation() -> None:
+    # (d) Ceiling 30.00 -> band limit 37.50 < 40.80: the quote is beyond the
+    # band and is filtered outright, exactly like today. No negotiation opens.
+    tx = _run_s2(_s2_brief(max_cpm=Money.from_decimal_str("30.00")), floor="24.00")
+
+    assert tx.walked_away is True
+    assert tx.deal is None
+    assert tx.exchanges("negotiation") == []
+    assert "no affordable quote" in (tx.walk_reason or "")
+
+
+def test_band_opt_out_restores_strict_ceiling_filter() -> None:
+    # A band of 1000 per mille (1.0x) is the strict legacy filter: the
+    # above-ceiling quote is discarded and nothing is negotiated.
+    buyer = ReferenceBuyer(negotiation_band_per_mille=1000)
+    tx = _run_s2(_s2_brief(), floor="30.00", buyer=buyer)
+
+    assert tx.walked_away is True
+    assert tx.exchanges("negotiation") == []
+
+
+def test_at_or_below_ceiling_behavior_is_unchanged() -> None:
+    # (e) A quote at/below the ceiling with negotiate=False books directly at
+    # the quoted price — the band never triggers an uninvited negotiation.
+    tx = _run_one(_brief(buyer_identity=BuyerIdentity(agency_id="omnicom-1")))
+
+    assert tx.booked and not tx.walked_away
+    assert tx.exchanges("negotiation") == []
+    assert tx.deal.pricing.final_cpm == Money.from_decimal_str("9.00")
+
+
+def test_voluntary_negotiation_books_at_the_agreed_price() -> None:
+    # An accepted VOLUNTARY negotiation (quote already under the ceiling)
+    # also books at the agreed price: counter 8.00 on a 9.00 quote -> the
+    # seller's midpoint counter 8.50 is accepted and the deal carries 8.50.
+    tx = _run_one(
+        _brief(
+            buyer_identity=BuyerIdentity(agency_id="omnicom-1"),
+            negotiate=True,
+            counter_cpm=Money.from_decimal_str("8.00"),
+        )
+    )
+
+    assert tx.negotiation is not None and tx.negotiation.status.value == "accepted"
+    assert tx.booked
+    assert tx.deal.pricing.final_cpm == Money.from_decimal_str("8.50")
+
+
+def test_negotiated_price_still_respects_the_budget_ceiling() -> None:
+    # Even an accepted negotiation at 36.00 must not book when 36,000 total
+    # exceeds the 30,000 budget: the hard budget ceiling wins.
+    tx = _run_s2(_s2_brief(budget=Money.from_decimal_str("30000.00")), floor="30.00")
+
+    assert tx.negotiation is not None and tx.negotiation.status.value == "accepted"
+    assert tx.walked_away is True
+    assert tx.booked is False
+    assert tx.deal is None
+    assert "budget ceiling" in (tx.walk_reason or "")
+
+
+# ---------------------------------------------------------------------------
 # Version-skew smoke stub (EP-7.2 entry point)
 # ---------------------------------------------------------------------------
 

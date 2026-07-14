@@ -20,6 +20,30 @@ major version bump.
   enforcement, idempotent booking, state reconciliation). Golden scenarios in
   `tests/test_harness.py`; consumption guide in `HARNESS.md`. New `harness`
   optional extra (httpx + fastapi).
+- `ReferenceBuyer` negotiation band (internal tracking):
+  `negotiation_band_per_mille` constructor knob (default
+  `DEFAULT_NEGOTIATION_BAND_PER_MILLE = 1250`, i.e. 1.25x). Quotes above
+  `max_cpm` but within the band are NEGOTIABLE instead of discarded: the
+  buyer opens a real `NegotiationMessage` at its true ceiling, never bids
+  above it, accepts iff the seller's counter is <= `max_cpm`, holds its
+  standing price while the seller spends its bounded rounds, and walks
+  honestly otherwise. `1000` restores the strict legacy filter. Beyond the
+  band remains filtered without negotiation.
+
+### Changed
+
+- `ReferenceBuyer` guardrails are now checked at the EFFECTIVE price: after
+  an accepted negotiation, the budget ceiling (and a new explicit `max_cpm`
+  ceiling guard) apply to the agreed price (final round's seller price), not
+  the pre-negotiation quote price. The buyer still NEVER books above
+  `max_cpm`.
+- `ReferenceSeller.book_deal` books at the NEGOTIATED price when the quote
+  has an accepted negotiation (the deal's `final_cpm` is the agreed price,
+  rationale annotated), instead of silently booking the stale quote price.
+- `ReferenceSeller` terminal negotiation round (`MAX_SELLER_ROUNDS`): if the
+  buyer's standing price is at/above the private floor the seller ACCEPTS it
+  rather than walking away from a profitable deal; below the floor it still
+  rejects. Termination is unchanged (bounded rounds, never stuck 'active').
 
 ## [0.1.0] - 2026-07-13
 

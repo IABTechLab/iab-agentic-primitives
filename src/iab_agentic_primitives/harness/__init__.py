@@ -42,7 +42,12 @@ from .assertions import (
     assert_state_consistent,
     assert_structural_rejection,
 )
-from .reference_agents import MAX_SELLER_ROUNDS, ReferenceBuyer, ReferenceSeller
+from .reference_agents import (
+    DEFAULT_NEGOTIATION_BAND_PER_MILLE,
+    MAX_SELLER_ROUNDS,
+    ReferenceBuyer,
+    ReferenceSeller,
+)
 from .roles import (
     BuyerOutcome,
     BuyerRole,
@@ -65,6 +70,7 @@ from .scenario import (
 )
 
 __all__ = [
+    "DEFAULT_NEGOTIATION_BAND_PER_MILLE",
     "MAX_SELLER_ROUNDS",
     "BuyerOutcome",
     "BuyerParticipant",
