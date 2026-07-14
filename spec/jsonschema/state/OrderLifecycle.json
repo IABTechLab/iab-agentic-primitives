@@ -1,0 +1,137 @@
+{
+  "initial": "draft",
+  "name": "order",
+  "states": [
+    "draft",
+    "submitted",
+    "pending_approval",
+    "approved",
+    "rejected",
+    "in_progress",
+    "booked",
+    "unbooked",
+    "completed",
+    "failed",
+    "cancelled"
+  ],
+  "terminal": [
+    "cancelled",
+    "completed"
+  ],
+  "transitions": [
+    {
+      "description": "Order submitted for review",
+      "from": "draft",
+      "rework": false,
+      "to": "submitted"
+    },
+    {
+      "description": "Awaiting human approval",
+      "from": "submitted",
+      "rework": false,
+      "to": "pending_approval"
+    },
+    {
+      "description": "Auto-approved (no gate)",
+      "from": "submitted",
+      "rework": false,
+      "to": "approved"
+    },
+    {
+      "description": "Human approved",
+      "from": "pending_approval",
+      "rework": false,
+      "to": "approved"
+    },
+    {
+      "description": "Human rejected",
+      "from": "pending_approval",
+      "rework": false,
+      "to": "rejected"
+    },
+    {
+      "description": "Execution started",
+      "from": "approved",
+      "rework": false,
+      "to": "in_progress"
+    },
+    {
+      "description": "Ad server confirmed booking",
+      "from": "in_progress",
+      "rework": false,
+      "to": "booked"
+    },
+    {
+      "description": "Order fulfilled",
+      "from": "booked",
+      "rework": false,
+      "to": "completed"
+    },
+    {
+      "description": "Booking reversed by ad server",
+      "from": "booked",
+      "rework": false,
+      "to": "unbooked"
+    },
+    {
+      "description": "Cancelled before submission",
+      "from": "draft",
+      "rework": false,
+      "to": "cancelled"
+    },
+    {
+      "description": "Cancelled after submission",
+      "from": "submitted",
+      "rework": false,
+      "to": "cancelled"
+    },
+    {
+      "description": "Submission processing failed",
+      "from": "submitted",
+      "rework": false,
+      "to": "failed"
+    },
+    {
+      "description": "Cancelled during approval",
+      "from": "pending_approval",
+      "rework": false,
+      "to": "cancelled"
+    },
+    {
+      "description": "Cancelled after approval",
+      "from": "approved",
+      "rework": false,
+      "to": "cancelled"
+    },
+    {
+      "description": "Execution or ad-server sync failed",
+      "from": "in_progress",
+      "rework": false,
+      "to": "failed"
+    },
+    {
+      "description": "Cancelled during execution",
+      "from": "in_progress",
+      "rework": false,
+      "to": "cancelled"
+    },
+    {
+      "description": "Returned to draft for revision",
+      "from": "rejected",
+      "rework": true,
+      "to": "draft"
+    },
+    {
+      "description": "Reset to draft after failure",
+      "from": "failed",
+      "rework": true,
+      "to": "draft"
+    },
+    {
+      "description": "Reset to draft after unbooking",
+      "from": "unbooked",
+      "rework": true,
+      "to": "draft"
+    }
+  ]
+}

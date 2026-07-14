@@ -1,0 +1,189 @@
+{
+  "initial": "proposed",
+  "name": "deal",
+  "states": [
+    "proposed",
+    "negotiating",
+    "accepted",
+    "booked",
+    "active",
+    "makegood_pending",
+    "partially_cancelled",
+    "completed",
+    "rejected",
+    "failed",
+    "cancelled",
+    "expired"
+  ],
+  "terminal": [
+    "cancelled",
+    "completed",
+    "expired",
+    "failed",
+    "rejected"
+  ],
+  "transitions": [
+    {
+      "description": "Buyer initiates negotiation",
+      "from": "proposed",
+      "rework": false,
+      "to": "negotiating"
+    },
+    {
+      "description": "Deal accepted without negotiation",
+      "from": "proposed",
+      "rework": false,
+      "to": "accepted"
+    },
+    {
+      "description": "Deal terms accepted",
+      "from": "negotiating",
+      "rework": false,
+      "to": "accepted"
+    },
+    {
+      "description": "Counter-offer received, terms re-proposed",
+      "from": "negotiating",
+      "rework": true,
+      "to": "proposed"
+    },
+    {
+      "description": "Booking confirmed by seller",
+      "from": "accepted",
+      "rework": false,
+      "to": "booked"
+    },
+    {
+      "description": "Campaign delivery started",
+      "from": "booked",
+      "rework": false,
+      "to": "active"
+    },
+    {
+      "description": "Campaign delivery completed",
+      "from": "active",
+      "rework": false,
+      "to": "completed"
+    },
+    {
+      "description": "Proposed deal rejected",
+      "from": "proposed",
+      "rework": false,
+      "to": "rejected"
+    },
+    {
+      "description": "Negotiation ended in walk-away",
+      "from": "negotiating",
+      "rework": false,
+      "to": "rejected"
+    },
+    {
+      "description": "Proposal processing failed",
+      "from": "proposed",
+      "rework": false,
+      "to": "failed"
+    },
+    {
+      "description": "Negotiation failed",
+      "from": "negotiating",
+      "rework": false,
+      "to": "failed"
+    },
+    {
+      "description": "Booking failed",
+      "from": "accepted",
+      "rework": false,
+      "to": "failed"
+    },
+    {
+      "description": "Delivery failed",
+      "from": "active",
+      "rework": false,
+      "to": "failed"
+    },
+    {
+      "description": "Deal cancelled",
+      "from": "proposed",
+      "rework": false,
+      "to": "cancelled"
+    },
+    {
+      "description": "Deal cancelled during negotiation",
+      "from": "negotiating",
+      "rework": false,
+      "to": "cancelled"
+    },
+    {
+      "description": "Deal cancelled after acceptance",
+      "from": "accepted",
+      "rework": false,
+      "to": "cancelled"
+    },
+    {
+      "description": "Booked deal cancelled",
+      "from": "booked",
+      "rework": false,
+      "to": "cancelled"
+    },
+    {
+      "description": "Delivery cancelled",
+      "from": "active",
+      "rework": false,
+      "to": "cancelled"
+    },
+    {
+      "description": "Proposed deal expired",
+      "from": "proposed",
+      "rework": false,
+      "to": "expired"
+    },
+    {
+      "description": "Negotiation expired",
+      "from": "negotiating",
+      "rework": false,
+      "to": "expired"
+    },
+    {
+      "description": "Makegood requested for under-delivery",
+      "from": "active",
+      "rework": false,
+      "to": "makegood_pending"
+    },
+    {
+      "description": "Makegood resolved, delivery resumed",
+      "from": "makegood_pending",
+      "rework": true,
+      "to": "active"
+    },
+    {
+      "description": "Makegood resolved, campaign complete",
+      "from": "makegood_pending",
+      "rework": false,
+      "to": "completed"
+    },
+    {
+      "description": "Makegood could not be fulfilled",
+      "from": "makegood_pending",
+      "rework": false,
+      "to": "failed"
+    },
+    {
+      "description": "Partial cancellation of booked units",
+      "from": "booked",
+      "rework": false,
+      "to": "partially_cancelled"
+    },
+    {
+      "description": "Partially cancelled deal begins delivery",
+      "from": "partially_cancelled",
+      "rework": false,
+      "to": "active"
+    },
+    {
+      "description": "Remaining units cancelled",
+      "from": "partially_cancelled",
+      "rework": false,
+      "to": "cancelled"
+    }
+  ]
+}
