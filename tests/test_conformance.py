@@ -15,7 +15,12 @@ from iab_agentic_primitives.conformance import (
     GapReport,
     conformance_targets,
     json_diff,
+    render_markdown,
     run_conformance,
+)
+from iab_agentic_primitives.conformance.gap_report_render import (
+    HIGHEST_PRIORITY_GAP_ID,
+    REMEDIATION,
 )
 from iab_agentic_primitives.conformance.vectors import (
     fixture_documents,
@@ -24,6 +29,7 @@ from iab_agentic_primitives.conformance.vectors import (
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 FIXTURES_DIR = REPO_ROOT / "spec" / "fixtures"
+GAP_REPORT_MD = REPO_ROOT / "STANDARDS_GAP_REPORT.md"
 
 
 @pytest.fixture(scope="module")
@@ -384,3 +390,148 @@ def test_cli_regenerate_writes_fixtures(tmp_path: Path) -> None:
 
 def test_default_fixtures_dir_points_at_repo() -> None:
     assert DEFAULT_FIXTURES_DIR == FIXTURES_DIR
+
+
+# ---------------------------------------------------------------------------
+# EP-6.2 Markdown gap report (STANDARDS_GAP_REPORT.md)
+# ---------------------------------------------------------------------------
+
+
+def test_checked_in_gap_report_matches_fresh_render(green_report: GapReport) -> None:
+    """Drift guard: the checked-in Markdown must match a fresh render exactly.
+
+    Regenerate with
+    `uv run python -m iab_agentic_primitives.conformance --render-md STANDARDS_GAP_REPORT.md`.
+    """
+    assert GAP_REPORT_MD.is_file(), "STANDARDS_GAP_REPORT.md is missing"
+    fresh = render_markdown(green_report.to_json_dict())
+    assert GAP_REPORT_MD.read_text() == fresh, (
+        "STANDARDS_GAP_REPORT.md has drifted; regenerate with "
+        "`uv run python -m iab_agentic_primitives.conformance "
+        "--render-md STANDARDS_GAP_REPORT.md`"
+    )
+
+
+def test_gap_report_render_is_deterministic_and_timeless(
+    green_report: GapReport,
+) -> None:
+    """The render omits the volatile timestamp so the drift guard is stable."""
+    payload = green_report.to_json_dict()
+    first = render_markdown(payload)
+    second = render_markdown(payload)
+    assert first == second
+    assert payload["generated_at"] not in first
+
+
+def test_render_markdown_on_synthetic_report() -> None:
+    """The renderer derives CONFORMANT / PARTIAL / UNVERIFIED from the data."""
+    report = {
+        "library_version": "9.9.9",
+        "summary": {
+            "conformant": False,
+            "checks": 6,
+            "passed": 3,
+            "failed": 1,
+            "skipped": 2,
+            "vectors": 4,
+            "targets": 3,
+        },
+        "standards": [
+            {
+                "id": "opendirect-2.1",
+                "name": "IAB OpenDirect",
+                "version": "2.1",
+                "status": "unverified",
+                "checks": [],
+                "missing": "No fidelity check against the published spec.",
+            },
+            {
+                "id": "good-impl",
+                "name": "Fully checked claim",
+                "version": "1.0",
+                "status": "implemented",
+                "checks": ["validate", "roundtrip"],
+                "missing": "",
+            },
+            {
+                "id": "broken-impl",
+                "name": "Failing claim",
+                "version": "1.0",
+                "status": "implemented",
+                "checks": ["expected_invalid"],
+                "missing": "",
+            },
+            {
+                "id": "never-ran",
+                "name": "Unexecuted claim",
+                "version": "1.0",
+                "status": "implemented",
+                "checks": ["ghost_check"],
+                "missing": "",
+            },
+        ],
+        "checks": [
+            {"area": "p", "target": "T", "check": "validate", "status": "pass"},
+            {"area": "p", "target": "T", "check": "roundtrip", "status": "pass"},
+            {"area": "p", "target": "U", "check": "expected_invalid", "status": "fail"},
+        ],
+        "gaps": [],
+    }
+    md = render_markdown(report)
+
+    # Executive summary counts: 1 conformant, 2 partial, 1 unverified.
+    assert "**1 fully self-conformant**" in md
+    assert "**2 partial**" in md
+    assert "**1 unverified (pending external spec)**" in md
+    assert "library version `9.9.9`" in md
+
+    # Highest-priority gap is called out with its remediation note.
+    assert "Highest-priority gap: IAB OpenDirect 2.1" in md
+    assert REMEDIATION[HIGHEST_PRIORITY_GAP_ID][:30] in md
+
+    # Statuses appear per standard.
+    assert "**Status:** CONFORMANT" in md
+    assert "**Status:** PARTIAL" in md
+    assert "**Status:** UNVERIFIED" in md
+
+    # A failing implemented claim is PARTIAL, not CONFORMANT.
+    broken = md.split("#### Failing claim")[1].split("####")[0]
+    assert "PARTIAL" in broken
+    # An implemented claim whose mapped check never executed is PARTIAL.
+    never = md.split("#### Unexecuted claim")[1].split("####")[0]
+    assert "PARTIAL" in never
+    # UNVERIFIED entries carry a concrete to-close note.
+    assert "To close this gap:" in md
+
+
+def test_every_unverified_standard_has_remediation(green_report: GapReport) -> None:
+    """No UNVERIFIED standard may ship without an actionable to-close note."""
+    md = render_markdown(green_report.to_json_dict())
+    for entry in green_report.standards:
+        if entry.status == "unverified":
+            block = md.split(f"`{entry.id}`")[1].split("####")[0]
+            assert "To close this gap:" in block, entry.id
+
+
+def test_cli_render_md_flag_writes_report(tmp_path: Path) -> None:
+    out_json = tmp_path / "gap_report.json"
+    out_md = tmp_path / "STANDARDS_GAP_REPORT.md"
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "iab_agentic_primitives.conformance",
+            "--output",
+            str(out_json),
+            "--render-md",
+            str(out_md),
+            "--quiet",
+        ],
+        capture_output=True,
+        text=True,
+        cwd=tmp_path,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    text = out_md.read_text()
+    assert text.startswith("# IAB Agentic Primitives — Standards Gap Report")
+    assert "## Executive summary" in text

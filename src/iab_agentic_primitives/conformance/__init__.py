@@ -23,6 +23,7 @@ Public surface:
 """
 
 from .canonical import canonical_json, json_diff
+from .gap_report_render import render_markdown
 from .report import CheckRecord, CheckStatus, DiffEntry, Gap, GapReport, StandardEntry
 from .runner import (
     DEFAULT_FIXTURES_DIR,
@@ -47,6 +48,7 @@ __all__ = [
     "canonical_json",
     "conformance_targets",
     "json_diff",
+    "render_markdown",
     "run_conformance",
     "standards_entries",
 ]

@@ -22,6 +22,7 @@ import json
 import sys
 from pathlib import Path
 
+from .gap_report_render import render_markdown
 from .runner import DEFAULT_FIXTURES_DIR, DEFAULT_SCHEMA_DIR, run_conformance
 from .vectors import write_fixtures
 
@@ -55,6 +56,16 @@ def main(argv: list[str] | None = None) -> int:
         help="Suppress the human-readable table (the JSON report is still written).",
     )
     parser.add_argument(
+        "--render-md",
+        type=Path,
+        default=None,
+        metavar="PATH",
+        help=(
+            "Also render the human-facing Markdown gap report "
+            "(STANDARDS_GAP_REPORT.md) from this run to PATH."
+        ),
+    )
+    parser.add_argument(
         "--regenerate",
         action="store_true",
         help="Regenerate the checked-in golden fixtures from the vector builders, then exit.",
@@ -79,10 +90,15 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     report = run_conformance(fixtures_dir=fixtures_dir, schema_dir=args.schemas)
-    args.output.write_text(json.dumps(report.to_json_dict(), indent=2) + "\n")
+    payload = report.to_json_dict()
+    args.output.write_text(json.dumps(payload, indent=2) + "\n")
+    if args.render_md is not None:
+        args.render_md.write_text(render_markdown(payload))
     if not args.quiet:
         print(report.render_table())
         print(f"\ngap report written to {args.output}")
+        if args.render_md is not None:
+            print(f"markdown gap report written to {args.render_md}")
     return 0 if report.conformant else 1
 
 
