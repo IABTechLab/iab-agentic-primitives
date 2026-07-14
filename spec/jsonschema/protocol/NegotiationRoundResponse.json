@@ -1,0 +1,135 @@
+{
+  "$defs": {
+    "Money": {
+      "description": "Exact money amount in integer micros (flagged decision FD-11).\n\n``1_000_000`` micros = 1 currency unit \u2014 the ad-industry convention\n(Google Ad Manager, among others, prices in micros). Float is BANNED on\nthe wire for money: IEEE 754 floating point is non-deterministic for\nmoney math (``0.1 + 0.2 != 0.3``, and repeated CPM \u2014 cost per mille \u2014\narithmetic accumulates error), and the two source repos used ``float``\nend-to-end; that defect must not be fossilized into the spec. Every\nprice, rate, budget, and offer in the shared contract is a ``Money``.\n\n``amount_micros`` is a strict integer: float inputs are rejected at\nvalidation time rather than silently truncated.",
+      "properties": {
+        "amount_micros": {
+          "description": "Amount in micros; 1,000,000 micros = 1 currency unit.",
+          "title": "Amount Micros",
+          "type": "integer"
+        },
+        "currency": {
+          "default": "USD",
+          "description": "ISO 4217 alpha-3 currency code.",
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount_micros"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "NegotiationAction": {
+      "description": "Action taken in a negotiation round.",
+      "enum": [
+        "accept",
+        "counter",
+        "reject",
+        "final_offer"
+      ],
+      "title": "NegotiationAction",
+      "type": "string"
+    },
+    "NegotiationRound": {
+      "description": "A single offer/counter round in a negotiation.",
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/NegotiationAction"
+        },
+        "buyer_price": {
+          "$ref": "#/$defs/Money",
+          "description": "What the buyer offered this round."
+        },
+        "concession_pct": {
+          "default": 0.0,
+          "description": "Seller concession this round (0-1).",
+          "title": "Concession Pct",
+          "type": "number"
+        },
+        "cumulative_concession_pct": {
+          "default": 0.0,
+          "description": "Total seller concession so far (0-1).",
+          "title": "Cumulative Concession Pct",
+          "type": "number"
+        },
+        "rationale": {
+          "default": "",
+          "title": "Rationale",
+          "type": "string"
+        },
+        "round_number": {
+          "minimum": 1,
+          "title": "Round Number",
+          "type": "integer"
+        },
+        "seller_price": {
+          "$ref": "#/$defs/Money",
+          "description": "What the seller countered (or accepted at) this round."
+        },
+        "timestamp": {
+          "format": "date-time",
+          "title": "Timestamp",
+          "type": "string"
+        }
+      },
+      "required": [
+        "round_number",
+        "buyer_price",
+        "seller_price",
+        "action"
+      ],
+      "title": "NegotiationRound",
+      "type": "object"
+    },
+    "NegotiationStatus": {
+      "description": "Status of a negotiation (typed; was a raw string in the seller repo).",
+      "enum": [
+        "active",
+        "accepted",
+        "rejected",
+        "expired"
+      ],
+      "title": "NegotiationStatus",
+      "type": "string"
+    }
+  },
+  "description": "The seller's answer to a :class:`NegotiationMessage`.\n\nEmbeds the shared\n:class:`~iab_agentic_primitives.primitives.NegotiationRound` primitive\n\u2014 the same record appended to the Negotiation history \u2014 so the two\nsides cannot disagree about what a round contains. ``round.action`` is\nthe SELLER's move (accept/counter/reject/final_offer); when\n``status`` is terminal the round is the last one.",
+  "properties": {
+    "negotiation_id": {
+      "description": "Seller-issued negotiation identifier.",
+      "title": "Negotiation Id",
+      "type": "string"
+    },
+    "round": {
+      "$ref": "#/$defs/NegotiationRound"
+    },
+    "rounds_remaining": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Rounds left before the seller walks away, if disclosed.",
+      "title": "Rounds Remaining"
+    },
+    "status": {
+      "$ref": "#/$defs/NegotiationStatus",
+      "description": "'active' or terminal ('accepted'/'rejected'/'expired'); terminal negotiations refuse further messages (negotiation_closed)."
+    }
+  },
+  "required": [
+    "negotiation_id",
+    "status",
+    "round"
+  ],
+  "title": "NegotiationRoundResponse",
+  "type": "object"
+}

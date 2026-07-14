@@ -1,0 +1,146 @@
+{
+  "$defs": {
+    "A2APart": {
+      "description": "One part of an A2A message: text or structured data.",
+      "properties": {
+        "data": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Set when kind == 'data'.",
+          "title": "Data"
+        },
+        "kind": {
+          "enum": [
+            "text",
+            "data"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Set when kind == 'text'.",
+          "title": "Text"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "A2APart",
+      "type": "object"
+    },
+    "A2AResult": {
+      "description": "``result`` object of a successful ``message/send`` response.",
+      "properties": {
+        "contextId": {
+          "default": "",
+          "description": "Echo/mint of the conversation context for multi-turn.",
+          "title": "Contextid",
+          "type": "string"
+        },
+        "parts": {
+          "items": {
+            "$ref": "#/$defs/A2APart"
+          },
+          "title": "Parts",
+          "type": "array"
+        },
+        "role": {
+          "default": "agent",
+          "enum": [
+            "user",
+            "agent"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "taskId": {
+          "default": "",
+          "title": "Taskid",
+          "type": "string"
+        }
+      },
+      "title": "A2AResult",
+      "type": "object"
+    },
+    "JsonRpcError": {
+      "description": "JSON-RPC 2.0 error object (protocol-level errors only; domain\nerrors ride inside ``result`` parts using the shared error envelope).",
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "integer"
+        },
+        "data": {
+          "default": null,
+          "title": "Data"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "title": "JsonRpcError",
+      "type": "object"
+    }
+  },
+  "description": "JSON-RPC 2.0 response envelope: exactly one of result/error.",
+  "properties": {
+    "error": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/JsonRpcError"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "jsonrpc": {
+      "const": "2.0",
+      "default": "2.0",
+      "title": "Jsonrpc",
+      "type": "string"
+    },
+    "result": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/A2AResult"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "id"
+  ],
+  "title": "JsonRpcResponse",
+  "type": "object"
+}

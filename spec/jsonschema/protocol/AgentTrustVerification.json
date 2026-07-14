@@ -1,0 +1,72 @@
+{
+  "$defs": {
+    "TrustStatus": {
+      "description": "Registry-verified trust status of an agent.\n\nDetermines the maximum :class:`AccessTier` an agent can claim. Per the\nremediation plan's registry-native corollary, trust is verified against\nthe AAMP registry (the IAB Tech Lab agent discovery and trust registry),\nnever self-asserted.",
+      "enum": [
+        "unknown",
+        "registered",
+        "approved",
+        "preferred",
+        "blocked"
+      ],
+      "title": "TrustStatus",
+      "type": "string"
+    }
+  },
+  "description": "Registry-verified trust result for an agent (replaces the buyer's\n``AgentTrustInfo``).\n\n``is_registered`` is retired \u2014 it is derivable as\n``trust_status != \"unknown\"``. Trust caps the effective access tier\nserver-side; it is never self-asserted (see the Agent primitive).",
+  "properties": {
+    "agent_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Registry-issued agent id, when registered.",
+      "title": "Agent Id"
+    },
+    "agent_url": {
+      "title": "Agent Url",
+      "type": "string"
+    },
+    "registry_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Registry that answered, e.g. \"iab_aamp\".",
+      "title": "Registry Id"
+    },
+    "trust_status": {
+      "$ref": "#/$defs/TrustStatus",
+      "default": "unknown"
+    },
+    "verified_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Timezone-aware timestamp of the verification.",
+      "title": "Verified At"
+    }
+  },
+  "required": [
+    "agent_url"
+  ],
+  "title": "AgentTrustVerification",
+  "type": "object"
+}

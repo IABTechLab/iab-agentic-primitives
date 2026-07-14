@@ -1,0 +1,137 @@
+{
+  "$defs": {
+    "A2AMessage": {
+      "description": "An A2A message (the A2A-spec shape the buyer already sent).",
+      "properties": {
+        "messageId": {
+          "description": "Sender-minted unique message id.",
+          "title": "Messageid",
+          "type": "string"
+        },
+        "parts": {
+          "items": {
+            "$ref": "#/$defs/A2APart"
+          },
+          "minItems": 1,
+          "title": "Parts",
+          "type": "array"
+        },
+        "role": {
+          "default": "user",
+          "enum": [
+            "user",
+            "agent"
+          ],
+          "title": "Role",
+          "type": "string"
+        }
+      },
+      "required": [
+        "messageId",
+        "parts"
+      ],
+      "title": "A2AMessage",
+      "type": "object"
+    },
+    "A2APart": {
+      "description": "One part of an A2A message: text or structured data.",
+      "properties": {
+        "data": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Set when kind == 'data'.",
+          "title": "Data"
+        },
+        "kind": {
+          "enum": [
+            "text",
+            "data"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Set when kind == 'text'.",
+          "title": "Text"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "A2APart",
+      "type": "object"
+    },
+    "MessageSendParams": {
+      "description": "``params`` object for the ``message/send`` method.",
+      "properties": {
+        "contextId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Continues a multi-turn conversation; None starts one.",
+          "title": "Contextid"
+        },
+        "message": {
+          "$ref": "#/$defs/A2AMessage"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "title": "MessageSendParams",
+      "type": "object"
+    }
+  },
+  "description": "JSON-RPC 2.0 request envelope, pinned to ``message/send``.\n\n``method`` is a Literal: the seller's retired ``\"call\"`` dialect does\nnot validate against this model by construction.",
+  "properties": {
+    "id": {
+      "description": "Caller-minted request id, echoed in the response.",
+      "title": "Id",
+      "type": "string"
+    },
+    "jsonrpc": {
+      "const": "2.0",
+      "default": "2.0",
+      "title": "Jsonrpc",
+      "type": "string"
+    },
+    "method": {
+      "const": "message/send",
+      "default": "message/send",
+      "title": "Method",
+      "type": "string"
+    },
+    "params": {
+      "$ref": "#/$defs/MessageSendParams"
+    }
+  },
+  "required": [
+    "id",
+    "params"
+  ],
+  "title": "JsonRpcRequest",
+  "type": "object"
+}

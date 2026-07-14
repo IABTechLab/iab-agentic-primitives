@@ -1,0 +1,15 @@
+{
+  "description": "Request body for ``POST /registry/agents/discover``: fetch and\nregister a counterparty's card by its base URL.",
+  "properties": {
+    "agent_url": {
+      "description": "Base URL of the agent; its card is fetched from {agent_url}/.well-known/agent.json.",
+      "title": "Agent Url",
+      "type": "string"
+    }
+  },
+  "required": [
+    "agent_url"
+  ],
+  "title": "AgentDiscoveryRequest",
+  "type": "object"
+}

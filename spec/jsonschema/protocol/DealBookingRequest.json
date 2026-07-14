@@ -1,0 +1,296 @@
+{
+  "$defs": {
+    "BuyerIdentity": {
+      "description": "Buyer identity revealed progressively to unlock better pricing.\n\nSuperset of the buyer repo's ``BuyerIdentity`` and the seller repo's\n``BuyerIdentity``/``QuoteBuyerIdentity``; every field is optional so a\npartially revealed identity is always representable. The tier derived\nfrom these fields is capped server-side by the registry-verified trust\nstatus of the calling agent \u2014 it is never self-asserted.",
+      "properties": {
+        "advertiser_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Advertiser Id"
+        },
+        "advertiser_industry": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Advertiser Industry"
+        },
+        "advertiser_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Advertiser Name"
+        },
+        "agency_holding_company": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Agency Holding Company"
+        },
+        "agency_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Agency Id"
+        },
+        "agency_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Agency Name"
+        },
+        "campaign_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional campaign scope for campaign-specific deals.",
+          "title": "Campaign Id"
+        },
+        "campaign_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Campaign Name"
+        },
+        "dsp_platform": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "DSP platform slug (e.g. 'ttd', 'dv360').",
+          "title": "Dsp Platform"
+        },
+        "seat_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "DSP seat identifier.",
+          "title": "Seat Id"
+        },
+        "seat_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "DSP platform display name.",
+          "title": "Seat Name"
+        }
+      },
+      "title": "BuyerIdentity",
+      "type": "object"
+    },
+    "ConsentContext": {
+      "description": "Privacy consent signals that travel with a deal (flagged decision FD-10).\n\nMinimal placeholder per the ratified decision: regime identifiers plus\ndiligence status. Full build-out (validated GPP \u2014 Global Privacy\nPlatform \u2014 sections, TCF \u2014 Transparency & Consent Framework \u2014 vendor\nchecks) is a later bead; the slot exists on Deal, Quote, and Order now\nso the wire shape does not have to break when it lands.",
+      "properties": {
+        "applicable_regimes": {
+          "description": "Privacy regime identifiers in scope (e.g. 'GDPR', 'CCPA').",
+          "items": {
+            "type": "string"
+          },
+          "title": "Applicable Regimes",
+          "type": "array"
+        },
+        "diligence_status": {
+          "$ref": "#/$defs/DiligenceStatus",
+          "default": "unknown",
+          "description": "Counterparty diligence status (IAB Diligence Platform)."
+        },
+        "gpp_section_ids": {
+          "description": "GPP section ids present in the string.",
+          "items": {
+            "type": "integer"
+          },
+          "title": "Gpp Section Ids",
+          "type": "array"
+        },
+        "gpp_string": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "GPP (Global Privacy Platform) consent string.",
+          "title": "Gpp String"
+        },
+        "tcf_string": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "TCF (Transparency & Consent Framework) TC string, when GDPR applies.",
+          "title": "Tcf String"
+        },
+        "verified_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Timezone-aware timestamp of the last diligence verification, if any.",
+          "title": "Verified At"
+        }
+      },
+      "title": "ConsentContext",
+      "type": "object"
+    },
+    "DiligenceStatus": {
+      "description": "Status of counterparty privacy diligence (IAB Diligence Platform).",
+      "enum": [
+        "unknown",
+        "pending",
+        "passed",
+        "failed"
+      ],
+      "title": "DiligenceStatus",
+      "type": "string"
+    }
+  },
+  "description": "Request body for ``POST /api/v1/deals`` (money-mutating: FD-12).\n\nThis is the commit point \u2014 the referenced quote becomes bound. The\nseller mints ``deal_id`` in the response.",
+  "properties": {
+    "audience_plan": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Audience plan frozen with the booking (open object; typed model lands with the audience-plan bead). Unsupported parts are rejected structurally (FD-6) so the buyer can degrade and retry.",
+      "title": "Audience Plan"
+    },
+    "buyer_identity": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/BuyerIdentity"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Must be consistent with the identity the quote was priced for; the seller re-verifies tier at booking."
+    },
+    "consent_context": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ConsentContext"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Privacy consent signals riding with the booking (FD-10)."
+    },
+    "idempotency_key": {
+      "description": "Requester-minted opaque key (UUID recommended). Same key -> same response, no duplicate side effects (FD-12). Reusing a key with a different body is an idempotency_conflict error.",
+      "minLength": 1,
+      "title": "Idempotency Key",
+      "type": "string"
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Notes"
+    },
+    "quote_id": {
+      "description": "Seller-issued quote being booked.",
+      "title": "Quote Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "idempotency_key",
+    "quote_id"
+  ],
+  "title": "DealBookingRequest",
+  "type": "object"
+}

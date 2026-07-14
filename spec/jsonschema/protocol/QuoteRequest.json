@@ -1,0 +1,532 @@
+{
+  "$defs": {
+    "BuyerIdentity": {
+      "description": "Buyer identity revealed progressively to unlock better pricing.\n\nSuperset of the buyer repo's ``BuyerIdentity`` and the seller repo's\n``BuyerIdentity``/``QuoteBuyerIdentity``; every field is optional so a\npartially revealed identity is always representable. The tier derived\nfrom these fields is capped server-side by the registry-verified trust\nstatus of the calling agent \u2014 it is never self-asserted.",
+      "properties": {
+        "advertiser_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Advertiser Id"
+        },
+        "advertiser_industry": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Advertiser Industry"
+        },
+        "advertiser_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Advertiser Name"
+        },
+        "agency_holding_company": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Agency Holding Company"
+        },
+        "agency_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Agency Id"
+        },
+        "agency_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Agency Name"
+        },
+        "campaign_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional campaign scope for campaign-specific deals.",
+          "title": "Campaign Id"
+        },
+        "campaign_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Campaign Name"
+        },
+        "dsp_platform": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "DSP platform slug (e.g. 'ttd', 'dv360').",
+          "title": "Dsp Platform"
+        },
+        "seat_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "DSP seat identifier.",
+          "title": "Seat Id"
+        },
+        "seat_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "DSP platform display name.",
+          "title": "Seat Name"
+        }
+      },
+      "title": "BuyerIdentity",
+      "type": "object"
+    },
+    "ConsentContext": {
+      "description": "Privacy consent signals that travel with a deal (flagged decision FD-10).\n\nMinimal placeholder per the ratified decision: regime identifiers plus\ndiligence status. Full build-out (validated GPP \u2014 Global Privacy\nPlatform \u2014 sections, TCF \u2014 Transparency & Consent Framework \u2014 vendor\nchecks) is a later bead; the slot exists on Deal, Quote, and Order now\nso the wire shape does not have to break when it lands.",
+      "properties": {
+        "applicable_regimes": {
+          "description": "Privacy regime identifiers in scope (e.g. 'GDPR', 'CCPA').",
+          "items": {
+            "type": "string"
+          },
+          "title": "Applicable Regimes",
+          "type": "array"
+        },
+        "diligence_status": {
+          "$ref": "#/$defs/DiligenceStatus",
+          "default": "unknown",
+          "description": "Counterparty diligence status (IAB Diligence Platform)."
+        },
+        "gpp_section_ids": {
+          "description": "GPP section ids present in the string.",
+          "items": {
+            "type": "integer"
+          },
+          "title": "Gpp Section Ids",
+          "type": "array"
+        },
+        "gpp_string": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "GPP (Global Privacy Platform) consent string.",
+          "title": "Gpp String"
+        },
+        "tcf_string": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "TCF (Transparency & Consent Framework) TC string, when GDPR applies.",
+          "title": "Tcf String"
+        },
+        "verified_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Timezone-aware timestamp of the last diligence verification, if any.",
+          "title": "Verified At"
+        }
+      },
+      "title": "ConsentContext",
+      "type": "object"
+    },
+    "DealType": {
+      "description": "Programmatic deal types. The short wire encoding is canonical.\n\n- ``PG`` = Programmatic Guaranteed: fixed price, guaranteed impressions\n- ``PD`` = Preferred Deal: fixed price, non-guaranteed first look\n- ``PA`` = Private Auction: auction with floor price, invited buyers\n\nMapping from the seller repo's retired long-form encoding\n(``models/core.py``): ``programmaticguaranteed`` -> ``PG``,\n``preferreddeal`` -> ``PD``, ``privateauction`` -> ``PA``. The\nlong-form strings are NOT valid wire values.",
+      "enum": [
+        "PG",
+        "PD",
+        "PA"
+      ],
+      "title": "DealType",
+      "type": "string"
+    },
+    "DiligenceStatus": {
+      "description": "Status of counterparty privacy diligence (IAB Diligence Platform).",
+      "enum": [
+        "unknown",
+        "pending",
+        "passed",
+        "failed"
+      ],
+      "title": "DiligenceStatus",
+      "type": "string"
+    },
+    "LinearTVParams": {
+      "description": "Linear-TV-specific request parameters (buyer-supplied).\n\nUsed when ``media_type == \"linear_tv\"``. GRP = gross rating point;\nCPP = cost per point; DMA = designated market area.",
+      "properties": {
+        "dayparts": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Target dayparts, e.g. \"primetime\", \"daytime\", \"late_night\".",
+          "title": "Dayparts"
+        },
+        "dmas": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Nielsen DMA (designated market area) codes; None means national.",
+          "title": "Dmas"
+        },
+        "grps_requested": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Requested volume in GRPs (gross rating points).",
+          "title": "Grps Requested"
+        },
+        "measurement_currency": {
+          "default": "nielsen",
+          "description": "Audience measurement provider: \"nielsen\", \"comscore\", \"videoamp\".",
+          "title": "Measurement Currency",
+          "type": "string"
+        },
+        "networks": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Target networks, e.g. [\"NBC\", \"ESPN\"].",
+          "title": "Networks"
+        },
+        "rotation": {
+          "default": "ros",
+          "description": "Spot rotation: \"ros\" (run of schedule), \"fixed\", \"program_specific\".",
+          "title": "Rotation",
+          "type": "string"
+        },
+        "spot_length": {
+          "default": 30,
+          "description": "Spot length in seconds: 15, 30, or 60.",
+          "title": "Spot Length",
+          "type": "integer"
+        },
+        "target_cpp": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Buyer's desired CPP (cost per point)."
+        },
+        "target_demo": {
+          "description": "Target demographic, e.g. \"A18-49\", \"A25-54\", \"HH\" (households).",
+          "title": "Target Demo",
+          "type": "string"
+        }
+      },
+      "required": [
+        "target_demo"
+      ],
+      "title": "LinearTVParams",
+      "type": "object"
+    },
+    "MediaType": {
+      "description": "Media type discriminator carried on quotes and deals.\n\nSellers that do not support ``linear_tv`` MUST return a structured\nrejection rather than silently mispricing (flagged decision FD-6);\nthe field exists on the shared schema so that rejection can be\nstructural.",
+      "enum": [
+        "digital",
+        "ctv",
+        "linear_tv"
+      ],
+      "title": "MediaType",
+      "type": "string"
+    },
+    "Money": {
+      "description": "Exact money amount in integer micros (flagged decision FD-11).\n\n``1_000_000`` micros = 1 currency unit \u2014 the ad-industry convention\n(Google Ad Manager, among others, prices in micros). Float is BANNED on\nthe wire for money: IEEE 754 floating point is non-deterministic for\nmoney math (``0.1 + 0.2 != 0.3``, and repeated CPM \u2014 cost per mille \u2014\narithmetic accumulates error), and the two source repos used ``float``\nend-to-end; that defect must not be fossilized into the spec. Every\nprice, rate, budget, and offer in the shared contract is a ``Money``.\n\n``amount_micros`` is a strict integer: float inputs are rejected at\nvalidation time rather than silently truncated.",
+      "properties": {
+        "amount_micros": {
+          "description": "Amount in micros; 1,000,000 micros = 1 currency unit.",
+          "title": "Amount Micros",
+          "type": "integer"
+        },
+        "currency": {
+          "default": "USD",
+          "description": "ISO 4217 alpha-3 currency code.",
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount_micros"
+      ],
+      "title": "Money",
+      "type": "object"
+    }
+  },
+  "description": "Request body for ``POST /api/v1/quotes`` (money-mutating: FD-12).\n\nID minting: the seller mints ``quote_id`` in the response; the buyer\nnever proposes one.",
+  "properties": {
+    "agent_url": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "A2A endpoint of the requesting buyer agent, for registry trust verification. The buyer already sent this; the seller's model dropped it \u2014 now part of the contract.",
+      "title": "Agent Url"
+    },
+    "audience_plan": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Audience plan slot (open object; the typed model lands with the audience-plan bead). Sellers pre-flight it against their capabilities and reject unsupported parts structurally (FD-6).",
+      "title": "Audience Plan"
+    },
+    "buyer_identity": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/BuyerIdentity"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Progressively revealed identity for tiered pricing; the effective tier is capped server-side by registry-verified trust."
+    },
+    "consent_context": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ConsentContext"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Privacy consent signals riding with the request (FD-10)."
+    },
+    "deal_type": {
+      "$ref": "#/$defs/DealType",
+      "description": "'PG' (Programmatic Guaranteed), 'PD' (Preferred Deal), 'PA' (Private Auction). Typed \u2014 the retired long-form strings are not valid wire values."
+    },
+    "flight_end": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Flight End"
+    },
+    "flight_start": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Flight Start"
+    },
+    "idempotency_key": {
+      "description": "Requester-minted opaque key (UUID recommended). Same key -> same response, no duplicate side effects (FD-12). Reusing a key with a different body is an idempotency_conflict error.",
+      "minLength": 1,
+      "title": "Idempotency Key",
+      "type": "string"
+    },
+    "impressions": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Requested volume; required for PG.",
+      "title": "Impressions"
+    },
+    "linear_tv": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/LinearTVParams"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Linear TV parameters; required when media_type == 'linear_tv', must be None otherwise."
+    },
+    "media_type": {
+      "$ref": "#/$defs/MediaType",
+      "default": "digital",
+      "description": "Media discriminator (FD-6). Sellers that do not support the requested type MUST reject structurally."
+    },
+    "product_id": {
+      "description": "Seller-issued product to quote.",
+      "title": "Product Id",
+      "type": "string"
+    },
+    "rate_card_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Seller-issued id of the pair's private rate card to price against (FD-9). The rate card itself never crosses the wire.",
+      "title": "Rate Card Id"
+    },
+    "target_cpm": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Money"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Buyer's desired CPM (exact micros; FD-11). Advisory."
+    }
+  },
+  "required": [
+    "idempotency_key",
+    "product_id",
+    "deal_type"
+  ],
+  "title": "QuoteRequest",
+  "type": "object"
+}

@@ -1,0 +1,155 @@
+{
+  "$defs": {
+    "ChangeSeverity": {
+      "description": "How significant the change is \u2014 determines approval requirements.",
+      "enum": [
+        "minor",
+        "material",
+        "critical"
+      ],
+      "title": "ChangeSeverity",
+      "type": "string"
+    },
+    "ChangeType": {
+      "description": "Category of change being requested.\n\n``makegood`` implements flagged decision FD-6: makegoods are a typed\nChangeRequest subtype, not a separate primitive.",
+      "enum": [
+        "flight_dates",
+        "impressions",
+        "pricing",
+        "creative",
+        "targeting",
+        "cancellation",
+        "makegood",
+        "other"
+      ],
+      "title": "ChangeType",
+      "type": "string"
+    },
+    "MakegoodDetails": {
+      "description": "Makegood payload for a ChangeRequest of type ``makegood`` (FD-6).\n\nSent when audience delivery falls short of the guaranteed GRP (gross\nrating point) level; the seller responds with replacement inventory.",
+      "properties": {
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "original_daypart": {
+          "description": "Daypart where the underdelivery occurred.",
+          "title": "Original Daypart",
+          "type": "string"
+        },
+        "preferred_dayparts": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Buyer's preferred dayparts for replacement inventory.",
+          "title": "Preferred Dayparts"
+        },
+        "shortfall_grps": {
+          "description": "GRP shortfall that needs to be made up.",
+          "title": "Shortfall Grps",
+          "type": "number"
+        },
+        "target_demo": {
+          "description": "Target demographic for makegood inventory.",
+          "title": "Target Demo",
+          "type": "string"
+        }
+      },
+      "required": [
+        "shortfall_grps",
+        "original_daypart",
+        "target_demo"
+      ],
+      "title": "MakegoodDetails",
+      "type": "object"
+    }
+  },
+  "description": "Request body for ``POST /api/v1/change-requests`` (money-mutating: FD-12).\n\nThe seller mints ``change_request_id`` and owns the request's\nlifecycle. Makegoods (GRP shortfall replacement, linear TV) and\ncancellations are typed subtypes of this one surface \u2014 see the\nmodule docstring for the retired per-deal sub-routes.",
+  "properties": {
+    "change_type": {
+      "$ref": "#/$defs/ChangeType"
+    },
+    "deal_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Deal being modified; at least one of order_id/deal_id.",
+      "title": "Deal Id"
+    },
+    "idempotency_key": {
+      "description": "Requester-minted opaque key (UUID recommended). Same key -> same response, no duplicate side effects (FD-12). Reusing a key with a different body is an idempotency_conflict error.",
+      "minLength": 1,
+      "title": "Idempotency Key",
+      "type": "string"
+    },
+    "makegood": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/MakegoodDetails"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Required when change_type == 'makegood' (FD-6)."
+    },
+    "order_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Order being modified; at least one of order_id/deal_id.",
+      "title": "Order Id"
+    },
+    "proposed_values": {
+      "additionalProperties": true,
+      "description": "Field -> proposed new value. For change_type 'cancellation': cancel_pct (0.0-1.0), reason, effective_date.",
+      "title": "Proposed Values",
+      "type": "object"
+    },
+    "reason": {
+      "default": "",
+      "title": "Reason",
+      "type": "string"
+    },
+    "severity": {
+      "$ref": "#/$defs/ChangeSeverity",
+      "default": "material"
+    }
+  },
+  "required": [
+    "idempotency_key",
+    "change_type"
+  ],
+  "title": "ChangeRequestCreate",
+  "type": "object"
+}

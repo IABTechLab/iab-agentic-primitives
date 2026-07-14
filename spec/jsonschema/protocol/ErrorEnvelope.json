@@ -1,0 +1,94 @@
+{
+  "$defs": {
+    "ErrorCode": {
+      "description": "Canonical machine-readable error codes for the shared contract.\n\n- ``validation``: request failed schema or business validation\n  (bad enum value, missing required field, below product minimums)\n- ``unsupported_capability``: the counterparty cannot honor a\n  requested capability (linear TV, an audience-plan role, ...) \u2014\n  the FD-6 structured rejection; specifics ride in ``unsupported``\n- ``not_found``: referenced resource does not exist\n- ``quote_expired``: the referenced quote's TTL (time to live) has\n  elapsed; request a new quote (HTTP 410)\n- ``contention``: concurrent-state conflict \u2014 e.g. the quote was\n  already booked, or the resource changed under the request (HTTP 409)\n- ``ceiling_exceeded``: the request would breach a hard money\n  guardrail (buyer budget/CPM \u2014 cost per mille \u2014 ceiling, seller floor)\n- ``negotiation_closed``: the negotiation is terminal\n  (accepted/rejected/expired); no further rounds are possible\n- ``idempotency_conflict``: an ``idempotency_key`` was reused with a\n  different request body (FD-12)\n- ``unauthorized``: missing or invalid credentials (HTTP 401)\n- ``forbidden``: authenticated but not allowed \u2014 e.g. a blocked agent\n  per registry trust status (HTTP 403)\n- ``internal``: unexpected server-side failure (HTTP 5xx)",
+      "enum": [
+        "validation",
+        "unsupported_capability",
+        "not_found",
+        "quote_expired",
+        "contention",
+        "ceiling_exceeded",
+        "negotiation_closed",
+        "idempotency_conflict",
+        "unauthorized",
+        "forbidden",
+        "internal"
+      ],
+      "title": "ErrorCode",
+      "type": "string"
+    },
+    "ErrorDetail": {
+      "description": "The inner error object carried in every :class:`ErrorEnvelope`.",
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/ErrorCode"
+        },
+        "message": {
+          "default": "",
+          "description": "Human-readable detail.",
+          "title": "Message",
+          "type": "string"
+        },
+        "unsupported": {
+          "description": "Populated when error == unsupported_capability (FD-6): the specific capabilities the counterparty cannot honor, so the requester can degrade and retry precisely.",
+          "items": {
+            "$ref": "#/$defs/UnsupportedItem"
+          },
+          "title": "Unsupported",
+          "type": "array"
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "title": "ErrorDetail",
+      "type": "object"
+    },
+    "UnsupportedItem": {
+      "description": "One capability the counterparty cannot honor (FD-6 rejection detail).\n\nGeneralizes the seller's ``audience_plan_unsupported`` entries\n(``{\"path\": ..., \"reason\": ...}``) so the same shape also serves the\nlinear-TV rejection: ``{\"capability\": \"linear_tv\"}``.",
+      "properties": {
+        "capability": {
+          "description": "What cannot be honored, e.g. \"linear_tv\", \"audience_plan.extensions[0]\", \"deal_type:PG\".",
+          "title": "Capability",
+          "type": "string"
+        },
+        "path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional JSON path into the request pinpointing the item.",
+          "title": "Path"
+        },
+        "reason": {
+          "default": "",
+          "description": "Human-readable explanation.",
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "capability"
+      ],
+      "title": "UnsupportedItem",
+      "type": "object"
+    }
+  },
+  "description": "The one wire shape for every protocol error: ``{\"detail\": {...}}``.\n\nMatches the FastAPI ``HTTPException(detail=<dict>)`` encoding already\nused on the quote->book path, so conformant servers keep their\nframework defaults and conformant clients parse one shape.",
+  "properties": {
+    "detail": {
+      "$ref": "#/$defs/ErrorDetail"
+    }
+  },
+  "required": [
+    "detail"
+  ],
+  "title": "ErrorEnvelope",
+  "type": "object"
+}

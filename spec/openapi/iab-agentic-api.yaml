@@ -1,0 +1,308 @@
+# OpenAPI 3.1 fragment for the IAB agentic-advertising protocol surfaces
+# (EP-1.3). This document is normative for paths, methods, and the schema
+# each request/response uses; the referenced JSON Schemas are the exported
+# artifacts under ../jsonschema/ (primitives) and ../jsonschema/protocol/
+# (protocol messages), which are drift-guarded against the Python
+# reference implementation in CI.
+#
+# Conventions:
+# - Every error response, any status, is the ONE structured envelope
+#   (ErrorEnvelope: {"detail": {"error": <code>, "message", "unsupported"}}).
+# - Money-mutating request bodies carry a required idempotency_key (FD-12):
+#   same key -> same response, no duplicate side effects.
+# - Wire schemas are must-ignore-unknown-fields (FD-13); the x_ field-name
+#   prefix is reserved for vendor extensions.
+# - There is deliberately NO POST /products/search (plan §7 amendment 3):
+#   the buyer filters client-side over the ProductListResponse fields.
+# - Reconciliation notes per surface: PROTOCOL_RECONCILIATION.md.
+openapi: 3.1.0
+info:
+  title: IAB Agentic Advertising API
+  version: 0.1.0
+  description: >-
+    Canonical wire protocol between the IAB Tech Lab buyer and seller
+    agents: catalog, quote->book deal flow, negotiation, change requests,
+    A2A (Agent-to-Agent protocol) JSON-RPC messaging, and Agent Card
+    discovery.
+paths:
+  /products:
+    get:
+      operationId: listProducts
+      summary: Paginated product catalog (filtering is client-side; no /products/search)
+      parameters:
+        - name: limit
+          in: query
+          schema: {type: integer, minimum: 1, maximum: 500, default: 50}
+        - name: offset
+          in: query
+          schema: {type: integer, minimum: 0, default: 0}
+      responses:
+        "200":
+          description: Page of products with pagination echo.
+          content:
+            application/json:
+              schema:
+                $ref: "../jsonschema/protocol/ProductListResponse.json"
+  /products/{product_id}:
+    get:
+      operationId: getProduct
+      summary: Product detail (the Product primitive, no wrapper)
+      parameters:
+        - name: product_id
+          in: path
+          required: true
+          schema: {type: string}
+      responses:
+        "200":
+          description: The product.
+          content:
+            application/json:
+              schema:
+                $ref: "../jsonschema/Product.json"
+        "404":
+          $ref: "#/components/responses/Error"
+  /api/v1/quotes:
+    post:
+      operationId: createQuote
+      summary: Request a non-binding quote (money-mutating; idempotency_key required)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../jsonschema/protocol/QuoteRequest.json"
+      responses:
+        "201":
+          description: Quote envelope wrapping the Quote primitive.
+          content:
+            application/json:
+              schema:
+                $ref: "../jsonschema/protocol/QuoteResponse.json"
+        "400":
+          description: >-
+            Validation failure, or the FD-6 structured capability rejection
+            (error=unsupported_capability with the unsupported list, e.g.
+            linear_tv).
+          content:
+            application/json:
+              schema:
+                $ref: "../jsonschema/protocol/ErrorEnvelope.json"
+        "404":
+          $ref: "#/components/responses/Error"
+  /api/v1/quotes/{quote_id}:
+    get:
+      operationId: getQuote
+      summary: Retrieve a quote
+      parameters:
+        - name: quote_id
+          in: path
+          required: true
+          schema: {type: string}
+      responses:
+        "200":
+          description: Quote envelope.
+          content:
+            application/json:
+              schema:
+                $ref: "../jsonschema/protocol/QuoteResponse.json"
+        "404":
+          $ref: "#/components/responses/Error"
+        "410":
+          description: Quote expired (error=quote_expired).
+          content:
+            application/json:
+              schema:
+                $ref: "../jsonschema/protocol/ErrorEnvelope.json"
+  /api/v1/deals:
+    post:
+      operationId: bookDeal
+      summary: Book a deal from a quote (money-mutating; idempotency_key required)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../jsonschema/protocol/DealBookingRequest.json"
+      responses:
+        "201":
+          description: Deal envelope wrapping the Deal primitive.
+          content:
+            application/json:
+              schema:
+                $ref: "../jsonschema/protocol/DealBookingResponse.json"
+        "400":
+          description: Validation failure or FD-6 capability rejection.
+          content:
+            application/json:
+              schema:
+                $ref: "../jsonschema/protocol/ErrorEnvelope.json"
+        "404":
+          $ref: "#/components/responses/Error"
+        "409":
+          description: Quote already booked / concurrent conflict (error=contention).
+          content:
+            application/json:
+              schema:
+                $ref: "../jsonschema/protocol/ErrorEnvelope.json"
+        "410":
+          description: Quote expired (error=quote_expired).
+          content:
+            application/json:
+              schema:
+                $ref: "../jsonschema/protocol/ErrorEnvelope.json"
+  /api/v1/deals/{deal_id}:
+    get:
+      operationId: getDeal
+      summary: Retrieve a deal
+      parameters:
+        - name: deal_id
+          in: path
+          required: true
+          schema: {type: string}
+      responses:
+        "200":
+          description: Deal envelope.
+          content:
+            application/json:
+              schema:
+                $ref: "../jsonschema/protocol/DealBookingResponse.json"
+        "404":
+          $ref: "#/components/responses/Error"
+  /api/v1/change-requests:
+    post:
+      operationId: createChangeRequest
+      summary: >-
+        Post-booking modification (money-mutating; idempotency_key
+        required). Makegoods (change_type=makegood, typed MakegoodDetails)
+        and cancellations (change_type=cancellation) ride this surface;
+        the per-deal /makegoods and /cancel sub-routes are retired (FD-6).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../jsonschema/protocol/ChangeRequestCreate.json"
+      responses:
+        "201":
+          description: Envelope wrapping the ChangeRequest primitive.
+          content:
+            application/json:
+              schema:
+                $ref: "../jsonschema/protocol/ChangeRequestResponse.json"
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
+  /api/v1/negotiations/messages:
+    post:
+      operationId: sendNegotiationMessage
+      summary: >-
+        One negotiation move: offer/counter/accept/decline via the required
+        action enum (FD-5). Replaces POST /proposals/{id}/counter and its
+        bare-price payload. Money-mutating; idempotency_key required.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../jsonschema/protocol/NegotiationMessage.json"
+      responses:
+        "200":
+          description: The seller's move for this round.
+          content:
+            application/json:
+              schema:
+                $ref: "../jsonschema/protocol/NegotiationRoundResponse.json"
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
+        "409":
+          description: >-
+            Terminal negotiation (error=negotiation_closed) or round-number
+            mismatch (error=contention).
+          content:
+            application/json:
+              schema:
+                $ref: "../jsonschema/protocol/ErrorEnvelope.json"
+  /api/v1/negotiations/{negotiation_id}:
+    get:
+      operationId: getNegotiation
+      summary: Full negotiation history (the Negotiation primitive)
+      parameters:
+        - name: negotiation_id
+          in: path
+          required: true
+          schema: {type: string}
+      responses:
+        "200":
+          description: The negotiation with its round history.
+          content:
+            application/json:
+              schema:
+                $ref: "../jsonschema/Negotiation.json"
+        "404":
+          $ref: "#/components/responses/Error"
+  /a2a/jsonrpc:
+    post:
+      operationId: a2aMessageSend
+      summary: >-
+        A2A JSON-RPC endpoint, ONE method: message/send (the A2A-spec
+        dialect). The retired method "call" MUST be answered with JSON-RPC
+        error -32601.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../jsonschema/protocol/JsonRpcRequest.json"
+      responses:
+        "200":
+          description: JSON-RPC response (exactly one of result/error).
+          content:
+            application/json:
+              schema:
+                $ref: "../jsonschema/protocol/JsonRpcResponse.json"
+  /.well-known/agent.json:
+    get:
+      operationId: getAgentCard
+      summary: >-
+        Agent Card for A2A discovery — the shared Agent primitive; ONE
+        card schema for both agents. trust_status is registry-verified,
+        never self-asserted (a self-served card carries "unknown").
+      responses:
+        "200":
+          description: The agent's card.
+          content:
+            application/json:
+              schema:
+                $ref: "../jsonschema/Agent.json"
+  /registry/agents/discover:
+    post:
+      operationId: discoverAgent
+      summary: Fetch and register a counterparty's card by base URL
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../jsonschema/protocol/AgentDiscoveryRequest.json"
+      responses:
+        "200":
+          description: Registry-verified trust result for the agent.
+          content:
+            application/json:
+              schema:
+                $ref: "../jsonschema/protocol/AgentTrustVerification.json"
+        "404":
+          $ref: "#/components/responses/Error"
+components:
+  responses:
+    Error:
+      description: >-
+        Structured error envelope: {"detail": {"error": <ErrorCode>,
+        "message": "...", "unsupported": [...]}}.
+      content:
+        application/json:
+          schema:
+            $ref: "../jsonschema/protocol/ErrorEnvelope.json"

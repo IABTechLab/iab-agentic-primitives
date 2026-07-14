@@ -1,0 +1,22 @@
+{
+  "description": "Query parameters for ``GET /products`` (pagination only).\n\nDeliberately carries no filter fields: filtering is client-side over\nthe returned :class:`~iab_agentic_primitives.primitives.Product`\nrecords (see module docstring). This replaces both the seller's\nunpaginated ``GET /products`` and the buyer's OpenDirect\n``$skip``/``$top`` query convention.",
+  "properties": {
+    "limit": {
+      "default": 50,
+      "description": "Maximum products to return.",
+      "maximum": 500,
+      "minimum": 1,
+      "title": "Limit",
+      "type": "integer"
+    },
+    "offset": {
+      "default": 0,
+      "description": "Zero-based index of the first product.",
+      "minimum": 0,
+      "title": "Offset",
+      "type": "integer"
+    }
+  },
+  "title": "ProductListRequest",
+  "type": "object"
+}

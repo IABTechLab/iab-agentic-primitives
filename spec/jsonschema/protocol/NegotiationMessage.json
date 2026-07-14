@@ -1,0 +1,281 @@
+{
+  "$defs": {
+    "BuyerIdentity": {
+      "description": "Buyer identity revealed progressively to unlock better pricing.\n\nSuperset of the buyer repo's ``BuyerIdentity`` and the seller repo's\n``BuyerIdentity``/``QuoteBuyerIdentity``; every field is optional so a\npartially revealed identity is always representable. The tier derived\nfrom these fields is capped server-side by the registry-verified trust\nstatus of the calling agent \u2014 it is never self-asserted.",
+      "properties": {
+        "advertiser_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Advertiser Id"
+        },
+        "advertiser_industry": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Advertiser Industry"
+        },
+        "advertiser_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Advertiser Name"
+        },
+        "agency_holding_company": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Agency Holding Company"
+        },
+        "agency_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Agency Id"
+        },
+        "agency_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Agency Name"
+        },
+        "campaign_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional campaign scope for campaign-specific deals.",
+          "title": "Campaign Id"
+        },
+        "campaign_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Campaign Name"
+        },
+        "dsp_platform": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "DSP platform slug (e.g. 'ttd', 'dv360').",
+          "title": "Dsp Platform"
+        },
+        "seat_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "DSP seat identifier.",
+          "title": "Seat Id"
+        },
+        "seat_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "DSP platform display name.",
+          "title": "Seat Name"
+        }
+      },
+      "title": "BuyerIdentity",
+      "type": "object"
+    },
+    "Money": {
+      "description": "Exact money amount in integer micros (flagged decision FD-11).\n\n``1_000_000`` micros = 1 currency unit \u2014 the ad-industry convention\n(Google Ad Manager, among others, prices in micros). Float is BANNED on\nthe wire for money: IEEE 754 floating point is non-deterministic for\nmoney math (``0.1 + 0.2 != 0.3``, and repeated CPM \u2014 cost per mille \u2014\narithmetic accumulates error), and the two source repos used ``float``\nend-to-end; that defect must not be fossilized into the spec. Every\nprice, rate, budget, and offer in the shared contract is a ``Money``.\n\n``amount_micros`` is a strict integer: float inputs are rejected at\nvalidation time rather than silently truncated.",
+      "properties": {
+        "amount_micros": {
+          "description": "Amount in micros; 1,000,000 micros = 1 currency unit.",
+          "title": "Amount Micros",
+          "type": "integer"
+        },
+        "currency": {
+          "default": "USD",
+          "description": "ISO 4217 alpha-3 currency code.",
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount_micros"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "NegotiationAction": {
+      "description": "Action taken in a negotiation round.",
+      "enum": [
+        "accept",
+        "counter",
+        "reject",
+        "final_offer"
+      ],
+      "title": "NegotiationAction",
+      "type": "string"
+    }
+  },
+  "description": "A buyer negotiation move (money-mutating: FD-12).\n\nExactly one negotiation context is required: ``negotiation_id`` to\ncontinue, or ``proposal_id``/``quote_id`` to open (the seller mints\n``negotiation_id`` on open).",
+  "properties": {
+    "action": {
+      "$ref": "#/$defs/NegotiationAction",
+      "description": "REQUIRED move discriminator: 'accept', 'counter', 'reject' (walk-away), or 'final_offer'. No default \u2014 the action-less bare-price payload that caused the historical 422 does not validate."
+    },
+    "buyer_identity": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/BuyerIdentity"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "buyer_price": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Money"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The buyer's price this round (exact micros; FD-11). REQUIRED for 'counter'/'final_offer'; optional echo on 'accept'; omitted on 'reject'."
+    },
+    "idempotency_key": {
+      "description": "Requester-minted opaque key (UUID recommended). Same key -> same response, no duplicate side effects (FD-12). Reusing a key with a different body is an idempotency_conflict error.",
+      "minLength": 1,
+      "title": "Idempotency Key",
+      "type": "string"
+    },
+    "negotiation_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Seller-issued id of the negotiation to continue; None opens a new negotiation on proposal_id/quote_id.",
+      "title": "Negotiation Id"
+    },
+    "proposal_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Proposal under negotiation, if proposal-led.",
+      "title": "Proposal Id"
+    },
+    "quote_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Quote under negotiation, if quote-led.",
+      "title": "Quote Id"
+    },
+    "rationale": {
+      "default": "",
+      "description": "Optional human-readable rationale.",
+      "title": "Rationale",
+      "type": "string"
+    },
+    "round_number": {
+      "anyOf": [
+        {
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The round the sender believes it is answering, for optimistic concurrency; a mismatch is a 'contention' error. The seller's numbering is authoritative.",
+      "title": "Round Number"
+    }
+  },
+  "required": [
+    "idempotency_key",
+    "action"
+  ],
+  "title": "NegotiationMessage",
+  "type": "object"
+}
