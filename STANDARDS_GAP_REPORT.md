@@ -11,7 +11,7 @@ IAB = Interactive Advertising Bureau. This report answers a single question hone
 - **0 partial** — an implemented claim whose mapped checks failed or did not execute.
 - **8 unverified (pending external spec)** — claims that reference a published external standard with no fidelity check against that publication yet.
 
-Conformance run: **310 checks**, 237 passed, 0 failed, 73 skipped across 115 vectors / 41 targets. Self-conformance verdict: **CONFORMANT**.
+Conformance run: **346 checks**, 264 passed, 0 failed, 82 skipped across 127 vectors / 45 targets. Self-conformance verdict: **CONFORMANT**.
 
 **Highest-priority gap: IAB OpenDirect 2.1** — field-level fidelity for the core commercial booking surface (Orders / Lines / Products) is the most consequential unverified claim. Obtain the published IAB OpenDirect 2.1 field specification (Order / Line / Product JSON schemas and canonical example payloads) and add field-level golden vectors derived from those examples; assert our reconciled Order/Line/Product shapes and the OpenDirect-cased LineStatus vocabulary round-trip against them.
 
@@ -29,19 +29,19 @@ What is **not** verified is external-spec *fidelity*. The contract borrows names
 
 - **Status:** CONFORMANT
 - **Registry id:** `contract-self-conformance`
-- **Checks:** `validate` (84 pass); `roundtrip` (73 pass); `schema` (73 skip); `schema_sync` (34 pass)
+- **Checks:** `validate` (95 pass); `roundtrip` (82 pass); `schema` (82 skip); `schema_sync` (38 pass)
 
 #### FD-11 Money as integer micros (float rejected on the wire) 0.1
 
 - **Status:** CONFORMANT
 - **Registry id:** `fd11-money-integer-micros`
-- **Checks:** `expected_invalid(money-float)` (13 pass)
+- **Checks:** `expected_invalid(money-float)` (14 pass)
 
 #### FD-13 must-ignore unknown fields + x_ extension prefix 0.1
 
 - **Status:** CONFORMANT
 - **Registry id:** `fd13-forward-compat`
-- **Checks:** `must_ignore` (11 pass)
+- **Checks:** `must_ignore` (13 pass)
 
 #### Canonical Deal/Order/ChangeRequest lifecycle machines (EP-1.4) 0.1
 
@@ -83,26 +83,26 @@ What is **not** verified is external-spec *fidelity*. The contract borrows names
 
 - **Status:** UNVERIFIED
 - **Registry id:** `adcom-openrtb-supply-chain`
-- **Unverified / missing:** SupplyChain (schain) objects are not modeled and no check against AdCOM/OpenRTB publications exists. The contract only carries AdCOM DeviceType integers and OpenRTB deal params as opaque fields.
+- **Unverified / missing:** SupplyChain (schain) is now modeled (EP-10.3: SupplyChain / SupplyChainNode with OpenRTB asi/sid/hp/rid field names) and round-trip/schema checked, but NO fidelity check against the AdCOM/OpenRTB publications exists: complete/hp 0-1 semantics and node ordering are asserted by our own spec only.
 - **To close this gap:** Model the SupplyChain (schain) object per AdCOM (Advertising Common Object Model) / OpenRTB (Open Real-Time Bidding) and add vectors that validate schain nodes, the `complete` flag, and AdCOM enum integers against the published specifications.
 
 #### sellers.json / ads.txt
 
 - **Status:** UNVERIFIED
 - **Registry id:** `sellers-json-ads-txt`
-- **Unverified / missing:** Not modeled anywhere in the contract; no parsing or validation checks exist.
+- **Unverified / missing:** A sellers.json entry is now modeled (EP-10.3: SellersJsonEntry with seller_type PUBLISHER/INTERMEDIARY/BOTH + is_confidential) and round-trip/schema checked, but no ads.txt/sellers.json file parsing or cross-file crawl/validation exists.
 - **To close this gap:** Model sellers.json and ads.txt records and add parser/validation checks against the published IAB Tech Lab formats (record grammar, seller_id/domain relationships, and the DIRECT/RESELLER distinction).
 
 #### Global Privacy Platform (GPP)
 
 - **Status:** UNVERIFIED
 - **Registry id:** `gpp`
-- **Unverified / missing:** gpp_string / gpp_section_ids are carried as opaque values (FD-10 placeholder); no GPP string decoding or section validation exists.
+- **Unverified / missing:** gpp_string / gpp_section_ids are carried as opaque values on the EP-10.4 ConsentContext (alongside us_privacy); no GPP string decoding or section validation exists.
 - **To close this gap:** Integrate a GPP (Global Privacy Platform) string decoder and add vectors that decode gpp_string / gpp_section_ids and validate section structure against the GPP specification, replacing the FD-10 (flagged decision) opaque placeholder.
 
 #### Transparency & Consent Framework (TCF)
 
 - **Status:** UNVERIFIED
 - **Registry id:** `tcf`
-- **Unverified / missing:** tcf_string is carried opaque (FD-10 placeholder); no TC string decoding or vendor-list checks exist.
+- **Unverified / missing:** tcf_string / gdpr_applies are carried opaque on the EP-10.4 ConsentContext; no TC string decoding or vendor-list checks exist.
 - **To close this gap:** Integrate a TCF (Transparency & Consent Framework) TC-string decoder and add vectors that decode tcf_string and validate it against a pinned GVL (Global Vendor List), replacing the FD-10 opaque placeholder.
