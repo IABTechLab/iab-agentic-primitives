@@ -128,6 +128,10 @@ dependencies = [
 client = [
     { name = "httpx" },
 ]
+harness = [
+    { name = "fastapi" },
+    { name = "httpx" },
+]
 sandbox = [
     { name = "fastapi" },
     { name = "uvicorn" },
@@ -144,12 +148,14 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "fastapi", marker = "extra == 'harness'", specifier = ">=0.110" },
     { name = "fastapi", marker = "extra == 'sandbox'", specifier = ">=0.110" },
     { name = "httpx", marker = "extra == 'client'", specifier = ">=0.27" },
+    { name = "httpx", marker = "extra == 'harness'", specifier = ">=0.27" },
     { name = "pydantic", specifier = ">=2" },
     { name = "uvicorn", marker = "extra == 'sandbox'", specifier = ">=0.29" },
 ]
-provides-extras = ["client", "sandbox"]
+provides-extras = ["client", "sandbox", "harness"]
 
 [package.metadata.requires-dev]
 dev = [
