@@ -26,12 +26,14 @@
             "CCPA"
           ],
           "diligence_status": "passed",
+          "gdpr_applies": true,
           "gpp_section_ids": [
             2,
             6
           ],
           "gpp_string": "DBABMA~CPXxRfAPXxRfAAfKABENB",
           "tcf_string": "CPXxRfAPXxRfAAfKABENB",
+          "us_privacy": "1YNN",
           "verified_at": "2026-07-01T12:00:00Z"
         },
         "deal_type": "PG",
@@ -114,12 +116,14 @@
             "CCPA"
           ],
           "diligence_status": "passed",
+          "gdpr_applies": true,
           "gpp_section_ids": [
             2,
             6
           ],
           "gpp_string": "DBABMA~CPXxRfAPXxRfAAfKABENB",
           "tcf_string": "CPXxRfAPXxRfAAfKABENB",
+          "us_privacy": "1YNN",
           "verified_at": "2026-07-01T12:00:00Z"
         },
         "deal_type": "PG",
@@ -164,12 +168,14 @@
             "CCPA"
           ],
           "diligence_status": "passed",
+          "gdpr_applies": true,
           "gpp_section_ids": [
             2,
             6
           ],
           "gpp_string": "DBABMA~CPXxRfAPXxRfAAfKABENB",
           "tcf_string": "CPXxRfAPXxRfAAfKABENB",
+          "us_privacy": "1YNN",
           "verified_at": "2026-07-01T12:00:00Z"
         },
         "deal_type": "PG",

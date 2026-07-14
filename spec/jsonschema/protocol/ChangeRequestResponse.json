@@ -250,7 +250,7 @@
       "type": "object"
     },
     "MakegoodDetails": {
-      "description": "Makegood payload for a ChangeRequest of type ``makegood`` (FD-6).\n\nSent when audience delivery falls short of the guaranteed GRP (gross\nrating point) level; the seller responds with replacement inventory.",
+      "description": "Makegood payload for a ChangeRequest of type ``makegood`` (FD-6).\n\nSent when delivery falls short of the guaranteed level; the seller\nresponds with replacement inventory. Carries the compensation terms:\nwhat is owed (``shortfall_grps`` for linear TV, ``owed_impressions``\nfor digital), the proposed replacement flight, and the makegood\n``status``. The human-readable reason lives on the enclosing\n:class:`ChangeRequest.reason` (not duplicated here). GRP = gross rating\npoint.",
       "properties": {
         "notes": {
           "anyOf": [
@@ -269,6 +269,20 @@
           "title": "Original Daypart",
           "type": "string"
         },
+        "owed_impressions": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Impressions owed for a digital makegood; None for a pure-GRP makegood.",
+          "title": "Owed Impressions"
+        },
         "preferred_dayparts": {
           "anyOf": [
             {
@@ -285,10 +299,43 @@
           "description": "Buyer's preferred dayparts for replacement inventory.",
           "title": "Preferred Dayparts"
         },
+        "replacement_flight_end": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Proposed end of the replacement flight.",
+          "title": "Replacement Flight End"
+        },
+        "replacement_flight_start": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Proposed start of the replacement flight.",
+          "title": "Replacement Flight Start"
+        },
         "shortfall_grps": {
-          "description": "GRP shortfall that needs to be made up.",
+          "description": "GRP shortfall owed that needs to be made up (linear TV).",
           "title": "Shortfall Grps",
           "type": "number"
+        },
+        "status": {
+          "$ref": "#/$defs/MakegoodStatus",
+          "default": "proposed",
+          "description": "Compensation status of the makegood."
         },
         "target_demo": {
           "description": "Target demographic for makegood inventory.",
@@ -303,6 +350,18 @@
       ],
       "title": "MakegoodDetails",
       "type": "object"
+    },
+    "MakegoodStatus": {
+      "description": "Compensation status of a makegood (EP-10.2).",
+      "enum": [
+        "proposed",
+        "accepted",
+        "scheduled",
+        "delivered",
+        "rejected"
+      ],
+      "title": "MakegoodStatus",
+      "type": "string"
     }
   },
   "description": "Success envelope wrapping the ChangeRequest primitive.",

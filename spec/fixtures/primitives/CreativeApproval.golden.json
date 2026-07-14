@@ -1,0 +1,35 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "primitives",
+  "target": "CreativeApproval",
+  "vectors": [
+    {
+      "data": {
+        "approval_id": "capp-001",
+        "creative_id": "crv-001",
+        "ext": null,
+        "occurred_at": "2026-07-01T12:00:00Z",
+        "reason": "Meets brand-safety and format requirements",
+        "reviewer": "human:ops-42",
+        "status": "approved"
+      },
+      "description": "Seller human reviewer approves a creative",
+      "mode": "valid",
+      "name": "human_approved"
+    },
+    {
+      "data": {
+        "approval_id": "capp-002",
+        "creative_id": "crv-002",
+        "ext": null,
+        "occurred_at": "2026-07-02T09:30:00Z",
+        "reason": "Declared advertiser domain is on the block list",
+        "reviewer": "system",
+        "status": "rejected"
+      },
+      "description": "Automated review rejects a creative with a reason",
+      "mode": "valid",
+      "name": "auto_rejected"
+    }
+  ]
+}

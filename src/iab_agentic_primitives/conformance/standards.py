@@ -125,10 +125,11 @@ STANDARDS: tuple[StandardEntry, ...] = (
         version="",
         status="unverified",
         missing=(
-            "SupplyChain (schain) objects are not modeled and no check "
-            "against AdCOM/OpenRTB publications exists. The contract only "
-            "carries AdCOM DeviceType integers and OpenRTB deal params as "
-            "opaque fields."
+            "SupplyChain (schain) is now modeled (EP-10.3: SupplyChain / "
+            "SupplyChainNode with OpenRTB asi/sid/hp/rid field names) and "
+            "round-trip/schema checked, but NO fidelity check against the "
+            "AdCOM/OpenRTB publications exists: complete/hp 0-1 semantics "
+            "and node ordering are asserted by our own spec only."
         ),
     ),
     StandardEntry(
@@ -137,8 +138,10 @@ STANDARDS: tuple[StandardEntry, ...] = (
         version="",
         status="unverified",
         missing=(
-            "Not modeled anywhere in the contract; no parsing or "
-            "validation checks exist."
+            "A sellers.json entry is now modeled (EP-10.3: SellersJsonEntry "
+            "with seller_type PUBLISHER/INTERMEDIARY/BOTH + is_confidential) "
+            "and round-trip/schema checked, but no ads.txt/sellers.json file "
+            "parsing or cross-file crawl/validation exists."
         ),
     ),
     StandardEntry(
@@ -147,9 +150,9 @@ STANDARDS: tuple[StandardEntry, ...] = (
         version="",
         status="unverified",
         missing=(
-            "gpp_string / gpp_section_ids are carried as opaque values "
-            "(FD-10 placeholder); no GPP string decoding or section "
-            "validation exists."
+            "gpp_string / gpp_section_ids are carried as opaque values on "
+            "the EP-10.4 ConsentContext (alongside us_privacy); no GPP "
+            "string decoding or section validation exists."
         ),
     ),
     StandardEntry(
@@ -158,8 +161,9 @@ STANDARDS: tuple[StandardEntry, ...] = (
         version="",
         status="unverified",
         missing=(
-            "tcf_string is carried opaque (FD-10 placeholder); no TC "
-            "string decoding or vendor-list checks exist."
+            "tcf_string / gdpr_applies are carried opaque on the EP-10.4 "
+            "ConsentContext; no TC string decoding or vendor-list checks "
+            "exist."
         ),
     ),
 )

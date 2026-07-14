@@ -10,14 +10,21 @@ from iab_agentic_primitives.primitives import (
     AgentProvider,
     Assignment,
     BuyerIdentity,
+    ActorKind,
     ChangeRequest,
     ChangeType,
     ConsentContext,
     Creative,
+    CreativeApproval,
     CreativeAsset,
     CreativeManifest,
     Deal,
     DealType,
+    DecisionActor,
+    DecisionInputRef,
+    DecisionRationale,
+    DecisionRecord,
+    DecisionType,
     DeliveryGoal,
     DiligenceStatus,
     Line,
@@ -46,8 +53,12 @@ from iab_agentic_primitives.primitives import (
     QuoteTerms,
     RateCard,
     RateCardEntry,
+    SellersJsonEntry,
+    SellerType,
     Session,
     SessionMessage,
+    SupplyChain,
+    SupplyChainNode,
 )
 
 
@@ -274,6 +285,13 @@ PRIMITIVE_INSTANCES = {
             duration_ms=30_000,
         ),
     ),
+    "CreativeApproval": CreativeApproval(
+        approval_id="capp-001",
+        creative_id="cr-001",
+        status="approved",
+        reviewer="human:ops-42",
+        reason="Meets brand-safety and format requirements",
+    ),
     "Assignment": Assignment(
         assignment_id="asg-001",
         creative_id="cr-001",
@@ -283,6 +301,48 @@ PRIMITIVE_INSTANCES = {
         effective_end_date=date(2026, 8, 31),
     ),
     "ConsentContext": build_consent_context(),
+    "SupplyChain": SupplyChain(
+        complete=1,
+        nodes=[
+            SupplyChainNode(
+                asi="exchange.example.com",
+                sid="seller-001",
+                hp=1,
+                name="PremiumPub",
+                domain="premiumpub.example.com",
+            )
+        ],
+    ),
+    "SellersJsonEntry": SellersJsonEntry(
+        seller_id="seller-001",
+        name="PremiumPub",
+        domain="premiumpub.example.com",
+        seller_type=SellerType.PUBLISHER,
+    ),
+    "DecisionRecord": DecisionRecord(
+        decision_id="dr-001",
+        subject_type="deal",
+        subject_id="deal-001",
+        decision_type=DecisionType.BOOKING,
+        actor=DecisionActor(
+            agent_id="agent-seller-1",
+            kind=ActorKind.MACHINE,
+            on_behalf_of="org-seller-1",
+        ),
+        inputs=[
+            DecisionInputRef(
+                kind="model_output",
+                digest="sha256:fcde2b2edba56bf408601fb721fe9b5c",
+                description="Pricing model recommendation",
+            )
+        ],
+        rationale=DecisionRationale(
+            summary="Booked at the advertiser-tier rate card price",
+            factors=["advertiser_tier", "rate_card_match"],
+        ),
+        money_effect=Money.from_decimal_str("22500"),
+        correlation_id="corr-001",
+    ),
 }
 
 

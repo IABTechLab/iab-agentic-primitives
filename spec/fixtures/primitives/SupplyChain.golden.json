@@ -1,0 +1,100 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "primitives",
+  "target": "SupplyChain",
+  "vectors": [
+    {
+      "data": {
+        "complete": 1,
+        "ext": null,
+        "nodes": [
+          {
+            "asi": "exchange.example.com",
+            "domain": "premiumpub.example.com",
+            "ext": null,
+            "hp": 1,
+            "name": "PremiumPub",
+            "rid": "req-abc",
+            "sid": "seller-001"
+          }
+        ],
+        "ver": "1.0"
+      },
+      "description": "Complete schain with one disclosed node (OpenRTB field names)",
+      "mode": "valid",
+      "name": "complete_single_hop"
+    },
+    {
+      "data": {
+        "complete": 0,
+        "ext": null,
+        "nodes": [
+          {
+            "asi": "ssp.example.com",
+            "domain": "ssp.example.com",
+            "ext": null,
+            "hp": 1,
+            "name": "Origin SSP",
+            "rid": null,
+            "sid": "pub-77"
+          },
+          {
+            "asi": "reseller.example.com",
+            "domain": null,
+            "ext": null,
+            "hp": 0,
+            "name": null,
+            "rid": null,
+            "sid": "rsl-9"
+          }
+        ],
+        "ver": "1.0"
+      },
+      "description": "Incomplete schain across a reseller hop",
+      "mode": "valid",
+      "name": "incomplete_two_hops"
+    },
+    {
+      "data": {
+        "complete": 1,
+        "ext": null,
+        "field_from_a_newer_spec_version": "must-be-ignored",
+        "nodes": [
+          {
+            "asi": "exchange.example.com",
+            "domain": "premiumpub.example.com",
+            "ext": null,
+            "hp": 1,
+            "name": "PremiumPub",
+            "rid": "req-abc",
+            "sid": "seller-001"
+          }
+        ],
+        "ver": "1.0",
+        "x_vendor_ext": {
+          "partner": "example-dsp",
+          "trace": "abc-123"
+        }
+      },
+      "description": "FD-13: unknown + x_ fields on a supply chain are ignored",
+      "expected": {
+        "complete": 1,
+        "ext": null,
+        "nodes": [
+          {
+            "asi": "exchange.example.com",
+            "domain": "premiumpub.example.com",
+            "ext": null,
+            "hp": 1,
+            "name": "PremiumPub",
+            "rid": "req-abc",
+            "sid": "seller-001"
+          }
+        ],
+        "ver": "1.0"
+      },
+      "mode": "must_ignore",
+      "name": "schain_with_unknown_fields"
+    }
+  ]
+}

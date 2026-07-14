@@ -278,11 +278,16 @@ class DiligenceStatus(str, Enum):
 class ConsentContext(WireModel):
     """Privacy consent signals that travel with a deal (flagged decision FD-10).
 
-    Minimal placeholder per the ratified decision: regime identifiers plus
-    diligence status. Full build-out (validated GPP — Global Privacy
-    Platform — sections, TCF — Transparency & Consent Framework — vendor
-    checks) is a later bead; the slot exists on Deal, Quote, and Order now
-    so the wire shape does not have to break when it lands.
+    Full build-out (EP-10.4) of the EP-1.2 placeholder: the three
+    interoperable consent-string carriers — GPP (Global Privacy Platform)
+    with its applicable section ids, TCF (Transparency & Consent Framework)
+    with the ``gdpr_applies`` gate, and the US Privacy (``us_privacy``)
+    string — plus the SGP (SafeGuard Privacy / IAB Diligence Platform)
+    ``diligence_status``. Field names from the EP-1.2 placeholder are kept
+    unchanged for backward compatibility; the build-out is purely additive.
+    It travels with the Deal, Quote, and Order. Strings are carried opaque:
+    no decoding/vendor-list validation is claimed (see the conformance
+    standards registry).
     """
 
     applicable_regimes: list[str] = Field(
@@ -299,9 +304,19 @@ class ConsentContext(WireModel):
         default=None,
         description="TCF (Transparency & Consent Framework) TC string, when GDPR applies.",
     )
+    gdpr_applies: bool | None = Field(
+        default=None,
+        description="Whether GDPR (EU General Data Protection Regulation) applies to this "
+        "context; None when undetermined. Gates interpretation of the TCF string.",
+    )
+    us_privacy: str | None = Field(
+        default=None,
+        description="US Privacy (CCPA) string, e.g. '1YNN'; superseded by GPP where present.",
+    )
     diligence_status: DiligenceStatus = Field(
         default=DiligenceStatus.UNKNOWN,
-        description="Counterparty diligence status (IAB Diligence Platform).",
+        description="Counterparty diligence status (SGP = SafeGuard Privacy / "
+        "IAB Diligence Platform).",
     )
     verified_at: datetime | None = Field(
         default=None,

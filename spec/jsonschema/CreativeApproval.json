@@ -1,0 +1,77 @@
+{
+  "$defs": {
+    "ReviewStatus": {
+      "description": "Seller-side creative review status.",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "title": "ReviewStatus",
+      "type": "string"
+    }
+  },
+  "description": "A durable seller-side creative approval decision (EP-10.5).\n\n:class:`Creative` carries the current ``review_status`` (its live\napproval state); this is the first-class, timestamped RECORD of a\nsingle approval decision \u2014 who reviewed it, the outcome, and why. The\ntwo are complementary: the seller flips ``Creative.review_status`` AND\nwrites a ``CreativeApproval`` for the audit trail. Reuses\n:class:`ReviewStatus` so the vocabulary never forks.\n\nID minting: ``approval_id`` is seller-issued (the seller owns creative\nreview).",
+  "properties": {
+    "approval_id": {
+      "description": "Seller-issued approval decision identifier.",
+      "title": "Approval Id",
+      "type": "string"
+    },
+    "creative_id": {
+      "description": "Seller-issued id of the creative reviewed.",
+      "title": "Creative Id",
+      "type": "string"
+    },
+    "ext": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Extension slot.",
+      "title": "Ext"
+    },
+    "occurred_at": {
+      "description": "Timezone-aware UTC timestamp of the review decision.",
+      "format": "date-time",
+      "title": "Occurred At",
+      "type": "string"
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Rationale, required in practice for a rejection.",
+      "title": "Reason"
+    },
+    "reviewer": {
+      "description": "Actor id: 'system', 'human:<id>', or 'agent:<id>'.",
+      "title": "Reviewer",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/ReviewStatus",
+      "description": "Outcome of this review decision."
+    }
+  },
+  "required": [
+    "approval_id",
+    "creative_id",
+    "status",
+    "reviewer"
+  ],
+  "title": "CreativeApproval",
+  "type": "object"
+}

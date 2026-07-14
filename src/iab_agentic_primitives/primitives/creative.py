@@ -8,13 +8,13 @@ supplies the asset, the seller reviews and approves it. See
 RECONCILIATION.md at the repo root for the field-level audit trail.
 """
 
-from datetime import date
+from datetime import date, datetime
 from enum import Enum
 from typing import Any
 
 from pydantic import Field
 
-from ._util import WireModel
+from ._util import WireModel, utc_now
 
 
 class AdProfile(str, Enum):
@@ -108,6 +108,37 @@ class Creative(WireModel):
     ext: dict[str, Any] | None = Field(default=None, description="Extension slot.")
 
 
+class CreativeApproval(WireModel):
+    """A durable seller-side creative approval decision (EP-10.5).
+
+    :class:`Creative` carries the current ``review_status`` (its live
+    approval state); this is the first-class, timestamped RECORD of a
+    single approval decision — who reviewed it, the outcome, and why. The
+    two are complementary: the seller flips ``Creative.review_status`` AND
+    writes a ``CreativeApproval`` for the audit trail. Reuses
+    :class:`ReviewStatus` so the vocabulary never forks.
+
+    ID minting: ``approval_id`` is seller-issued (the seller owns creative
+    review).
+    """
+
+    approval_id: str = Field(description="Seller-issued approval decision identifier.")
+    creative_id: str = Field(description="Seller-issued id of the creative reviewed.")
+    status: ReviewStatus = Field(description="Outcome of this review decision.")
+    reviewer: str = Field(
+        description="Actor id: 'system', 'human:<id>', or 'agent:<id>'."
+    )
+    reason: str | None = Field(
+        default=None,
+        description="Rationale, required in practice for a rejection.",
+    )
+    occurred_at: datetime = Field(
+        default_factory=utc_now,
+        description="Timezone-aware UTC timestamp of the review decision.",
+    )
+    ext: dict[str, Any] | None = Field(default=None, description="Extension slot.")
+
+
 class Assignment(WireModel):
     """Binds a creative to a line with rotation rules.
 
@@ -140,6 +171,7 @@ __all__ = [
     "Assignment",
     "ContentPolicy",
     "Creative",
+    "CreativeApproval",
     "CreativeAsset",
     "CreativeManifest",
     "ReviewStatus",

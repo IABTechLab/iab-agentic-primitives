@@ -1,0 +1,35 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "primitives",
+  "target": "SellersJsonEntry",
+  "vectors": [
+    {
+      "data": {
+        "comment": null,
+        "domain": "premiumpub.example.com",
+        "ext": null,
+        "is_confidential": false,
+        "name": "PremiumPub",
+        "seller_id": "seller-001",
+        "seller_type": "PUBLISHER"
+      },
+      "description": "Publisher sellers.json entry (owns the inventory)",
+      "mode": "valid",
+      "name": "publisher_entry"
+    },
+    {
+      "data": {
+        "comment": "Confidential per contract",
+        "domain": null,
+        "ext": null,
+        "is_confidential": true,
+        "name": null,
+        "seller_id": "seller-002",
+        "seller_type": "INTERMEDIARY"
+      },
+      "description": "Confidential intermediary: name/domain withheld",
+      "mode": "valid",
+      "name": "confidential_intermediary"
+    }
+  ]
+}

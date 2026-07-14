@@ -18,11 +18,15 @@
           "makegood": {
             "notes": "Week 2 audience under-delivery",
             "original_daypart": "primetime",
+            "owed_impressions": 250000,
             "preferred_dayparts": [
               "primetime",
               "late_night"
             ],
+            "replacement_flight_end": "2026-10-14",
+            "replacement_flight_start": "2026-10-01",
             "shortfall_grps": 8.5,
+            "status": "proposed",
             "target_demo": "A18-49"
           },
           "order_id": null,

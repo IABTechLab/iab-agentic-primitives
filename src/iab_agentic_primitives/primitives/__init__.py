@@ -15,18 +15,29 @@ Modules:
 - ``inventory`` -- Product, MediaKit, Package
 - ``pricing``   -- DealType, pricing enums, linear TV params, RateCard, Quote
 - ``lifecycle`` -- Proposal, Negotiation, Deal, Order, Line, ChangeRequest, Session
-- ``creative``  -- Creative, Assignment
+- ``creative``  -- Creative, CreativeApproval, Assignment
+- ``supply_chain`` -- SupplyChain, SupplyChainNode, SellersJsonEntry
+- ``audit``     -- DecisionRecord (durable "why did money move" record)
 
 Reconciliation decisions (which repo's shape won, and why) are recorded in
 RECONCILIATION.md at the repository root.
 """
 
 from ._util import Money, WireModel, utc_now
+from .audit import (
+    ActorKind,
+    DecisionActor,
+    DecisionInputRef,
+    DecisionRationale,
+    DecisionRecord,
+    DecisionType,
+)
 from .creative import (
     AdProfile,
     Assignment,
     ContentPolicy,
     Creative,
+    CreativeApproval,
     CreativeAsset,
     CreativeManifest,
     ReviewStatus,
@@ -74,6 +85,7 @@ from .lifecycle import (
     Line,
     LineStatus,
     MakegoodDetails,
+    MakegoodStatus,
     Negotiation,
     NegotiationAction,
     NegotiationRound,
@@ -107,6 +119,12 @@ from .pricing import (
     RateCardEntry,
     RateCardStatus,
 )
+from .supply_chain import (
+    SellersJsonEntry,
+    SellerType,
+    SupplyChain,
+    SupplyChainNode,
+)
 
 # The top-level exchanged primitives, in spec order. This mapping drives the
 # JSON-Schema export (spec/generate_schemas.py) and the drift-guard test.
@@ -127,8 +145,12 @@ WIRE_PRIMITIVES: dict[str, type] = {
     "ChangeRequest": ChangeRequest,
     "Session": Session,
     "Creative": Creative,
+    "CreativeApproval": CreativeApproval,
     "Assignment": Assignment,
     "ConsentContext": ConsentContext,
+    "SupplyChain": SupplyChain,
+    "SellersJsonEntry": SellersJsonEntry,
+    "DecisionRecord": DecisionRecord,
 }
 
 __all__ = [
@@ -136,6 +158,18 @@ __all__ = [
     "Money",
     "WireModel",
     "utc_now",
+    # audit / decision record
+    "ActorKind",
+    "DecisionActor",
+    "DecisionInputRef",
+    "DecisionRationale",
+    "DecisionRecord",
+    "DecisionType",
+    # supply chain
+    "SellerType",
+    "SellersJsonEntry",
+    "SupplyChain",
+    "SupplyChainNode",
     # identity
     "AccessTier",
     "Account",
@@ -193,6 +227,7 @@ __all__ = [
     "Line",
     "LineStatus",
     "MakegoodDetails",
+    "MakegoodStatus",
     "Negotiation",
     "NegotiationAction",
     "NegotiationRound",
@@ -212,6 +247,7 @@ __all__ = [
     "Assignment",
     "ContentPolicy",
     "Creative",
+    "CreativeApproval",
     "CreativeAsset",
     "CreativeManifest",
     "ReviewStatus",

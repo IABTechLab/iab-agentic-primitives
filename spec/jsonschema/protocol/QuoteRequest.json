@@ -144,7 +144,7 @@
       "type": "object"
     },
     "ConsentContext": {
-      "description": "Privacy consent signals that travel with a deal (flagged decision FD-10).\n\nMinimal placeholder per the ratified decision: regime identifiers plus\ndiligence status. Full build-out (validated GPP \u2014 Global Privacy\nPlatform \u2014 sections, TCF \u2014 Transparency & Consent Framework \u2014 vendor\nchecks) is a later bead; the slot exists on Deal, Quote, and Order now\nso the wire shape does not have to break when it lands.",
+      "description": "Privacy consent signals that travel with a deal (flagged decision FD-10).\n\nFull build-out (EP-10.4) of the EP-1.2 placeholder: the three\ninteroperable consent-string carriers \u2014 GPP (Global Privacy Platform)\nwith its applicable section ids, TCF (Transparency & Consent Framework)\nwith the ``gdpr_applies`` gate, and the US Privacy (``us_privacy``)\nstring \u2014 plus the SGP (SafeGuard Privacy / IAB Diligence Platform)\n``diligence_status``. Field names from the EP-1.2 placeholder are kept\nunchanged for backward compatibility; the build-out is purely additive.\nIt travels with the Deal, Quote, and Order. Strings are carried opaque:\nno decoding/vendor-list validation is claimed (see the conformance\nstandards registry).",
       "properties": {
         "applicable_regimes": {
           "description": "Privacy regime identifiers in scope (e.g. 'GDPR', 'CCPA').",
@@ -157,7 +157,20 @@
         "diligence_status": {
           "$ref": "#/$defs/DiligenceStatus",
           "default": "unknown",
-          "description": "Counterparty diligence status (IAB Diligence Platform)."
+          "description": "Counterparty diligence status (SGP = SafeGuard Privacy / IAB Diligence Platform)."
+        },
+        "gdpr_applies": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Whether GDPR (EU General Data Protection Regulation) applies to this context; None when undetermined. Gates interpretation of the TCF string.",
+          "title": "Gdpr Applies"
         },
         "gpp_section_ids": {
           "description": "GPP section ids present in the string.",
@@ -192,6 +205,19 @@
           "default": null,
           "description": "TCF (Transparency & Consent Framework) TC string, when GDPR applies.",
           "title": "Tcf String"
+        },
+        "us_privacy": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "US Privacy (CCPA) string, e.g. '1YNN'; superseded by GPP where present.",
+          "title": "Us Privacy"
         },
         "verified_at": {
           "anyOf": [

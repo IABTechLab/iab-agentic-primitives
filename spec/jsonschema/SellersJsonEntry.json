@@ -1,0 +1,91 @@
+{
+  "$defs": {
+    "SellerType": {
+      "description": "sellers.json ``seller_type``.\n\n- ``PUBLISHER``: the seller is the owner of the inventory\n- ``INTERMEDIARY``: the seller resells inventory it does not own\n- ``BOTH``: the seller acts as both on different inventory",
+      "enum": [
+        "PUBLISHER",
+        "INTERMEDIARY",
+        "BOTH"
+      ],
+      "title": "SellerType",
+      "type": "string"
+    }
+  },
+  "description": "One entry from a system's sellers.json file.\n\nMirrors the IAB Tech Lab sellers.json ``sellers[]`` object. ``name``\nand ``domain`` are omitted (``None``) for a confidential seller, in\nwhich case ``is_confidential`` is true. Modeled as a ``bool`` here\nrather than the sellers.json 0/1 integer for wire cleanliness; adapters\ntranslate at the edge.",
+  "properties": {
+    "comment": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Optional free-text comment.",
+      "title": "Comment"
+    },
+    "domain": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Seller business domain; None when confidential.",
+      "title": "Domain"
+    },
+    "ext": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Extension slot.",
+      "title": "Ext"
+    },
+    "is_confidential": {
+      "default": false,
+      "description": "True when name/domain are withheld (sellers.json is_confidential=1).",
+      "title": "Is Confidential",
+      "type": "boolean"
+    },
+    "name": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Seller business name; None when confidential.",
+      "title": "Name"
+    },
+    "seller_id": {
+      "description": "Opaque seller id, unique within the publishing system.",
+      "title": "Seller Id",
+      "type": "string"
+    },
+    "seller_type": {
+      "$ref": "#/$defs/SellerType",
+      "description": "PUBLISHER, INTERMEDIARY, or BOTH."
+    }
+  },
+  "required": [
+    "seller_id",
+    "seller_type"
+  ],
+  "title": "SellersJsonEntry",
+  "type": "object"
+}

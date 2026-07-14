@@ -1,0 +1,127 @@
+{
+  "$defs": {
+    "SupplyChainNode": {
+      "description": "One hop in the OpenRTB supply chain (``schain`` node).\n\nField names are the OpenRTB SupplyChainNode names verbatim. ``asi`` is\nthe advertising system identifier (the canonical domain of the system\nthe node operates in, e.g. ``\"exchange.example.com\"``); ``sid`` is the\nseller id **within that system** and matches a ``seller_id`` in that\nsystem's sellers.json.",
+      "properties": {
+        "asi": {
+          "description": "Advertising system identifier (canonical domain of the system).",
+          "title": "Asi",
+          "type": "string"
+        },
+        "domain": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Business domain of the entity represented by this node.",
+          "title": "Domain"
+        },
+        "ext": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Extension slot.",
+          "title": "Ext"
+        },
+        "hp": {
+          "default": 1,
+          "description": "Handled-payment flag (OpenRTB 0/1): 1 = node is paid for this inventory.",
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Hp",
+          "type": "integer"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Business name of the entity represented by this node.",
+          "title": "Name"
+        },
+        "rid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Request id issued by the seller (OpenRTB ``rid``), when present.",
+          "title": "Rid"
+        },
+        "sid": {
+          "description": "Seller id within the ``asi`` system; matches its sellers.json seller_id.",
+          "title": "Sid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "asi",
+        "sid"
+      ],
+      "title": "SupplyChainNode",
+      "type": "object"
+    }
+  },
+  "description": "OpenRTB SupplyChain object (``schain``): the ordered node path.\n\n``complete`` is the OpenRTB 0/1 flag: 1 means every node from the\ninitial impression to the final bidder is present (no undisclosed\nhops). Nodes are ordered from the first seller to the entity making the\nrequest. Carried optionally on the :class:`Deal` for transparency.",
+  "properties": {
+    "complete": {
+      "default": 1,
+      "description": "OpenRTB 0/1: 1 = all nodes in the path are disclosed.",
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Complete",
+      "type": "integer"
+    },
+    "ext": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Extension slot.",
+      "title": "Ext"
+    },
+    "nodes": {
+      "description": "Supply path, ordered first-seller -> requesting-entity.",
+      "items": {
+        "$ref": "#/$defs/SupplyChainNode"
+      },
+      "title": "Nodes",
+      "type": "array"
+    },
+    "ver": {
+      "default": "1.0",
+      "description": "SupplyChain object version (OpenRTB ``ver``).",
+      "title": "Ver",
+      "type": "string"
+    }
+  },
+  "title": "SupplyChain",
+  "type": "object"
+}

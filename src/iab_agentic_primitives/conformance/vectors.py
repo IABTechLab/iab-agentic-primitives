@@ -42,6 +42,7 @@ from ..events import Event, EventType
 from ..primitives import (
     AccessTier,
     Account,
+    ActorKind,
     Agent,
     AgentProvider,
     AgentSkill,
@@ -55,11 +56,17 @@ from ..primitives import (
     CommercialTerms,
     ConsentContext,
     Creative,
+    CreativeApproval,
     CreativeAsset,
     CreativeManifest,
     Deal,
     DealStatus,
     DealType,
+    DecisionActor,
+    DecisionInputRef,
+    DecisionRationale,
+    DecisionRecord,
+    DecisionType,
     DeliveryGoal,
     DeliveryType,
     DiligenceStatus,
@@ -69,6 +76,7 @@ from ..primitives import (
     LinearTVQuoteDetails,
     LineStatus,
     MakegoodDetails,
+    MakegoodStatus,
     MediaKit,
     MediaType,
     Money,
@@ -103,9 +111,13 @@ from ..primitives import (
     RateCardStatus,
     ReviewStatus,
     RotationMode,
+    SellersJsonEntry,
+    SellerType,
     Session,
     SessionMessage,
     SessionStatus,
+    SupplyChain,
+    SupplyChainNode,
     TrustStatus,
 )
 from ..protocol import (
@@ -215,8 +227,27 @@ def _consent() -> ConsentContext:
         gpp_string="DBABMA~CPXxRfAPXxRfAAfKABENB",
         gpp_section_ids=[2, 6],
         tcf_string="CPXxRfAPXxRfAAfKABENB",
+        gdpr_applies=True,
+        us_privacy="1YNN",
         diligence_status=DiligenceStatus.PASSED,
         verified_at=T0,
+    )
+
+
+def _supply_chain() -> SupplyChain:
+    return SupplyChain(
+        complete=1,
+        ver="1.0",
+        nodes=[
+            SupplyChainNode(
+                asi="exchange.example.com",
+                sid="seller-001",
+                hp=1,
+                rid="req-abc",
+                name="PremiumPub",
+                domain="premiumpub.example.com",
+            )
+        ],
     )
 
 
@@ -336,6 +367,7 @@ def _deal_pg_booked() -> Deal:
         ),
         created_at=T0,
         consent_context=_consent(),
+        supply_chain=_supply_chain(),
     )
 
 
@@ -344,7 +376,11 @@ def _makegood_details() -> MakegoodDetails:
         shortfall_grps=8.5,
         original_daypart="primetime",
         target_demo="A18-49",
+        owed_impressions=250_000,
         preferred_dayparts=["primetime", "late_night"],
+        replacement_flight_start=date(2026, 10, 1),
+        replacement_flight_end=date(2026, 10, 14),
+        status=MakegoodStatus.PROPOSED,
         notes="Week 2 audience under-delivery",
     )
 
@@ -368,7 +404,7 @@ def _idem(n: int) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Primitives (18 targets)
+# Primitives (22 targets)
 # ---------------------------------------------------------------------------
 
 
@@ -1132,9 +1168,188 @@ def primitive_fixture_docs() -> dict[str, dict[str, Any]]:
                 _consent(),
             ),
             _valid(
+                "us_privacy_only",
+                "US-only consent: us_privacy string, GDPR not applicable",
+                ConsentContext(
+                    applicable_regimes=["CCPA"],
+                    us_privacy="1YNN",
+                    gdpr_applies=False,
+                    diligence_status=DiligenceStatus.PASSED,
+                    verified_at=T0,
+                ),
+            ),
+            _valid(
                 "unknown_minimal",
                 "Empty consent context: unknown diligence, no signals",
                 ConsentContext(),
+            ),
+        ],
+    )
+
+    docs["CreativeApproval"] = _doc(
+        "primitives",
+        "CreativeApproval",
+        [
+            _valid(
+                "human_approved",
+                "Seller human reviewer approves a creative",
+                CreativeApproval(
+                    approval_id="capp-001",
+                    creative_id="crv-001",
+                    status=ReviewStatus.APPROVED,
+                    reviewer="human:ops-42",
+                    reason="Meets brand-safety and format requirements",
+                    occurred_at=T0,
+                ),
+            ),
+            _valid(
+                "auto_rejected",
+                "Automated review rejects a creative with a reason",
+                CreativeApproval(
+                    approval_id="capp-002",
+                    creative_id="crv-002",
+                    status=ReviewStatus.REJECTED,
+                    reviewer="system",
+                    reason="Declared advertiser domain is on the block list",
+                    occurred_at=T1,
+                ),
+            ),
+        ],
+    )
+
+    docs["SupplyChain"] = _doc(
+        "primitives",
+        "SupplyChain",
+        [
+            _valid(
+                "complete_single_hop",
+                "Complete schain with one disclosed node (OpenRTB field names)",
+                _supply_chain(),
+            ),
+            _valid(
+                "incomplete_two_hops",
+                "Incomplete schain across a reseller hop",
+                SupplyChain(
+                    complete=0,
+                    nodes=[
+                        SupplyChainNode(
+                            asi="ssp.example.com",
+                            sid="pub-77",
+                            hp=1,
+                            name="Origin SSP",
+                            domain="ssp.example.com",
+                        ),
+                        SupplyChainNode(
+                            asi="reseller.example.com",
+                            sid="rsl-9",
+                            hp=0,
+                        ),
+                    ],
+                ),
+            ),
+            _must_ignore(
+                "schain_with_unknown_fields",
+                "FD-13: unknown + x_ fields on a supply chain are ignored",
+                _supply_chain(),
+            ),
+        ],
+    )
+
+    docs["SellersJsonEntry"] = _doc(
+        "primitives",
+        "SellersJsonEntry",
+        [
+            _valid(
+                "publisher_entry",
+                "Publisher sellers.json entry (owns the inventory)",
+                SellersJsonEntry(
+                    seller_id="seller-001",
+                    name="PremiumPub",
+                    domain="premiumpub.example.com",
+                    seller_type=SellerType.PUBLISHER,
+                ),
+            ),
+            _valid(
+                "confidential_intermediary",
+                "Confidential intermediary: name/domain withheld",
+                SellersJsonEntry(
+                    seller_id="seller-002",
+                    seller_type=SellerType.INTERMEDIARY,
+                    is_confidential=True,
+                    comment="Confidential per contract",
+                ),
+            ),
+        ],
+    )
+
+    decision = DecisionRecord(
+        decision_id="dr-001",
+        subject_type="deal",
+        subject_id="deal-001",
+        decision_type=DecisionType.BOOKING,
+        actor=DecisionActor(
+            agent_id="agent-seller-1",
+            kind=ActorKind.MACHINE,
+            on_behalf_of="org-seller-1",
+        ),
+        inputs=[
+            DecisionInputRef(
+                kind="counterparty_message",
+                ref="msg-001",
+                digest="sha256:2c26b46b68ffc68ff99b453c1d304134",
+                description="Buyer booking request",
+            ),
+            DecisionInputRef(
+                kind="model_output",
+                digest="sha256:fcde2b2edba56bf408601fb721fe9b5c",
+                description="Pricing model recommendation",
+            ),
+        ],
+        rationale=DecisionRationale(
+            summary="Booked at the advertiser-tier rate card price",
+            factors=["advertiser_tier", "rate_card_match", "inventory_available"],
+            policy_refs=["policy:auto-book-approved-tier"],
+        ),
+        money_effect=Money.from_decimal_str("22500"),
+        occurred_at=T0,
+        correlation_id="corr-001",
+        session_id="sess-001",
+    )
+    docs["DecisionRecord"] = _doc(
+        "primitives",
+        "DecisionRecord",
+        [
+            _valid(
+                "booking_decision",
+                "Durable record of why a booking committed money (EP-10.1)",
+                decision,
+            ),
+            _valid(
+                "concession_minimal",
+                "Negotiation-concession decision by a human, no money effect yet",
+                DecisionRecord(
+                    decision_id="dr-002",
+                    subject_type="negotiation",
+                    subject_id="neg-001",
+                    decision_type=DecisionType.NEGOTIATION_CONCESSION,
+                    actor=DecisionActor(agent_id="human:trader-7", kind=ActorKind.HUMAN),
+                    rationale=DecisionRationale(
+                        summary="Conceded 3% to close within the buyer's ceiling"
+                    ),
+                    occurred_at=T1,
+                    negotiation_id="neg-001",
+                ),
+            ),
+            _must_ignore(
+                "decision_with_unknown_fields",
+                "FD-13: unknown + x_ fields on a decision record are ignored",
+                decision,
+            ),
+            _invalid(
+                "float_money_effect_rejected",
+                "FD-11: float-typed money_effect must be rejected",
+                _with_float_money(_dump(decision), ["money_effect"]),
+                "Input should be a valid integer",
             ),
         ],
     )
