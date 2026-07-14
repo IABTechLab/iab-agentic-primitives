@@ -1,0 +1,68 @@
+{
+  "initial": "pending",
+  "name": "change_request",
+  "states": [
+    "pending",
+    "validating",
+    "pending_approval",
+    "approved",
+    "rejected",
+    "applied",
+    "failed"
+  ],
+  "terminal": [
+    "applied",
+    "failed",
+    "rejected"
+  ],
+  "transitions": [
+    {
+      "description": "Validation begins",
+      "from": "pending",
+      "rework": false,
+      "to": "validating"
+    },
+    {
+      "description": "Validation errors found",
+      "from": "validating",
+      "rework": false,
+      "to": "failed"
+    },
+    {
+      "description": "Minor severity, auto-approved",
+      "from": "validating",
+      "rework": false,
+      "to": "approved"
+    },
+    {
+      "description": "Material/critical severity, human review",
+      "from": "validating",
+      "rework": false,
+      "to": "pending_approval"
+    },
+    {
+      "description": "Reviewer approved",
+      "from": "pending_approval",
+      "rework": false,
+      "to": "approved"
+    },
+    {
+      "description": "Reviewer rejected",
+      "from": "pending_approval",
+      "rework": false,
+      "to": "rejected"
+    },
+    {
+      "description": "Changes applied to the order",
+      "from": "approved",
+      "rework": false,
+      "to": "applied"
+    },
+    {
+      "description": "Applying the approved change failed",
+      "from": "approved",
+      "rework": false,
+      "to": "failed"
+    }
+  ]
+}
