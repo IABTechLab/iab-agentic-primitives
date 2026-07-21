@@ -6,3 +6,10 @@ build/
 *.egg-info/
 .pytest_cache/
 .ruff_cache/
+
+# Secrets hygiene
+.env
+.env.*
+*.pem
+*.key
+credentials*
