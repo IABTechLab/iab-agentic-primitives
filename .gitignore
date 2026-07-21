@@ -13,3 +13,4 @@ build/
 *.pem
 *.key
 credentials*
+.beads/
