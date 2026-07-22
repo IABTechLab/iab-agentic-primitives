@@ -1,0 +1,79 @@
+{
+  "description": "Response body for ``POST /products/avails``.\n\nHonest-availability policy: every number is derived from catalog\ndata \u2014 nothing is fabricated. Optional fields with no value are\nOMITTED from the wire, not sent as ``null`` (readers tolerate ``null``\nfrom pre-contract emitters).",
+  "properties": {
+    "availableImpressions": {
+      "description": "REQUIRED (policy 1). Products without a capacity cap report the requested volume as available.",
+      "minimum": 0,
+      "title": "Availableimpressions",
+      "type": "integer"
+    },
+    "availableTargeting": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Targeting dimensions the product supports; omitted when the product declares none.",
+      "title": "Availabletargeting"
+    },
+    "deliveryConfidence": {
+      "anyOf": [
+        {
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Forecast confidence percentage. OPTIONAL \u2014 OMITTED entirely when the seller has no forecast data source (policy 2); never fabricated.",
+      "title": "Deliveryconfidence"
+    },
+    "estimatedCpm": {
+      "description": "CPM the availability is priced at (base CPM, falling back to floor CPM). OpenDirect 2.1 float dialect (FD-11 exception).",
+      "title": "Estimatedcpm",
+      "type": "number"
+    },
+    "guaranteedImpressions": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Present ONLY for PG-capable products (policy 3); omitted otherwise.",
+      "title": "Guaranteedimpressions"
+    },
+    "productid": {
+      "description": "Echo of the product.",
+      "title": "Productid",
+      "type": "string"
+    },
+    "totalCost": {
+      "description": "availableImpressions / 1000 * estimatedCpm, rounded to 2 decimals. OpenDirect 2.1 float dialect (FD-11 exception).",
+      "title": "Totalcost",
+      "type": "number"
+    }
+  },
+  "required": [
+    "productid",
+    "availableImpressions",
+    "estimatedCpm",
+    "totalCost"
+  ],
+  "title": "AvailsResponse",
+  "type": "object"
+}

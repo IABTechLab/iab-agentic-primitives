@@ -11,7 +11,7 @@ IAB = Interactive Advertising Bureau. This report answers a single question hone
 - **0 partial** — an implemented claim whose mapped checks failed or did not execute.
 - **8 unverified (pending external spec)** — claims that reference a published external standard with no fidelity check against that publication yet.
 
-Conformance run: **346 checks**, 264 passed, 0 failed, 82 skipped across 127 vectors / 45 targets. Self-conformance verdict: **CONFORMANT**.
+Conformance run: **364 checks**, 278 passed, 0 failed, 86 skipped across 134 vectors / 47 targets. Self-conformance verdict: **CONFORMANT**.
 
 **Highest-priority gap: IAB OpenDirect 2.1** — field-level fidelity for the core commercial booking surface (Orders / Lines / Products) is the most consequential unverified claim. Obtain the published IAB OpenDirect 2.1 field specification (Order / Line / Product JSON schemas and canonical example payloads) and add field-level golden vectors derived from those examples; assert our reconciled Order/Line/Product shapes and the OpenDirect-cased LineStatus vocabulary round-trip against them.
 
@@ -29,19 +29,19 @@ What is **not** verified is external-spec *fidelity*. The contract borrows names
 
 - **Status:** CONFORMANT
 - **Registry id:** `contract-self-conformance`
-- **Checks:** `validate` (95 pass); `roundtrip` (82 pass); `schema` (82 skip); `schema_sync` (38 pass)
+- **Checks:** `validate` (100 pass); `roundtrip` (86 pass); `schema` (86 skip); `schema_sync` (40 pass)
 
 #### FD-11 Money as integer micros (float rejected on the wire) 0.1
 
 - **Status:** CONFORMANT
 - **Registry id:** `fd11-money-integer-micros`
-- **Checks:** `expected_invalid(money-float)` (14 pass)
+- **Checks:** `expected_invalid(money-float)` (16 pass)
 
 #### FD-13 must-ignore unknown fields + x_ extension prefix 0.1
 
 - **Status:** CONFORMANT
 - **Registry id:** `fd13-forward-compat`
-- **Checks:** `must_ignore` (13 pass)
+- **Checks:** `must_ignore` (14 pass)
 
 #### Canonical Deal/Order/ChangeRequest lifecycle machines (EP-1.4) 0.1
 

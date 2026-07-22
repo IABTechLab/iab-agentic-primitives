@@ -2,7 +2,8 @@
 
 Defines the request/response messages and envelopes for the protocol
 surfaces the two agents speak to each other: the catalog
-(``GET /products``), the Deals API quote->book flow, negotiation
+(``GET /products``), the avails query (``POST /products/avails``), the
+Deals API quote->book flow, negotiation
 messages, the A2A (Agent-to-Agent protocol) JSON-RPC envelope, the Agent
 Card discovery surface, and the ONE structured error envelope.
 Request/response query messages that are capabilities rather than
@@ -39,6 +40,7 @@ from .a2a import (
     MessageSendParams,
 )
 from .agent_card import AgentCard, AgentDiscoveryRequest, AgentTrustVerification
+from .avails import AvailsRequest, AvailsResponse, AvailsWireModel
 from .catalog import ProductListRequest, ProductListResponse
 from .deals import (
     ChangeRequestCreate,
@@ -63,6 +65,9 @@ PROTOCOL_MESSAGES: dict[str, type] = {
     # catalog
     "ProductListRequest": ProductListRequest,
     "ProductListResponse": ProductListResponse,
+    # avails
+    "AvailsRequest": AvailsRequest,
+    "AvailsResponse": AvailsResponse,
     # quotes
     "QuoteRequest": QuoteRequest,
     "QuoteResponse": QuoteResponse,
@@ -97,6 +102,9 @@ __all__ = [
     "AgentCard",
     "AgentDiscoveryRequest",
     "AgentTrustVerification",
+    "AvailsRequest",
+    "AvailsResponse",
+    "AvailsWireModel",
     "ChangeRequestCreate",
     "ChangeRequestResponse",
     "DealBookingRequest",
