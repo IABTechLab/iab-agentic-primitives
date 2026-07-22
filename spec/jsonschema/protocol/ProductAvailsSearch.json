@@ -1,0 +1,267 @@
+{
+  "$defs": {
+    "ProductTargeting": {
+      "description": "Spec ``Object: ProductTargeting`` \u2014 dimensional targeting/metrics.\n\nAll-lowercase wire names per the normative table; the six starred\nattributes are required.",
+      "properties": {
+        "count": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Count of targetvalues.",
+          "title": "Count"
+        },
+        "datasource": {
+          "description": "Data source that defines the target vocabulary (third-party schemas welcome by design).",
+          "maxLength": 255,
+          "title": "Datasource",
+          "type": "string"
+        },
+        "default": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Default targetvalue(s) when the buyer selects none.",
+          "title": "Default"
+        },
+        "increment": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Permitted increment between target values.",
+          "title": "Increment"
+        },
+        "maximum": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Maximum number of selectable targetvalues.",
+          "title": "Maximum"
+        },
+        "minimum": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Minimum number of selectable targetvalues.",
+          "title": "Minimum"
+        },
+        "name": {
+          "$ref": "#/$defs/TargetingDimension",
+          "description": "What is described: Inventory, Delivery, Distribution, Investment, or Prohibitions."
+        },
+        "selectable": {
+          "description": "Whether a buyer may select from targetvalues or the values are fixed.",
+          "title": "Selectable",
+          "type": "boolean"
+        },
+        "target": {
+          "description": "The targeted metric within datasource.",
+          "maxLength": 255,
+          "title": "Target",
+          "type": "string"
+        },
+        "targetvalues": {
+          "description": "One or more values for the target (strings on the wire).",
+          "items": {
+            "type": "string"
+          },
+          "title": "Targetvalues",
+          "type": "array"
+        },
+        "type": {
+          "$ref": "#/$defs/TargetingUnit",
+          "description": "How it is quantified: Frames, Audience, Investment, or Total."
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "datasource",
+        "target",
+        "targetvalues",
+        "selectable"
+      ],
+      "title": "ProductTargeting",
+      "type": "object"
+    },
+    "TargetingDimension": {
+      "description": "Spec ``ProductTargeting.name``: what the entry describes.",
+      "enum": [
+        "Inventory",
+        "Delivery",
+        "Distribution",
+        "Investment",
+        "Prohibitions"
+      ],
+      "title": "TargetingDimension",
+      "type": "string"
+    },
+    "TargetingUnit": {
+      "description": "Spec ``ProductTargeting.type``: how the entry is quantified.",
+      "enum": [
+        "Frames",
+        "Audience",
+        "Investment",
+        "Total"
+      ],
+      "title": "TargetingUnit",
+      "type": "string"
+    }
+  },
+  "description": "Spec REQUEST body for ``POST /products/avails``.\n\nThe published multi-product form: ``productids`` is an array, and\n``accountid``/``advertiserbrandid`` are required. Use\n:meth:`to_simplified` to bridge to the legacy single-product queries\n(one per product id), recovering any minted Investment extension\nentries (requested volume / budget) and the Segment-array targeting.",
+  "properties": {
+    "accountid": {
+      "description": "Account identifying the buyer, advertiser, and other stakeholders (spec-required).",
+      "maxLength": 36,
+      "title": "Accountid",
+      "type": "string"
+    },
+    "advertiserbrandid": {
+      "description": "Brand being advertised (spec-required).",
+      "maxLength": 36,
+      "title": "Advertiserbrandid",
+      "type": "string"
+    },
+    "availabilityfields": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/ProductTargeting"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "ProductTargeting metrics availability is returned as.",
+      "title": "Availabilityfields"
+    },
+    "currency": {
+      "anyOf": [
+        {
+          "maxLength": 3,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "ISO-4217 currency code.",
+      "title": "Currency"
+    },
+    "enddate": {
+      "description": "Desired delivery end (ISO-8601); must be after startdate.",
+      "format": "date-time",
+      "title": "Enddate",
+      "type": "string"
+    },
+    "grouping": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/ProductTargeting"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "ProductTargeting metrics the availability output is grouped by.",
+      "title": "Grouping"
+    },
+    "productids": {
+      "description": "Products to get availability + pricing for (spec-required, non-empty).",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Productids",
+      "type": "array"
+    },
+    "producttargeting": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/ProductTargeting"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "ProductTargeting entries to target for the availability request.",
+      "title": "Producttargeting"
+    },
+    "startdate": {
+      "description": "Desired delivery start (ISO-8601).",
+      "format": "date-time",
+      "title": "Startdate",
+      "type": "string"
+    },
+    "targeting": {
+      "anyOf": [
+        {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "AdCOM Segment object array ({\"name\": <dimension>, \"value\": <value>}).",
+      "title": "Targeting"
+    }
+  },
+  "required": [
+    "productids",
+    "accountid",
+    "advertiserbrandid",
+    "startdate",
+    "enddate"
+  ],
+  "title": "ProductAvailsSearch",
+  "type": "object"
+}

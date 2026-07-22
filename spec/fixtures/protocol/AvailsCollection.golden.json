@@ -1,0 +1,133 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "protocol",
+  "target": "AvailsCollection",
+  "vectors": [
+    {
+      "data": {
+        "avails": [
+          {
+            "accountid": "acct-42",
+            "availability": 500000,
+            "availsstatus": {
+              "comment": null,
+              "context": null,
+              "producttargeting": [
+                {
+                  "count": 500000.0,
+                  "datasource": "iab-agentic-primitives",
+                  "default": null,
+                  "increment": null,
+                  "maximum": null,
+                  "minimum": null,
+                  "name": "Inventory",
+                  "selectable": false,
+                  "target": "impressions",
+                  "targetvalues": [
+                    "500000"
+                  ],
+                  "type": "Audience"
+                }
+              ],
+              "reason": null,
+              "status": "Available"
+            },
+            "currency": "USD",
+            "enddate": "2026-08-31T23:59:59Z",
+            "price": 12.0,
+            "productid": "prod-001",
+            "startdate": "2026-08-01T00:00:00Z"
+          },
+          {
+            "accountid": "acct-42",
+            "availability": 0,
+            "availsstatus": {
+              "comment": null,
+              "context": null,
+              "producttargeting": [
+                {
+                  "count": 0.0,
+                  "datasource": "iab-agentic-primitives",
+                  "default": null,
+                  "increment": null,
+                  "maximum": null,
+                  "minimum": null,
+                  "name": "Inventory",
+                  "selectable": false,
+                  "target": "impressions",
+                  "targetvalues": [
+                    "0"
+                  ],
+                  "type": "Audience"
+                }
+              ],
+              "reason": "Booked",
+              "status": "Unavailable"
+            },
+            "currency": "USD",
+            "enddate": "2026-08-31T23:59:59Z",
+            "price": 12.0,
+            "productid": "prod-002",
+            "startdate": "2026-08-01T00:00:00Z"
+          }
+        ]
+      },
+      "description": "Collection Objects envelope: the array property is named 'avails', one record per product in the request",
+      "mode": "valid",
+      "name": "one_record_per_requested_product"
+    },
+    {
+      "data": {
+        "avails": []
+      },
+      "description": "No matching availability: the avails array is empty, never absent",
+      "mode": "valid",
+      "name": "empty_collection"
+    },
+    {
+      "data": {
+        "avails": [
+          {
+            "accountid": "acct-42",
+            "availability": null,
+            "availsstatus": null,
+            "currency": null,
+            "enddate": "2026-08-31T23:59:59Z",
+            "price": 12.0,
+            "productid": "prod-001",
+            "startdate": "2026-08-01T00:00:00Z"
+          }
+        ],
+        "field_from_a_newer_spec_version": "must-be-ignored",
+        "x_vendor_ext": {
+          "partner": "example-dsp",
+          "trace": "abc-123"
+        }
+      },
+      "description": "FD-13 + spec: 'the collection object may include additional publisher-defined properties'",
+      "expected": {
+        "avails": [
+          {
+            "accountid": "acct-42",
+            "availability": null,
+            "availsstatus": null,
+            "currency": null,
+            "enddate": "2026-08-31T23:59:59Z",
+            "price": 12.0,
+            "productid": "prod-001",
+            "startdate": "2026-08-01T00:00:00Z"
+          }
+        ]
+      },
+      "mode": "must_ignore",
+      "name": "forward_compat_extras"
+    },
+    {
+      "data": {},
+      "description": "The envelope must contain the 'avails' array property",
+      "expected_error": "avails",
+      "mode": "invalid",
+      "name": "missing_avails_array"
+    }
+  ]
+}

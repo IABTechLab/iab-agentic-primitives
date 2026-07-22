@@ -1,0 +1,318 @@
+{
+  "$defs": {
+    "AvailsStatus": {
+      "description": "Spec ``Object: AvailsStatus`` \u2014 availability grouping for a product.",
+      "properties": {
+        "comment": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Free-text availability comment.",
+          "title": "Comment"
+        },
+        "context": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/ProductTargeting"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "ProductTargeting entries describing the context of a Partially Available or Unavailable status.",
+          "title": "Context"
+        },
+        "producttargeting": {
+          "description": "ProductTargeting entries describing the inventory at this status (spec-required).",
+          "items": {
+            "$ref": "#/$defs/ProductTargeting"
+          },
+          "title": "Producttargeting",
+          "type": "array"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AvailsStatusReason"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Spec-enumerated reason when Partially Available or Unavailable."
+        },
+        "status": {
+          "$ref": "#/$defs/AvailsStatusValue",
+          "description": "Available, Partially Available, or Unavailable."
+        }
+      },
+      "required": [
+        "status",
+        "producttargeting"
+      ],
+      "title": "AvailsStatus",
+      "type": "object"
+    },
+    "AvailsStatusReason": {
+      "description": "Spec ``AvailsStatus.reason``: why inventory is not fully available.",
+      "enum": [
+        "Booked",
+        "Optioned",
+        "Excluded",
+        "OutOfCharge",
+        "Prohibited",
+        "Manual Trade Only",
+        "InvalidPeriodLength",
+        "InvalidFrameID",
+        "InvalidBudget",
+        "InvalidPrice",
+        "ClientDuplication",
+        "LocationDuplication",
+        "LocationJuxta"
+      ],
+      "title": "AvailsStatusReason",
+      "type": "string"
+    },
+    "AvailsStatusValue": {
+      "description": "Spec ``AvailsStatus.status`` (note the space in the middle value).",
+      "enum": [
+        "Available",
+        "Partially Available",
+        "Unavailable"
+      ],
+      "title": "AvailsStatusValue",
+      "type": "string"
+    },
+    "ProductTargeting": {
+      "description": "Spec ``Object: ProductTargeting`` \u2014 dimensional targeting/metrics.\n\nAll-lowercase wire names per the normative table; the six starred\nattributes are required.",
+      "properties": {
+        "count": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Count of targetvalues.",
+          "title": "Count"
+        },
+        "datasource": {
+          "description": "Data source that defines the target vocabulary (third-party schemas welcome by design).",
+          "maxLength": 255,
+          "title": "Datasource",
+          "type": "string"
+        },
+        "default": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Default targetvalue(s) when the buyer selects none.",
+          "title": "Default"
+        },
+        "increment": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Permitted increment between target values.",
+          "title": "Increment"
+        },
+        "maximum": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Maximum number of selectable targetvalues.",
+          "title": "Maximum"
+        },
+        "minimum": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Minimum number of selectable targetvalues.",
+          "title": "Minimum"
+        },
+        "name": {
+          "$ref": "#/$defs/TargetingDimension",
+          "description": "What is described: Inventory, Delivery, Distribution, Investment, or Prohibitions."
+        },
+        "selectable": {
+          "description": "Whether a buyer may select from targetvalues or the values are fixed.",
+          "title": "Selectable",
+          "type": "boolean"
+        },
+        "target": {
+          "description": "The targeted metric within datasource.",
+          "maxLength": 255,
+          "title": "Target",
+          "type": "string"
+        },
+        "targetvalues": {
+          "description": "One or more values for the target (strings on the wire).",
+          "items": {
+            "type": "string"
+          },
+          "title": "Targetvalues",
+          "type": "array"
+        },
+        "type": {
+          "$ref": "#/$defs/TargetingUnit",
+          "description": "How it is quantified: Frames, Audience, Investment, or Total."
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "datasource",
+        "target",
+        "targetvalues",
+        "selectable"
+      ],
+      "title": "ProductTargeting",
+      "type": "object"
+    },
+    "TargetingDimension": {
+      "description": "Spec ``ProductTargeting.name``: what the entry describes.",
+      "enum": [
+        "Inventory",
+        "Delivery",
+        "Distribution",
+        "Investment",
+        "Prohibitions"
+      ],
+      "title": "TargetingDimension",
+      "type": "string"
+    },
+    "TargetingUnit": {
+      "description": "Spec ``ProductTargeting.type``: how the entry is quantified.",
+      "enum": [
+        "Frames",
+        "Audience",
+        "Investment",
+        "Total"
+      ],
+      "title": "TargetingUnit",
+      "type": "string"
+    }
+  },
+  "description": "Spec per-product RESPONSE record for ``POST /products/avails``.\n\n``price`` stays a float per the OpenDirect 2.1 decimal dialect (the\nFD-11 exception documented in the module docstring).",
+  "properties": {
+    "accountid": {
+      "description": "Echo of the requesting account (spec-required).",
+      "maxLength": 36,
+      "title": "Accountid",
+      "type": "string"
+    },
+    "availability": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Quantity available for booking in the date range.",
+      "title": "Availability"
+    },
+    "availsstatus": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/AvailsStatus"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Availability grouping (Available / Partially Available / Unavailable)."
+    },
+    "currency": {
+      "anyOf": [
+        {
+          "maxLength": 3,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "ISO-4217 currency code.",
+      "title": "Currency"
+    },
+    "enddate": {
+      "description": "Echo of the requested delivery end (spec-required).",
+      "format": "date-time",
+      "title": "Enddate",
+      "type": "string"
+    },
+    "price": {
+      "description": "The product's price (spec-required; OpenDirect 2.1 float dialect, FD-11 exception).",
+      "title": "Price",
+      "type": "number"
+    },
+    "productid": {
+      "description": "Product the availability + pricing is for (spec-required).",
+      "maxLength": 36,
+      "title": "Productid",
+      "type": "string"
+    },
+    "startdate": {
+      "description": "Echo of the requested delivery start (spec-required).",
+      "format": "date-time",
+      "title": "Startdate",
+      "type": "string"
+    }
+  },
+  "required": [
+    "productid",
+    "accountid",
+    "price",
+    "startdate",
+    "enddate"
+  ],
+  "title": "Avails",
+  "type": "object"
+}

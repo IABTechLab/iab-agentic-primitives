@@ -78,10 +78,16 @@ STANDARDS: tuple[StandardEntry, ...] = (
         version="2.1",
         status="unverified",
         missing=(
-            "No fidelity check against the published OpenDirect 2.1 "
-            "schemas/API. Internal vectors only exercise our reconciled "
-            "Order/Line/Product shapes and the OpenDirect-cased LineStatus "
-            "vocabulary."
+            "The avails surface now carries the published wire shapes "
+            "transcribed from the OpenDirect 2.1 normative attribute "
+            "tables (ProductAvailsSearch / Avails / AvailsStatus / "
+            "ProductTargeting and the 'avails' collection envelope), with "
+            "golden vectors, alongside the legacy simplified profile. "
+            "Still missing: validation against a hash-pinned copy of the "
+            "publication itself (the transcription is authored here), and "
+            "any fidelity check for the remaining surfaces — the "
+            "Order/Line/Product object tables, the required endpoint "
+            "surface (URI Summary Table), and URI versioning."
         ),
     ),
     StandardEntry(

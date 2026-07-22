@@ -8,6 +8,41 @@ major version bump.
 
 ### Added
 
+- OpenDirect 2.1 dialect convergence for the avails surface (v0.5.0
+  content): the published wire shapes now live in the contract alongside
+  the legacy simplified profile — `protocol.ProductAvailsSearch` (the
+  spec's multi-product request: `productids` array + required
+  `accountid`/`advertiserbrandid`), `protocol.Avails` (the spec
+  per-product response record) with `protocol.AvailsStatus` /
+  `protocol.ProductTargeting` (spec `availsstatus` semantics: Available /
+  Partially Available / Unavailable with the spec's enumerated reasons),
+  and `protocol.AvailsCollection` (the `avails` collection envelope the
+  spec's Collection Objects table requires for `POST /products/avails`
+  responses). Servers accept BOTH request dialects
+  (`parse_avails_request` discriminates on `productids` vs `productid`);
+  the response dialect follows the request dialect, so every
+  v2.1.0–v2.2.1 legacy payload round-trips unchanged (pinned by tests).
+  Dialect bridge helpers ship with the contract:
+  `AvailsRequest.to_spec()` emits a strictly spec-shaped request
+  (extension fields travel as minted Investment `producttargeting`
+  entries and the AdCOM Segment `targeting` array),
+  `ProductAvailsSearch.to_simplified()` recovers the legacy queries, and
+  `avails_from_simplified()` derives spec `availsstatus` from the
+  honest-availability numbers. Ships with exported JSON Schemas, the
+  dual-dialect OpenAPI path, and golden conformance vectors (valid +
+  must-ignore + invalid) for all three new messages.
+
+  **Breaking-change register (release planning):** none on the wire for
+  existing traffic — the convergence is additive. (1) Legacy requests
+  and responses are byte-for-byte unchanged. (2) A strictly spec-shaped
+  `ProductAvailsSearch` request, previously rejected with a validation
+  error, now succeeds and returns the spec envelope — a behavior
+  addition, not a break. (3) Emitting the spec dialect requires
+  `accountid`/`advertiserbrandid`, which the legacy profile never
+  carried; buyers without account context must stay on the legacy
+  dialect (documented in PROTOCOL_RECONCILIATION.md). The FD-11
+  float-money exception on this surface is unchanged.
+
 - Avails surface (`POST /products/avails`): `protocol.AvailsRequest` /
   `protocol.AvailsResponse`, the canonical home of the availability +
   pricing query the seller shipped in v2.1.0 and the buyer's OpenDirect

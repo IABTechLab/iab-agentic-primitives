@@ -1,0 +1,151 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "protocol",
+  "target": "ProductAvailsSearch",
+  "vectors": [
+    {
+      "data": {
+        "accountid": "acct-42",
+        "advertiserbrandid": "brand-7",
+        "availabilityfields": null,
+        "currency": "USD",
+        "enddate": "2026-08-31T23:59:59Z",
+        "grouping": null,
+        "productids": [
+          "prod-001",
+          "prod-002"
+        ],
+        "producttargeting": null,
+        "startdate": "2026-08-01T00:00:00Z",
+        "targeting": null
+      },
+      "description": "Strictly spec-shaped multi-product search: the five spec-required attributes plus currency",
+      "mode": "valid",
+      "name": "spec_minimal_multi_product"
+    },
+    {
+      "data": {
+        "accountid": "acct-42",
+        "advertiserbrandid": "brand-7",
+        "availabilityfields": null,
+        "currency": null,
+        "enddate": "2026-08-31T23:59:59Z",
+        "grouping": null,
+        "productids": [
+          "prod-001"
+        ],
+        "producttargeting": [
+          {
+            "count": null,
+            "datasource": "iab-agentic-primitives",
+            "default": null,
+            "increment": null,
+            "maximum": null,
+            "minimum": null,
+            "name": "Investment",
+            "selectable": false,
+            "target": "requestedimpressions",
+            "targetvalues": [
+              "500000"
+            ],
+            "type": "Audience"
+          },
+          {
+            "count": null,
+            "datasource": "iab-agentic-primitives",
+            "default": null,
+            "increment": null,
+            "maximum": null,
+            "minimum": null,
+            "name": "Investment",
+            "selectable": false,
+            "target": "budget",
+            "targetvalues": [
+              "6000.0"
+            ],
+            "type": "Investment"
+          }
+        ],
+        "startdate": "2026-08-01T00:00:00Z",
+        "targeting": [
+          {
+            "name": "device",
+            "value": "mobile"
+          },
+          {
+            "name": "geo",
+            "value": "US"
+          }
+        ]
+      },
+      "description": "AvailsRequest.to_spec output: volume/budget as minted Investment producttargeting, legacy dict targeting as the AdCOM Segment array",
+      "mode": "valid",
+      "name": "bridged_from_simplified"
+    },
+    {
+      "data": {
+        "accountid": "acct-42",
+        "advertiserbrandid": "brand-7",
+        "availabilityfields": null,
+        "currency": null,
+        "enddate": "2026-08-31T23:59:59Z",
+        "field_from_a_newer_spec_version": "must-be-ignored",
+        "grouping": null,
+        "productids": [
+          "prod-001"
+        ],
+        "producttargeting": null,
+        "startdate": "2026-08-01T00:00:00Z",
+        "targeting": null,
+        "x_vendor_ext": {
+          "partner": "example-dsp",
+          "trace": "abc-123"
+        }
+      },
+      "description": "FD-13: unknown and x_ extension fields are ignored",
+      "expected": {
+        "accountid": "acct-42",
+        "advertiserbrandid": "brand-7",
+        "availabilityfields": null,
+        "currency": null,
+        "enddate": "2026-08-31T23:59:59Z",
+        "grouping": null,
+        "productids": [
+          "prod-001"
+        ],
+        "producttargeting": null,
+        "startdate": "2026-08-01T00:00:00Z",
+        "targeting": null
+      },
+      "mode": "must_ignore",
+      "name": "forward_compat_extras"
+    },
+    {
+      "data": {
+        "advertiserbrandid": "brand-7",
+        "enddate": "2026-08-31T23:59:59Z",
+        "productids": [
+          "prod-001"
+        ],
+        "startdate": "2026-08-01T00:00:00Z"
+      },
+      "description": "accountid is spec-required on ProductAvailsSearch",
+      "expected_error": "accountid",
+      "mode": "invalid",
+      "name": "missing_accountid"
+    },
+    {
+      "data": {
+        "accountid": "acct-42",
+        "advertiserbrandid": "brand-7",
+        "enddate": "2026-08-31T23:59:59Z",
+        "productids": [],
+        "startdate": "2026-08-01T00:00:00Z"
+      },
+      "description": "productids must name at least one product",
+      "expected_error": "productids",
+      "mode": "invalid",
+      "name": "empty_productids"
+    }
+  ]
+}
