@@ -6,6 +6,12 @@ major version bump.
 
 ## [Unreleased]
 
+### Changed
+
+- Known behavior note: invalid LEGACY avails requests now return 422
+  details that include ProductAvailsSearch union errors with altered
+  `loc` paths (success and 404 responses are byte-identical to v0.4.0).
+
 ### Added
 
 - OpenDirect 2.1 dialect convergence for the avails surface (v0.5.0
