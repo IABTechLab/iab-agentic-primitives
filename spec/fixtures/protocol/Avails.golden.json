@@ -1,0 +1,108 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "protocol",
+  "target": "Avails",
+  "vectors": [
+    {
+      "data": {
+        "accountid": "acct-42",
+        "availability": 500000,
+        "availsstatus": {
+          "comment": null,
+          "context": null,
+          "producttargeting": [
+            {
+              "count": 500000.0,
+              "datasource": "iab-agentic-primitives",
+              "default": null,
+              "increment": null,
+              "maximum": null,
+              "minimum": null,
+              "name": "Inventory",
+              "selectable": false,
+              "target": "impressions",
+              "targetvalues": [
+                "500000"
+              ],
+              "type": "Audience"
+            }
+          ],
+          "reason": null,
+          "status": "Available"
+        },
+        "currency": "USD",
+        "enddate": "2026-08-31T23:59:59Z",
+        "price": 12.0,
+        "productid": "prod-001",
+        "startdate": "2026-08-01T00:00:00Z"
+      },
+      "description": "Full requested volume available: availsstatus Available, no reason",
+      "mode": "valid",
+      "name": "fully_available"
+    },
+    {
+      "data": {
+        "accountid": "acct-42",
+        "availability": 400000,
+        "availsstatus": {
+          "comment": null,
+          "context": null,
+          "producttargeting": [
+            {
+              "count": 400000.0,
+              "datasource": "iab-agentic-primitives",
+              "default": null,
+              "increment": null,
+              "maximum": null,
+              "minimum": null,
+              "name": "Inventory",
+              "selectable": false,
+              "target": "impressions",
+              "targetvalues": [
+                "400000"
+              ],
+              "type": "Audience"
+            }
+          ],
+          "reason": "Booked",
+          "status": "Partially Available"
+        },
+        "currency": "USD",
+        "enddate": "2026-08-31T23:59:59Z",
+        "price": 12.0,
+        "productid": "prod-002",
+        "startdate": "2026-08-01T00:00:00Z"
+      },
+      "description": "Capacity caps availability below the requested volume: Partially Available with spec reason Booked",
+      "mode": "valid",
+      "name": "partially_available_booked"
+    },
+    {
+      "data": {
+        "accountid": "acct-42",
+        "availability": null,
+        "availsstatus": null,
+        "currency": null,
+        "enddate": "2026-08-31T23:59:59Z",
+        "price": 8.5,
+        "productid": "prod-003",
+        "startdate": "2026-08-01T00:00:00Z"
+      },
+      "description": "Only the spec-required attributes (productid, accountid, price, startdate, enddate)",
+      "mode": "valid",
+      "name": "minimal_required_only"
+    },
+    {
+      "data": {
+        "accountid": "acct-42",
+        "enddate": "2026-08-31T23:59:59Z",
+        "productid": "prod-001",
+        "startdate": "2026-08-01T00:00:00Z"
+      },
+      "description": "price is spec-required on Avails",
+      "expected_error": "price",
+      "mode": "invalid",
+      "name": "missing_price"
+    }
+  ]
+}

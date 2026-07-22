@@ -11,7 +11,7 @@ IAB = Interactive Advertising Bureau. This report answers a single question hone
 - **0 partial** — an implemented claim whose mapped checks failed or did not execute.
 - **8 unverified (pending external spec)** — claims that reference a published external standard with no fidelity check against that publication yet.
 
-Conformance run: **364 checks**, 278 passed, 0 failed, 86 skipped across 134 vectors / 47 targets. Self-conformance verdict: **CONFORMANT**.
+Conformance run: **396 checks**, 303 passed, 0 failed, 93 skipped across 147 vectors / 50 targets. Self-conformance verdict: **CONFORMANT**.
 
 **Highest-priority gap: IAB OpenDirect 2.1** — field-level fidelity for the core commercial booking surface (Orders / Lines / Products) is the most consequential unverified claim. Obtain the published IAB OpenDirect 2.1 field specification (Order / Line / Product JSON schemas and canonical example payloads) and add field-level golden vectors derived from those examples; assert our reconciled Order/Line/Product shapes and the OpenDirect-cased LineStatus vocabulary round-trip against them.
 
@@ -29,19 +29,19 @@ What is **not** verified is external-spec *fidelity*. The contract borrows names
 
 - **Status:** CONFORMANT
 - **Registry id:** `contract-self-conformance`
-- **Checks:** `validate` (100 pass); `roundtrip` (86 pass); `schema` (86 skip); `schema_sync` (40 pass)
+- **Checks:** `validate` (109 pass); `roundtrip` (93 pass); `schema` (93 skip); `schema_sync` (43 pass)
 
 #### FD-11 Money as integer micros (float rejected on the wire) 0.1
 
 - **Status:** CONFORMANT
 - **Registry id:** `fd11-money-integer-micros`
-- **Checks:** `expected_invalid(money-float)` (16 pass)
+- **Checks:** `expected_invalid(money-float)` (20 pass)
 
 #### FD-13 must-ignore unknown fields + x_ extension prefix 0.1
 
 - **Status:** CONFORMANT
 - **Registry id:** `fd13-forward-compat`
-- **Checks:** `must_ignore` (14 pass)
+- **Checks:** `must_ignore` (16 pass)
 
 #### Canonical Deal/Order/ChangeRequest lifecycle machines (EP-1.4) 0.1
 
@@ -55,7 +55,7 @@ What is **not** verified is external-spec *fidelity*. The contract borrows names
 
 - **Status:** UNVERIFIED
 - **Registry id:** `opendirect-2.1`
-- **Unverified / missing:** No fidelity check against the published OpenDirect 2.1 schemas/API. Internal vectors only exercise our reconciled Order/Line/Product shapes and the OpenDirect-cased LineStatus vocabulary.
+- **Unverified / missing:** The avails surface now carries the published wire shapes transcribed from the OpenDirect 2.1 normative attribute tables (ProductAvailsSearch / Avails / AvailsStatus / ProductTargeting and the 'avails' collection envelope), with golden vectors, alongside the legacy simplified profile. Still missing: validation against a hash-pinned copy of the publication itself (the transcription is authored here), and any fidelity check for the remaining surfaces — the Order/Line/Product object tables, the required endpoint surface (URI Summary Table), and URI versioning.
 - **To close this gap:** Obtain the published IAB OpenDirect 2.1 field specification (Order / Line / Product JSON schemas and canonical example payloads) and add field-level golden vectors derived from those examples; assert our reconciled Order/Line/Product shapes and the OpenDirect-cased LineStatus vocabulary round-trip against them.
 
 #### IAB Deals API 1.0

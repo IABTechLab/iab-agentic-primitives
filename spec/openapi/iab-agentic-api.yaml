@@ -64,9 +64,22 @@ paths:
   /products/avails:
     post:
       operationId: checkAvails
-      summary: Availability + pricing query for a product (OpenDirect 2.1 dialect)
+      summary: >-
+        Availability + pricing query (OpenDirect 2.1 spec dialect and
+        legacy simplified profile)
       description: >-
-        Honest-availability check. availableImpressions is REQUIRED
+        Honest-availability check, served in BOTH dialects. Servers accept
+        the published OpenDirect 2.1 ProductAvailsSearch (multi-product
+        productids array with required accountid/advertiserbrandid) AND
+        the legacy single-product simplified profile, discriminated by
+        productids (array, spec) vs productid (scalar, legacy). The
+        response dialect follows the request dialect — spec requests get
+        the spec 'avails' collection envelope of Avails records (per the
+        OpenDirect Collection Objects table) with availsstatus semantics
+        (Available / Partially Available / Unavailable, enumerated
+        reasons); legacy requests get the legacy single-object response
+        unchanged, so v2.1.0-v2.2.1 payload round-trips are preserved.
+        Legacy policy (unchanged): availableImpressions is REQUIRED
         (uncapped products report the requested volume as available).
         deliveryConfidence is OPTIONAL and OMITTED entirely when the seller
         has no forecast data source — emitters MUST NOT fabricate a value
@@ -81,14 +94,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "../jsonschema/protocol/AvailsRequest.json"
+              oneOf:
+                - $ref: "../jsonschema/protocol/ProductAvailsSearch.json"
+                - $ref: "../jsonschema/protocol/AvailsRequest.json"
       responses:
         "200":
-          description: Availability and pricing derived from catalog data.
+          description: >-
+            Availability and pricing derived from catalog data. Spec
+            requests: the 'avails' collection envelope (one Avails record
+            per requested product). Legacy requests: the legacy
+            single-object response.
           content:
             application/json:
               schema:
-                $ref: "../jsonschema/protocol/AvailsResponse.json"
+                oneOf:
+                  - $ref: "../jsonschema/protocol/AvailsCollection.json"
+                  - $ref: "../jsonschema/protocol/AvailsResponse.json"
         "404":
           $ref: "#/components/responses/Error"
         "422":

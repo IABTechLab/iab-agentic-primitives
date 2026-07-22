@@ -40,7 +40,27 @@ from .a2a import (
     MessageSendParams,
 )
 from .agent_card import AgentCard, AgentDiscoveryRequest, AgentTrustVerification
-from .avails import AvailsRequest, AvailsResponse, AvailsWireModel
+from .avails import (
+    EXTENSION_DATASOURCE,
+    TARGET_BUDGET,
+    TARGET_IMPRESSIONS,
+    TARGET_REQUESTED_IMPRESSIONS,
+    Avails,
+    AvailsCollection,
+    AvailsRequest,
+    AvailsResponse,
+    AvailsStatus,
+    AvailsStatusReason,
+    AvailsStatusValue,
+    AvailsWireModel,
+    ProductAvailsSearch,
+    ProductTargeting,
+    TargetingDimension,
+    TargetingUnit,
+    avails_from_simplified,
+    parse_avails_request,
+    parse_avails_response,
+)
 from .catalog import ProductListRequest, ProductListResponse
 from .deals import (
     ChangeRequestCreate,
@@ -65,9 +85,14 @@ PROTOCOL_MESSAGES: dict[str, type] = {
     # catalog
     "ProductListRequest": ProductListRequest,
     "ProductListResponse": ProductListResponse,
-    # avails
+    # avails — legacy simplified profile AND the published OpenDirect 2.1
+    # shapes (request dialects discriminated by productids vs productid;
+    # response dialect follows the request dialect)
     "AvailsRequest": AvailsRequest,
     "AvailsResponse": AvailsResponse,
+    "ProductAvailsSearch": ProductAvailsSearch,
+    "Avails": Avails,
+    "AvailsCollection": AvailsCollection,
     # quotes
     "QuoteRequest": QuoteRequest,
     "QuoteResponse": QuoteResponse,
@@ -91,9 +116,13 @@ PROTOCOL_MESSAGES: dict[str, type] = {
 
 __all__ = [
     "A2A_METHOD_MESSAGE_SEND",
+    "EXTENSION_DATASOURCE",
     "JSONRPC_METHOD_NOT_FOUND",
     "PRICED_ACTIONS",
     "PROTOCOL_MESSAGES",
+    "TARGET_BUDGET",
+    "TARGET_IMPRESSIONS",
+    "TARGET_REQUESTED_IMPRESSIONS",
     "TERMINAL_ACTIONS",
     "A2AMessage",
     "A2APart",
@@ -102,9 +131,21 @@ __all__ = [
     "AgentCard",
     "AgentDiscoveryRequest",
     "AgentTrustVerification",
+    "Avails",
+    "AvailsCollection",
     "AvailsRequest",
     "AvailsResponse",
+    "AvailsStatus",
+    "AvailsStatusReason",
+    "AvailsStatusValue",
     "AvailsWireModel",
+    "ProductAvailsSearch",
+    "ProductTargeting",
+    "TargetingDimension",
+    "TargetingUnit",
+    "avails_from_simplified",
+    "parse_avails_request",
+    "parse_avails_response",
     "ChangeRequestCreate",
     "ChangeRequestResponse",
     "DealBookingRequest",

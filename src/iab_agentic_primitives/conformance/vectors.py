@@ -126,8 +126,17 @@ from ..protocol import (
     A2AResult,
     AgentDiscoveryRequest,
     AgentTrustVerification,
+    Avails,
+    AvailsCollection,
     AvailsRequest,
     AvailsResponse,
+    AvailsStatus,
+    AvailsStatusReason,
+    AvailsStatusValue,
+    ProductAvailsSearch,
+    ProductTargeting,
+    TargetingDimension,
+    TargetingUnit,
     ChangeRequestCreate,
     ChangeRequestResponse,
     DealBookingRequest,
@@ -1541,6 +1550,216 @@ def protocol_fixture_docs() -> dict[str, dict[str, Any]]:
                     "totalCost": 9000.0,
                 },
                 "availableImpressions",
+            ),
+        ],
+    )
+
+    # ------------------------------------------------------------------
+    # OpenDirect 2.1 spec dialect (normative attribute tables): the
+    # converged request/response shapes served alongside the legacy
+    # simplified profile.
+    # ------------------------------------------------------------------
+
+    _avails_flight = dict(
+        start_date=datetime(2026, 8, 1, tzinfo=UTC),
+        end_date=datetime(2026, 8, 31, 23, 59, 59, tzinfo=UTC),
+    )
+
+    def _spec_inventory_pt(available: int) -> ProductTargeting:
+        return ProductTargeting(
+            name=TargetingDimension.INVENTORY,
+            type=TargetingUnit.AUDIENCE,
+            datasource="iab-agentic-primitives",
+            target="impressions",
+            target_values=[str(available)],
+            selectable=False,
+            count=available,
+        )
+
+    def _spec_avails(
+        product_id: str,
+        available: int,
+        status: AvailsStatusValue,
+        reason: AvailsStatusReason | None,
+    ) -> Avails:
+        return Avails(
+            product_id=product_id,
+            account_id="acct-42",
+            availability=available,
+            avails_status=AvailsStatus(
+                status=status,
+                reason=reason,
+                product_targeting=[_spec_inventory_pt(available)],
+            ),
+            currency="USD",
+            price=12.0,
+            **_avails_flight,
+        )
+
+    docs["ProductAvailsSearch"] = _doc(
+        "protocol",
+        "ProductAvailsSearch",
+        [
+            _valid(
+                "spec_minimal_multi_product",
+                "Strictly spec-shaped multi-product search: the five "
+                "spec-required attributes plus currency",
+                ProductAvailsSearch(
+                    product_ids=["prod-001", "prod-002"],
+                    account_id="acct-42",
+                    advertiser_brand_id="brand-7",
+                    currency="USD",
+                    **_avails_flight,
+                ),
+            ),
+            _valid(
+                "bridged_from_simplified",
+                "AvailsRequest.to_spec output: volume/budget as minted "
+                "Investment producttargeting, legacy dict targeting as "
+                "the AdCOM Segment array",
+                AvailsRequest(
+                    product_id="prod-001",
+                    requested_impressions=500_000,
+                    budget=6000.0,
+                    targeting={"geo": ["US"], "device": ["mobile"]},
+                    **_avails_flight,
+                ).to_spec(account_id="acct-42", advertiser_brand_id="brand-7"),
+            ),
+            _must_ignore(
+                "forward_compat_extras",
+                "FD-13: unknown and x_ extension fields are ignored",
+                ProductAvailsSearch(
+                    product_ids=["prod-001"],
+                    account_id="acct-42",
+                    advertiser_brand_id="brand-7",
+                    **_avails_flight,
+                ),
+            ),
+            _invalid(
+                "missing_accountid",
+                "accountid is spec-required on ProductAvailsSearch",
+                {
+                    "productids": ["prod-001"],
+                    "advertiserbrandid": "brand-7",
+                    "startdate": "2026-08-01T00:00:00Z",
+                    "enddate": "2026-08-31T23:59:59Z",
+                },
+                "accountid",
+            ),
+            _invalid(
+                "empty_productids",
+                "productids must name at least one product",
+                {
+                    "productids": [],
+                    "accountid": "acct-42",
+                    "advertiserbrandid": "brand-7",
+                    "startdate": "2026-08-01T00:00:00Z",
+                    "enddate": "2026-08-31T23:59:59Z",
+                },
+                "productids",
+            ),
+        ],
+    )
+
+    docs["Avails"] = _doc(
+        "protocol",
+        "Avails",
+        [
+            _valid(
+                "fully_available",
+                "Full requested volume available: availsstatus Available, "
+                "no reason",
+                _spec_avails(
+                    "prod-001", 500_000, AvailsStatusValue.AVAILABLE, None
+                ),
+            ),
+            _valid(
+                "partially_available_booked",
+                "Capacity caps availability below the requested volume: "
+                "Partially Available with spec reason Booked",
+                _spec_avails(
+                    "prod-002",
+                    400_000,
+                    AvailsStatusValue.PARTIALLY_AVAILABLE,
+                    AvailsStatusReason.BOOKED,
+                ),
+            ),
+            _valid(
+                "minimal_required_only",
+                "Only the spec-required attributes (productid, accountid, "
+                "price, startdate, enddate)",
+                Avails(
+                    product_id="prod-003",
+                    account_id="acct-42",
+                    price=8.5,
+                    **_avails_flight,
+                ),
+            ),
+            _invalid(
+                "missing_price",
+                "price is spec-required on Avails",
+                {
+                    "productid": "prod-001",
+                    "accountid": "acct-42",
+                    "startdate": "2026-08-01T00:00:00Z",
+                    "enddate": "2026-08-31T23:59:59Z",
+                },
+                "price",
+            ),
+        ],
+    )
+
+    docs["AvailsCollection"] = _doc(
+        "protocol",
+        "AvailsCollection",
+        [
+            _valid(
+                "one_record_per_requested_product",
+                "Collection Objects envelope: the array property is named "
+                "'avails', one record per product in the request",
+                AvailsCollection(
+                    avails=[
+                        _spec_avails(
+                            "prod-001",
+                            500_000,
+                            AvailsStatusValue.AVAILABLE,
+                            None,
+                        ),
+                        _spec_avails(
+                            "prod-002",
+                            0,
+                            AvailsStatusValue.UNAVAILABLE,
+                            AvailsStatusReason.BOOKED,
+                        ),
+                    ]
+                ),
+            ),
+            _valid(
+                "empty_collection",
+                "No matching availability: the avails array is empty, "
+                "never absent",
+                AvailsCollection(avails=[]),
+            ),
+            _must_ignore(
+                "forward_compat_extras",
+                "FD-13 + spec: 'the collection object may include "
+                "additional publisher-defined properties'",
+                AvailsCollection(
+                    avails=[
+                        Avails(
+                            product_id="prod-001",
+                            account_id="acct-42",
+                            price=12.0,
+                            **_avails_flight,
+                        )
+                    ]
+                ),
+            ),
+            _invalid(
+                "missing_avails_array",
+                "The envelope must contain the 'avails' array property",
+                {},
+                "avails",
             ),
         ],
     )

@@ -36,8 +36,17 @@ from iab_agentic_primitives.protocol import (
     AgentCard,
     AgentDiscoveryRequest,
     AgentTrustVerification,
+    Avails,
+    AvailsCollection,
     AvailsRequest,
     AvailsResponse,
+    AvailsStatus,
+    AvailsStatusReason,
+    AvailsStatusValue,
+    ProductAvailsSearch,
+    ProductTargeting,
+    TargetingDimension,
+    TargetingUnit,
     ChangeRequestCreate,
     ChangeRequestResponse,
     DealBookingRequest,
@@ -99,6 +108,61 @@ PROTOCOL_INSTANCES: dict[str, object] = {
         estimated_cpm=12.0,
         total_cost=9000.0,
         available_targeting=["device", "geo"],
+    ),
+    "ProductAvailsSearch": ProductAvailsSearch(
+        product_ids=["prod-001", "prod-002"],
+        account_id="acct-42",
+        advertiser_brand_id="brand-7",
+        currency="USD",
+        start_date=datetime(2026, 8, 1, tzinfo=UTC),
+        end_date=datetime(2026, 8, 31, 23, 59, 59, tzinfo=UTC),
+        product_targeting=[
+            ProductTargeting(
+                name=TargetingDimension.INVESTMENT,
+                type=TargetingUnit.AUDIENCE,
+                datasource="iab-agentic-primitives",
+                target="requestedimpressions",
+                target_values=["500000"],
+                selectable=False,
+            )
+        ],
+    ),
+    "Avails": Avails(
+        product_id="prod-001",
+        account_id="acct-42",
+        availability=400_000,
+        avails_status=AvailsStatus(
+            status=AvailsStatusValue.PARTIALLY_AVAILABLE,
+            reason=AvailsStatusReason.BOOKED,
+            product_targeting=[
+                ProductTargeting(
+                    name=TargetingDimension.INVENTORY,
+                    type=TargetingUnit.AUDIENCE,
+                    datasource="iab-agentic-primitives",
+                    target="impressions",
+                    target_values=["400000"],
+                    selectable=False,
+                    count=400_000,
+                )
+            ],
+        ),
+        currency="USD",
+        price=12.0,
+        start_date=datetime(2026, 8, 1, tzinfo=UTC),
+        end_date=datetime(2026, 8, 31, 23, 59, 59, tzinfo=UTC),
+    ),
+    "AvailsCollection": AvailsCollection(
+        avails=[
+            Avails(
+                product_id="prod-001",
+                account_id="acct-42",
+                availability=500_000,
+                price=12.0,
+                currency="USD",
+                start_date=datetime(2026, 8, 1, tzinfo=UTC),
+                end_date=datetime(2026, 8, 31, 23, 59, 59, tzinfo=UTC),
+            )
+        ]
     ),
     "QuoteRequest": QuoteRequest(
         idempotency_key="idem-quote-1",
