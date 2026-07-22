@@ -1,0 +1,77 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "protocol",
+  "target": "AvailsResponse",
+  "vectors": [
+    {
+      "data": {
+        "availableImpressions": 750000,
+        "availableTargeting": [
+          "device",
+          "geo"
+        ],
+        "deliveryConfidence": null,
+        "estimatedCpm": 12.0,
+        "guaranteedImpressions": 500000,
+        "productid": "prod-001",
+        "totalCost": 9000.0
+      },
+      "description": "PG-capable product: guaranteedImpressions present (policy 3)",
+      "mode": "valid",
+      "name": "pg_capable_guaranteed"
+    },
+    {
+      "data": {
+        "availableImpressions": 250000,
+        "availableTargeting": null,
+        "deliveryConfidence": null,
+        "estimatedCpm": 8.5,
+        "guaranteedImpressions": null,
+        "productid": "prod-002",
+        "totalCost": 2125.0
+      },
+      "description": "Uncapped non-PG product reports requested-as-available; no forecast source, so deliveryConfidence has no value (policies 1 and 2)",
+      "mode": "valid",
+      "name": "uncapped_non_pg"
+    },
+    {
+      "data": {
+        "availableImpressions": 100000,
+        "availableTargeting": null,
+        "deliveryConfidence": null,
+        "estimatedCpm": 10.0,
+        "field_from_a_newer_spec_version": "must-be-ignored",
+        "guaranteedImpressions": null,
+        "productid": "prod-001",
+        "totalCost": 1000.0,
+        "x_vendor_ext": {
+          "partner": "example-dsp",
+          "trace": "abc-123"
+        }
+      },
+      "description": "FD-13: unknown and x_ extension fields are ignored",
+      "expected": {
+        "availableImpressions": 100000,
+        "availableTargeting": null,
+        "deliveryConfidence": null,
+        "estimatedCpm": 10.0,
+        "guaranteedImpressions": null,
+        "productid": "prod-001",
+        "totalCost": 1000.0
+      },
+      "mode": "must_ignore",
+      "name": "forward_compat_extras"
+    },
+    {
+      "data": {
+        "estimatedCpm": 12.0,
+        "productid": "prod-001",
+        "totalCost": 9000.0
+      },
+      "description": "availableImpressions is REQUIRED (policy 1)",
+      "expected_error": "availableImpressions",
+      "mode": "invalid",
+      "name": "missing_available_impressions"
+    }
+  ]
+}

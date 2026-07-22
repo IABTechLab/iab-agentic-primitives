@@ -1,0 +1,51 @@
+{
+  "$comment": "GENERATED golden vectors -- regenerate with `uv run python -m iab_agentic_primitives.conformance --regenerate`; a drift test fails if this file diverges from iab_agentic_primitives.conformance.vectors.",
+  "area": "protocol",
+  "target": "AvailsRequest",
+  "vectors": [
+    {
+      "data": {
+        "budget": 6000.0,
+        "enddate": "2026-08-31T23:59:59Z",
+        "productid": "prod-001",
+        "requestedImpressions": 500000,
+        "startdate": "2026-08-01T00:00:00Z",
+        "targeting": {
+          "device": [
+            "mobile"
+          ],
+          "geo": [
+            "US"
+          ]
+        }
+      },
+      "description": "Avails check with requested volume, budget, and targeting",
+      "mode": "valid",
+      "name": "impressions_and_targeting"
+    },
+    {
+      "data": {
+        "budget": null,
+        "enddate": "2026-09-30T00:00:00Z",
+        "productid": "prod-001",
+        "requestedImpressions": null,
+        "startdate": "2026-09-01T00:00:00Z",
+        "targeting": null
+      },
+      "description": "Minimal check: seller falls back to product minimums",
+      "mode": "valid",
+      "name": "minimal_dates_only"
+    },
+    {
+      "data": {
+        "enddate": "2026-08-01T00:00:00Z",
+        "productid": "prod-001",
+        "startdate": "2026-08-31T00:00:00Z"
+      },
+      "description": "Flight end must be strictly after the start",
+      "expected_error": "enddate must be after startdate",
+      "mode": "invalid",
+      "name": "end_before_start"
+    }
+  ]
+}

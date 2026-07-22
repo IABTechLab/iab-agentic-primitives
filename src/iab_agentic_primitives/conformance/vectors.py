@@ -126,6 +126,8 @@ from ..protocol import (
     A2AResult,
     AgentDiscoveryRequest,
     AgentTrustVerification,
+    AvailsRequest,
+    AvailsResponse,
     ChangeRequestCreate,
     ChangeRequestResponse,
     DealBookingRequest,
@@ -1450,6 +1452,95 @@ def protocol_fixture_docs() -> dict[str, dict[str, Any]]:
                 "empty_catalog",
                 "Empty catalog page",
                 ProductListResponse(products=[], total_count=0, limit=50, offset=0),
+            ),
+        ],
+    )
+
+    docs["AvailsRequest"] = _doc(
+        "protocol",
+        "AvailsRequest",
+        [
+            _valid(
+                "impressions_and_targeting",
+                "Avails check with requested volume, budget, and targeting",
+                AvailsRequest(
+                    product_id="prod-001",
+                    start_date=datetime(2026, 8, 1, tzinfo=UTC),
+                    end_date=datetime(2026, 8, 31, 23, 59, 59, tzinfo=UTC),
+                    requested_impressions=500_000,
+                    budget=6000.0,
+                    targeting={"geo": ["US"], "device": ["mobile"]},
+                ),
+            ),
+            _valid(
+                "minimal_dates_only",
+                "Minimal check: seller falls back to product minimums",
+                AvailsRequest(
+                    product_id="prod-001",
+                    start_date=datetime(2026, 9, 1, tzinfo=UTC),
+                    end_date=datetime(2026, 9, 30, tzinfo=UTC),
+                ),
+            ),
+            _invalid(
+                "end_before_start",
+                "Flight end must be strictly after the start",
+                {
+                    "productid": "prod-001",
+                    "startdate": "2026-08-31T00:00:00Z",
+                    "enddate": "2026-08-01T00:00:00Z",
+                },
+                "enddate must be after startdate",
+            ),
+        ],
+    )
+
+    docs["AvailsResponse"] = _doc(
+        "protocol",
+        "AvailsResponse",
+        [
+            _valid(
+                "pg_capable_guaranteed",
+                "PG-capable product: guaranteedImpressions present (policy 3)",
+                AvailsResponse(
+                    product_id="prod-001",
+                    available_impressions=750_000,
+                    guaranteed_impressions=500_000,
+                    estimated_cpm=12.0,
+                    total_cost=9000.0,
+                    available_targeting=["device", "geo"],
+                ),
+            ),
+            _valid(
+                "uncapped_non_pg",
+                "Uncapped non-PG product reports requested-as-available; "
+                "no forecast source, so deliveryConfidence has no value "
+                "(policies 1 and 2)",
+                AvailsResponse(
+                    product_id="prod-002",
+                    available_impressions=250_000,
+                    estimated_cpm=8.5,
+                    total_cost=2125.0,
+                ),
+            ),
+            _must_ignore(
+                "forward_compat_extras",
+                "FD-13: unknown and x_ extension fields are ignored",
+                AvailsResponse(
+                    product_id="prod-001",
+                    available_impressions=100_000,
+                    estimated_cpm=10.0,
+                    total_cost=1000.0,
+                ),
+            ),
+            _invalid(
+                "missing_available_impressions",
+                "availableImpressions is REQUIRED (policy 1)",
+                {
+                    "productid": "prod-001",
+                    "estimatedCpm": 12.0,
+                    "totalCost": 9000.0,
+                },
+                "availableImpressions",
             ),
         ],
     )

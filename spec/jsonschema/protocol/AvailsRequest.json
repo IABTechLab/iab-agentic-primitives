@@ -1,0 +1,70 @@
+{
+  "description": "Request body for ``POST /products/avails``.\n\nSpec-named fields use the OpenDirect 2.1 all-lowercase wire names;\nthe extension fields (``requestedImpressions``/``budget``/\n``targeting``) keep their camelCase names. When neither\n``requestedImpressions`` nor ``budget`` is sent, the seller falls back\nto the product's minimum impressions.",
+  "properties": {
+    "budget": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Budget in currency units (OpenDirect 2.1 float dialect \u2014 see the module docstring for the FD-11 exception).",
+      "title": "Budget"
+    },
+    "enddate": {
+      "description": "Flight end (ISO-8601); must be after startdate.",
+      "format": "date-time",
+      "title": "Enddate",
+      "type": "string"
+    },
+    "productid": {
+      "description": "Product to check.",
+      "title": "Productid",
+      "type": "string"
+    },
+    "requestedImpressions": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Requested volume; when omitted the seller derives it from budget at the product CPM, else the product minimum.",
+      "title": "Requestedimpressions"
+    },
+    "startdate": {
+      "description": "Flight start (ISO-8601).",
+      "format": "date-time",
+      "title": "Startdate",
+      "type": "string"
+    },
+    "targeting": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Requested targeting slices; sellers without per-slice availability data accept but do not filter on it.",
+      "title": "Targeting"
+    }
+  },
+  "required": [
+    "productid",
+    "startdate",
+    "enddate"
+  ],
+  "title": "AvailsRequest",
+  "type": "object"
+}

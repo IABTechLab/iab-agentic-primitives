@@ -8,6 +8,24 @@ major version bump.
 
 ### Added
 
+- Avails surface (`POST /products/avails`): `protocol.AvailsRequest` /
+  `protocol.AvailsResponse`, the canonical home of the availability +
+  pricing query the seller shipped in v2.1.0 and the buyer's OpenDirect
+  client already speaks. The served OpenDirect 2.1 dialect is preserved
+  byte-for-byte (spec-lowercase `productid`/`startdate`/`enddate`,
+  camelCase extension fields) so existing payloads round-trip identically.
+  Settled policy encoded: `availableImpressions` REQUIRED (uncapped
+  products report requested-as-available); `deliveryConfidence` OPTIONAL
+  and omitted entirely when there is no forecast data source (never
+  fabricated or null-padded; readers tolerate legacy `null`);
+  `guaranteedImpressions` present ONLY for PG-capable products. Money
+  fields on this surface remain floats — a documented FD-11 exception to
+  keep the live wire compatible; `Money` micros migration is reserved for
+  the next major version. Ships with exported JSON Schemas
+  (`spec/jsonschema/protocol/Avails*.json`), the OpenAPI path, golden
+  conformance vectors, and reconciliation notes
+  (PROTOCOL_RECONCILIATION.md).
+
 - `harness` subpackage (EP-7.1): an in-process two-agent interop test rig
   that runs BOTH sides of a transaction against the shared contract instead
   of mocking the counterparty. Ships the `BuyerRole`/`SellerRole`/

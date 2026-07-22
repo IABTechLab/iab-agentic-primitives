@@ -61,6 +61,44 @@ paths:
                 $ref: "../jsonschema/Product.json"
         "404":
           $ref: "#/components/responses/Error"
+  /products/avails:
+    post:
+      operationId: checkAvails
+      summary: Availability + pricing query for a product (OpenDirect 2.1 dialect)
+      description: >-
+        Honest-availability check. availableImpressions is REQUIRED
+        (uncapped products report the requested volume as available).
+        deliveryConfidence is OPTIONAL and OMITTED entirely when the seller
+        has no forecast data source — emitters MUST NOT fabricate a value
+        or pad with null (readers tolerate null from pre-contract
+        emitters). guaranteedImpressions is present ONLY for PG-capable
+        (Programmatic Guaranteed) products. Money fields on this surface
+        are floats — a documented FD-11 exception preserving the shipped
+        OpenDirect 2.1 wire dialect; migration to Money micros is reserved
+        for the next major version.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../jsonschema/protocol/AvailsRequest.json"
+      responses:
+        "200":
+          description: Availability and pricing derived from catalog data.
+          content:
+            application/json:
+              schema:
+                $ref: "../jsonschema/protocol/AvailsResponse.json"
+        "404":
+          $ref: "#/components/responses/Error"
+        "422":
+          description: >-
+            Unpriceable product (neither base nor floor CPM) or request
+            validation failure — never a fabricated price.
+          content:
+            application/json:
+              schema:
+                $ref: "../jsonschema/protocol/ErrorEnvelope.json"
   /api/v1/quotes:
     post:
       operationId: createQuote
