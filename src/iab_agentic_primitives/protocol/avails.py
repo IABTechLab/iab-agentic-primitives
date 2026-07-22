@@ -506,6 +506,30 @@ class Avails(AvailsWireModel):
         description="Echo of the requested delivery end (spec-required).",
     )
 
+    def to_simplified(self) -> AvailsResponse:
+        """Bridge a spec record to the legacy simplified response.
+
+        Field mapping (inverse of :func:`avails_from_simplified`):
+        ``availableImpressions`` <- ``availability``, ``estimatedCpm`` <-
+        ``price``, ``totalCost`` = availability / 1000 * price rounded to
+        2 decimals. Fields with no spec home (``guaranteedImpressions``,
+        ``deliveryConfidence``, ``availableTargeting``) stay unset —
+        never fabricated. ``availability`` is optional on the spec table,
+        but the legacy profile requires it: a record without it raises
+        ``ValueError`` rather than inventing a volume.
+        """
+        if self.availability is None:
+            raise ValueError(
+                "availability is required to derive the simplified "
+                "profile; refusing to fabricate a volume"
+            )
+        return AvailsResponse(
+            product_id=self.product_id,
+            available_impressions=self.availability,
+            estimated_cpm=self.price,
+            total_cost=round(self.availability / 1000 * self.price, 2),
+        )
+
 
 class AvailsCollection(AvailsWireModel):
     """Spec response envelope: the ``avails`` collection object.

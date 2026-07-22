@@ -488,3 +488,46 @@ def test_spec_messages_are_registered():
     assert PROTOCOL_MESSAGES["ProductAvailsSearch"] is ProductAvailsSearch
     assert PROTOCOL_MESSAGES["Avails"] is Avails
     assert PROTOCOL_MESSAGES["AvailsCollection"] is AvailsCollection
+
+
+class TestAvailsToSimplified:
+    """Spec record -> legacy simplified response (buyer parse-side bridge)."""
+
+    def test_derives_the_legacy_fields(self):
+        avails = Avails.model_validate(SPEC_AVAILS_WIRE)
+        simplified = avails.to_simplified()
+        assert isinstance(simplified, AvailsResponse)
+        assert simplified.product_id == "prod-video-001"
+        assert simplified.available_impressions == 640_000
+        assert simplified.estimated_cpm == 14.5
+        assert simplified.total_cost == round(640_000 / 1000 * 14.5, 2)
+        # Unknown on the spec dialect -- never fabricated.
+        assert simplified.guaranteed_impressions is None
+        assert simplified.delivery_confidence is None
+        assert simplified.available_targeting is None
+
+    def test_round_trips_with_avails_from_simplified(self):
+        original = AvailsResponse(
+            product_id="prod-video-001",
+            available_impressions=400_000,
+            estimated_cpm=14.5,
+            total_cost=5800.0,
+        )
+        spec = avails_from_simplified(
+            original,
+            account_id="acct-42",
+            start_date=START,
+            end_date=END,
+            requested_impressions=500_000,
+        )
+        back = spec.to_simplified()
+        assert back.available_impressions == original.available_impressions
+        assert back.estimated_cpm == original.estimated_cpm
+        assert back.total_cost == original.total_cost
+
+    def test_missing_availability_is_an_error_not_a_fabrication(self):
+        avails = Avails.model_validate(
+            {k: v for k, v in SPEC_AVAILS_WIRE.items() if k != "availability"}
+        )
+        with pytest.raises(ValueError, match="availability"):
+            avails.to_simplified()
