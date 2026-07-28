@@ -6,7 +6,7 @@ IAB = Interactive Advertising Bureau. This report answers a single question hone
 
 ## Executive summary
 
-- **12 standards tracked** (library version `0.1.0`).
+- **12 standards tracked** (library version `0.5.0`).
 - **4 fully self-conformant** — the contract's own guarantees (primitives, protocol, state, events, money, idempotency, forward-compat), verified by executed checks against our spec artifacts.
 - **0 partial** — an implemented claim whose mapped checks failed or did not execute.
 - **8 unverified (pending external spec)** — claims that reference a published external standard with no fidelity check against that publication yet.
