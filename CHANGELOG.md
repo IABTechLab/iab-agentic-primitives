@@ -6,6 +6,22 @@ major version bump.
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-08-10
+
+First tagged release published on GitHub.
+
+### Fixed
+
+- Version single-sourcing
+  ([#2](https://github.com/IABTechLab/iab-agentic-primitives/issues/2)):
+  `iab_agentic_primitives.__version__` was hardcoded to `0.1.0` while
+  `pyproject.toml` declared `0.5.0`. The runtime version is now read from
+  installed package metadata via `importlib.metadata`, so it always matches
+  the version declared in `pyproject.toml`; a regression test pins the
+  invariant.
+
+## [0.5.0] - 2026-07-28
+
 ### Changed
 
 - Known behavior note: invalid LEGACY avails requests now return 422

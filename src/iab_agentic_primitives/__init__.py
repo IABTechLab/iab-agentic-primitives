@@ -8,4 +8,9 @@ package is its reference implementation, verified against the spec fixtures
 in continuous integration like any other implementation.
 """
 
-__version__ = "0.1.0"
+from importlib.metadata import PackageNotFoundError, version
+
+try:
+    __version__ = version("iab-agentic-primitives")
+except PackageNotFoundError:  # pragma: no cover - package not installed (raw checkout)
+    __version__ = "0.0.0+unknown"
