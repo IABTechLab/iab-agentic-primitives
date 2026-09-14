@@ -26,7 +26,26 @@ class DealType(str, Enum):
 
     - ``PG`` = Programmatic Guaranteed: fixed price, guaranteed impressions
     - ``PD`` = Preferred Deal: fixed price, non-guaranteed first look
-    - ``PA`` = Private Auction: auction with floor price, invited buyers
+    - ``PA`` = Private Auction: auction with floor price, invited buyers.
+      This is the general private-marketplace tier — bare "PMP" in
+      industry usage most often means this.
+
+    Curated packages are NOT a fourth deal type. A curated deal (Index
+    Exchange Inventory/Auction Packages, PubMatic Auction Packages,
+    Magnite Curate, and the like) is represented by the optional
+    :class:`Curation` object riding alongside a deal, not by a distinct
+    ``DealType`` value — pricing mechanic and packaging structure are
+    orthogonal, and the ``Curation`` object can accompany any
+    ``DealType`` (curated deals are typically ``PA``-mechanics — floor +
+    competitive bid — but a curated deal can equally be ``PG``). Two
+    wire-value candidates for a fourth deal type, ``CUR`` and the
+    industry term "PMP", were considered and rejected during design: both
+    would have collapsed a packaging/provenance concept into the
+    pricing-mechanic enum, which the published IAB Deals API v1.0
+    ``Curation`` object (``deal-api`` spec, ``deal1.0.md``) deliberately
+    keeps separate. See :class:`Curation` for the wire shape; seller-
+    internal "PMP curated deals" terminology maps to a deal carrying a
+    populated ``Curation`` object, not to a dedicated ``DealType`` value.
 
     Mapping from the seller repo's retired long-form encoding
     (``models/core.py``): ``programmaticguaranteed`` -> ``PG``,
@@ -37,6 +56,61 @@ class DealType(str, Enum):
     PROGRAMMATIC_GUARANTEED = "PG"
     PREFERRED_DEAL = "PD"
     PRIVATE_AUCTION = "PA"
+
+
+# ---------------------------------------------------------------------------
+# Curation — IAB Deals API v1.0 Curation object (deal-api spec, deal1.0.md)
+# ---------------------------------------------------------------------------
+
+
+class CurationFeeType(int, Enum):
+    """Deals API v1.0 ``Curation.curfeetype``: how the curator's fee is
+    structured. Communicates fee STRUCTURE only, never the fee amount
+    itself (per the published spec).
+
+    - ``0`` = undisclosed
+    - ``1`` = percentage of spend
+    - ``2`` = flat fee
+    - ``3`` = CPM (cost per mille)
+    - ``4`` = no fee
+    """
+
+    UNDISCLOSED = 0
+    PERCENT_OF_SPEND = 1
+    FLAT_FEE = 2
+    CPM = 3
+    NO_FEE = 4
+
+
+class Curation(WireModel):
+    """IAB Deals API v1.0 ``Curation`` object (``deal-api`` spec,
+    ``deal1.0.md``): identifies the entity that packaged inventory,
+    technology, and/or data into a deal.
+
+    Orthogonal to :class:`DealType` (see its docstring) — a curated deal
+    still has a pricing mechanic (``PG``/``PD``/``PA``); this object
+    layers packaging provenance on top and can accompany any of them.
+    Every field is optional per the published spec, matching the
+    spec's own all-optional ``Curation`` object.
+    """
+
+    curator: str | None = Field(
+        default=None,
+        description="Canonical domain of the business entity that did the "
+        "packaging of inventory, technology and/or data (spec ``curator``).",
+    )
+    curator_deal_id: str | None = Field(
+        default=None,
+        description="Deal id in the curator's own namespace (spec ``cdealid``).",
+    )
+    curation_fee_type: CurationFeeType | None = Field(
+        default=None,
+        description="Fee-structure classification for curation services "
+        "(spec ``curfeetype``); see :class:`CurationFeeType`.",
+    )
+    ext: dict[str, Any] | None = Field(
+        default=None, description="Extension slot (spec placeholder for deal-specific ext)."
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -369,6 +443,8 @@ class Quote(WireModel):
 
 __all__ = [
     "CancellationTerms",
+    "Curation",
+    "CurationFeeType",
     "DealType",
     "LinearTVParams",
     "LinearTVQuoteDetails",

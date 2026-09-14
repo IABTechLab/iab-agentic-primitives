@@ -13,7 +13,7 @@ Modules:
 
 - ``identity``  -- Organization, Account, Agent, BuyerIdentity, ConsentContext
 - ``inventory`` -- Product, MediaKit, Package
-- ``pricing``   -- DealType, pricing enums, linear TV params, RateCard, Quote
+- ``pricing``   -- DealType, Curation, pricing enums, linear TV params, RateCard, Quote
 - ``lifecycle`` -- Proposal, Negotiation, Deal, Order, Line, ChangeRequest, Session
 - ``creative``  -- Creative, CreativeApproval, Assignment
 - ``supply_chain`` -- SupplyChain, SupplyChainNode, SellersJsonEntry
@@ -103,6 +103,8 @@ from .lifecycle import (
 )
 from .pricing import (
     CancellationTerms,
+    Curation,
+    CurationFeeType,
     DealType,
     LinearTVParams,
     LinearTVQuoteDetails,
@@ -198,6 +200,8 @@ __all__ = [
     "Product",
     # pricing
     "CancellationTerms",
+    "Curation",
+    "CurationFeeType",
     "DealType",
     "LinearTVParams",
     "LinearTVQuoteDetails",

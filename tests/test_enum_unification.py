@@ -47,6 +47,18 @@ def test_dealtype_serializes_to_wire_value() -> None:
     assert '"deal_type":"PG"' in quote.model_dump_json()
 
 
+def test_dealtype_docstring_disclaims_curation_as_a_deal_type() -> None:
+    """Curated packages are represented by the Curation object, not a DealType
+    value; the docstring must say so explicitly and record that CUR/PMP were
+    considered and rejected as fourth deal-type wire values."""
+    doc = DealType.__doc__ or ""
+    assert "not" in doc.lower() and "deal type" in doc.lower()
+    assert "Curation" in doc
+    assert "CUR" in doc
+    assert "PMP" in doc
+    assert "orthogonal" in doc.lower()
+
+
 # ---------------------------------------------------------------------------
 # DealStatus: ONE unioned vocabulary; retired aliases absent
 # ---------------------------------------------------------------------------

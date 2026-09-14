@@ -183,6 +183,19 @@
       "$ref": "#/$defs/NegotiationAction",
       "description": "REQUIRED move discriminator: 'accept', 'counter', 'reject' (walk-away), or 'final_offer'. No default \u2014 the action-less bare-price payload that caused the historical 422 does not validate."
     },
+    "agent_url": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "A2A endpoint of the sending agent, for registry trust verification (see AgentTrustVerification). Optional for backward compatibility with callers that predate this field.",
+      "title": "Agent Url"
+    },
     "buyer_identity": {
       "anyOf": [
         {

@@ -26,6 +26,7 @@
           "verified_at": "2026-07-01T12:00:00Z"
         },
         "created_at": "2026-07-01T12:00:00Z",
+        "curation": null,
         "deal_id": "deal-001",
         "deal_type": "PG",
         "expires_at": null,
@@ -107,6 +108,7 @@
         "buyer_tier": "agency",
         "consent_context": null,
         "created_at": "2026-07-01T12:00:00Z",
+        "curation": null,
         "deal_id": "deal-ltv-002",
         "deal_type": "PG",
         "expires_at": null,
@@ -190,6 +192,7 @@
         "buyer_tier": "public",
         "consent_context": null,
         "created_at": "2026-07-02T09:30:00Z",
+        "curation": null,
         "deal_id": "deal-003",
         "deal_type": "PD",
         "expires_at": null,
@@ -257,6 +260,7 @@
           "verified_at": "2026-07-01T12:00:00Z"
         },
         "created_at": "2026-07-01T12:00:00Z",
+        "curation": null,
         "deal_id": "deal-001",
         "deal_type": "PG",
         "expires_at": null,
@@ -356,6 +360,7 @@
           "verified_at": "2026-07-01T12:00:00Z"
         },
         "created_at": "2026-07-01T12:00:00Z",
+        "curation": null,
         "deal_id": "deal-001",
         "deal_type": "PG",
         "expires_at": null,
@@ -453,6 +458,7 @@
           "verified_at": "2026-07-01T12:00:00Z"
         },
         "created_at": "2026-07-01T12:00:00Z",
+        "curation": null,
         "deal_id": "deal-001",
         "deal_type": "PG",
         "expires_at": null,

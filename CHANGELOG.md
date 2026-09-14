@@ -6,6 +6,35 @@ major version bump.
 
 ## [Unreleased]
 
+### Changed
+
+- **Breaking:** name-length bounds conformed to the OpenDirect 2.1 spec
+  (the IAB direct-buying API standard): `Product.name` max length 128 ->
+  100; `Organization.name` and `Account.name` max length 128 -> 120.
+  Bounds already matching spec (`Creative.name` 255, the lifecycle `name`
+  fields at 200) are unchanged. Breaking for any integrator currently
+  sending names in the 101-128 (Product) or 121-128 (Organization/
+  Account) range.
+
+### Added
+
+- `NegotiationMessage.agent_url` (optional): the sender's registered A2A
+  agent URL, for registry trust-tier verification. Optional for backward
+  compatibility with callers that predate this field.
+- `Deal.curation` (optional): an IAB Deals API v1.0 `Curation` object
+  (`deal-api` spec, `deal1.0.md`) — `curator` (canonical domain of the
+  packaging entity), `curator_deal_id` (the curator's own deal id, spec
+  `cdealid`), `curation_fee_type` (spec `curfeetype`; 0=undisclosed,
+  1=percent of spend, 2=flat fee, 3=CPM, 4=no fee), and an `ext` slot.
+  Curated packages (Index Inventory/Auction Packages, PubMatic Auction
+  Packages, Magnite Curate, and the like) are represented by this object
+  riding alongside any `DealType`, not by a new `DealType` value:
+  pricing mechanic and packaging structure are orthogonal per the
+  published spec. Two candidate `DealType` wire values, `CUR` and the
+  industry term "PMP", were considered and rejected in favor of this
+  spec-aligned object; see the `DealType` docstring for the full
+  disambiguation.
+
 ## [0.5.1] - 2026-08-10
 
 First tagged release published on GitHub.

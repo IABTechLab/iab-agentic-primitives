@@ -112,6 +112,12 @@ class NegotiationMessage(IdempotentRequest):
         "omitted on 'reject'.",
     )
     buyer_identity: BuyerIdentity | None = None
+    agent_url: str | None = Field(
+        default=None,
+        description="A2A endpoint of the sending agent, for registry trust "
+        "verification (see AgentTrustVerification). Optional for backward "
+        "compatibility with callers that predate this field.",
+    )
     rationale: str = Field(default="", description="Optional human-readable rationale.")
 
     @model_validator(mode="after")

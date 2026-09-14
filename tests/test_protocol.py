@@ -295,6 +295,27 @@ def test_buyer_counter_validates_against_the_sellers_model() -> None:
     assert received.buyer_price == Money.from_decimal_str("21.00")
 
 
+def test_agent_url_is_optional_and_roundtrips() -> None:
+    """agent_url (sender identity, for tier verification) is optional for
+    backward compatibility, and round-trips when supplied."""
+    without_url = build_negotiation_message()
+    assert without_url.agent_url is None
+    reparsed = NegotiationMessage.model_validate_json(without_url.model_dump_json())
+    assert reparsed.agent_url is None
+
+    with_url = NegotiationMessage(
+        idempotency_key="idem-neg-2",
+        action=NegotiationAction.COUNTER,
+        negotiation_id="neg-001",
+        buyer_price=Money.from_decimal_str("21.00"),
+        agent_url="https://buyer.example.com/agents/acme",
+    )
+    dumped = with_url.model_dump_json()
+    assert '"agent_url":"https://buyer.example.com/agents/acme"' in dumped
+    reparsed_with_url = NegotiationMessage.model_validate_json(dumped)
+    assert reparsed_with_url.agent_url == "https://buyer.example.com/agents/acme"
+
+
 def test_legacy_bare_price_payload_is_rejected() -> None:
     """The buyer's historical ``{"price": 22.0}`` body cannot validate:
     no action, no typed buyer_price, no negotiation context."""

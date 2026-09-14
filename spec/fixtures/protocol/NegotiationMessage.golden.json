@@ -6,6 +6,7 @@
     {
       "data": {
         "action": "counter",
+        "agent_url": null,
         "buyer_identity": {
           "advertiser_id": null,
           "advertiser_industry": null,
@@ -37,6 +38,7 @@
     {
       "data": {
         "action": "accept",
+        "agent_url": null,
         "buyer_identity": null,
         "buyer_price": {
           "amount_micros": 22000000,
@@ -56,6 +58,7 @@
     {
       "data": {
         "action": "reject",
+        "agent_url": null,
         "buyer_identity": null,
         "buyer_price": null,
         "idempotency_key": "00000000-0000-4000-8000-000000000012",
@@ -72,6 +75,7 @@
     {
       "data": {
         "action": "counter",
+        "agent_url": null,
         "buyer_identity": {
           "advertiser_id": null,
           "advertiser_industry": null,
@@ -104,6 +108,7 @@
       "description": "FD-13: unknown + x_ fields on a negotiation message are ignored",
       "expected": {
         "action": "counter",
+        "agent_url": null,
         "buyer_identity": {
           "advertiser_id": null,
           "advertiser_industry": null,
