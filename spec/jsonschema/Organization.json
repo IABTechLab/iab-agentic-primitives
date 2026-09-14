@@ -67,7 +67,8 @@
       "title": "Ext"
     },
     "name": {
-      "maxLength": 128,
+      "description": "OpenDirect 2.1 identity name bound (120).",
+      "maxLength": 120,
       "title": "Name",
       "type": "string"
     },

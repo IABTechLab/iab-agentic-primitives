@@ -37,7 +37,8 @@ class CommercialTerms(WireModel):
     supported_deal_types: list[DealType] = Field(
         default_factory=list,
         description="Supported deal types: 'PG' (Programmatic Guaranteed), "
-        "'PD' (Preferred Deal), 'PA' (Private Auction).",
+        "'PD' (Preferred Deal), 'PA' (Private Auction), 'CUR' (curated "
+        "package deal).",
     )
     supported_pricing_models: list[PricingModel] = Field(default_factory=list)
     minimum_deal_value: Money | None = None
@@ -65,7 +66,7 @@ class Product(WireModel):
     seller_organization_id: str = Field(
         description="Registry-issued id of the owning seller organization."
     )
-    name: str = Field(max_length=128)
+    name: str = Field(max_length=100, description="OpenDirect 2.1 Product name bound (100).")
     description: str | None = None
     base_price: Money | None = Field(
         default=None,

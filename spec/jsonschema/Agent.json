@@ -226,7 +226,7 @@
       "type": "array"
     },
     "supported_deal_types": {
-      "description": "DealType wire values the agent supports: 'PG' (Programmatic Guaranteed), 'PD' (Preferred Deal), 'PA' (Private Auction).",
+      "description": "DealType wire values the agent supports: 'PG' (Programmatic Guaranteed), 'PD' (Preferred Deal), 'PA' (Private Auction), 'CUR' (curated package deal).",
       "items": {
         "type": "string"
       },

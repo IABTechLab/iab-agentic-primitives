@@ -1,6 +1,7 @@
 """Enum-unification tests: one vocabulary per concept, wire values canonical.
 
-PG = Programmatic Guaranteed, PD = Preferred Deal, PA = Private Auction.
+PG = Programmatic Guaranteed, PD = Preferred Deal, PA = Private Auction,
+CUR = curated package deal.
 """
 
 import pytest
@@ -22,7 +23,7 @@ def test_dealtype_wire_values() -> None:
     assert DealType("PG") is DealType.PROGRAMMATIC_GUARANTEED
     assert DealType("PD") is DealType.PREFERRED_DEAL
     assert DealType("PA") is DealType.PRIVATE_AUCTION
-    assert {m.value for m in DealType} == {"PG", "PD", "PA"}
+    assert {m.value for m in DealType} == {"PG", "PD", "PA", "CUR"}
 
 
 @pytest.mark.parametrize(
@@ -45,6 +46,34 @@ def test_dealtype_serializes_to_wire_value() -> None:
         terms=QuoteTerms(),
     )
     assert '"deal_type":"PG"' in quote.model_dump_json()
+
+
+def test_dealtype_cur_roundtrips() -> None:
+    """CUR (curated package deal) serializes/deserializes like any other member."""
+    from iab_agentic_primitives.primitives import ProductRef, Quote, QuotePricing, QuoteTerms
+
+    assert DealType("CUR") is DealType.CURATED_PACKAGE
+
+    quote = Quote(
+        quote_id="q-2",
+        deal_type=DealType.CURATED_PACKAGE,
+        product=ProductRef(product_id="p-1", name="x"),
+        pricing=QuotePricing(),
+        terms=QuoteTerms(),
+    )
+    dumped = quote.model_dump_json()
+    assert '"deal_type":"CUR"' in dumped
+    assert Quote.model_validate_json(dumped).deal_type is DealType.CURATED_PACKAGE
+
+
+def test_dealtype_cur_documented_distinctly_from_pa() -> None:
+    """The docstring must disambiguate CUR (curated package) from PA (private auction),
+    and explain why the wire value is CUR rather than the industry's ambiguous "PMP"."""
+    doc = DealType.__doc__ or ""
+    assert "CUR" in doc
+    assert "curated" in doc.lower()
+    assert "ambiguous" in doc.lower()
+    assert "PMP" in doc  # still referenced, as the term the ambiguity comes from
 
 
 # ---------------------------------------------------------------------------

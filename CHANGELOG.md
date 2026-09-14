@@ -6,6 +6,31 @@ major version bump.
 
 ## [Unreleased]
 
+### Changed
+
+- **Breaking:** name-length bounds conformed to the OpenDirect 2.1 spec
+  (the IAB direct-buying API standard): `Product.name` max length 128 ->
+  100; `Organization.name` and `Account.name` max length 128 -> 120.
+  Bounds already matching spec (`Creative.name` 255, the lifecycle `name`
+  fields at 200) are unchanged. Breaking for any integrator currently
+  sending names in the 101-128 (Product) or 121-128 (Organization/
+  Account) range.
+
+### Added
+
+- `NegotiationMessage.agent_url` (optional): the sender's registered A2A
+  agent URL, for registry trust-tier verification. Optional for backward
+  compatibility with callers that predate this field.
+- `DealType.CUR`: curated package deal (floor-priced, bid-based, curated
+  inventory bundled under one deal ID via an SSP-native curation
+  product — e.g. Index Inventory/Auction Packages, PubMatic Auction
+  Packages, Magnite Curate). Distinct from `PA` (private auction, the
+  general private-marketplace tier); named `CUR` rather than "PMP"
+  because bare "PMP" is ambiguous in industry usage and commonly refers
+  to the `PA` tier instead. Seller-internal "PMP curated deals" map to
+  `CUR` on the wire. See the `DealType` docstring for the full
+  disambiguation.
+
 ## [0.5.1] - 2026-08-10
 
 First tagged release published on GitHub.

@@ -26,7 +26,21 @@ class DealType(str, Enum):
 
     - ``PG`` = Programmatic Guaranteed: fixed price, guaranteed impressions
     - ``PD`` = Preferred Deal: fixed price, non-guaranteed first look
-    - ``PA`` = Private Auction: auction with floor price, invited buyers
+    - ``PA`` = Private Auction: auction with floor price, invited buyers.
+      This is the general private-marketplace tier — bare "PMP" in
+      industry usage most often means this.
+    - ``CUR`` = curated package deal: a floor-priced, bid-based deal that
+      bundles curated inventory (single- or multi-publisher) under one
+      deal ID via an SSP-native (supply-side platform) curation product —
+      e.g. Index Exchange Inventory/Auction Packages, PubMatic Auction
+      Packages, Magnite Curate. Mechanically closest to ``PA`` (floor +
+      competitive bid) but a commercially distinct, separately sold
+      product, so it is kept as a sibling value rather than folded into
+      ``PA``. Named ``CUR`` rather than "PMP" specifically because
+      bare "PMP" is ambiguous in industry usage — it is also the term
+      commonly used for the ``PA`` private-auction tier — so this value
+      deliberately avoids reusing that string on the wire. Seller-internal
+      "PMP curated deals" terminology maps to ``CUR`` here, not to ``PA``.
 
     Mapping from the seller repo's retired long-form encoding
     (``models/core.py``): ``programmaticguaranteed`` -> ``PG``,
@@ -37,6 +51,7 @@ class DealType(str, Enum):
     PROGRAMMATIC_GUARANTEED = "PG"
     PREFERRED_DEAL = "PD"
     PRIVATE_AUCTION = "PA"
+    CURATED_PACKAGE = "CUR"
 
 
 # ---------------------------------------------------------------------------

@@ -56,7 +56,7 @@ class Organization(WireModel):
     """
 
     organization_id: str = Field(description="Registry-issued organization identifier.")
-    name: str = Field(max_length=128)
+    name: str = Field(max_length=120, description="OpenDirect 2.1 identity name bound (120).")
     role: OrganizationRole
     status: OrganizationStatus = OrganizationStatus.ACTIVE
     address: str | None = None
@@ -96,7 +96,9 @@ class Account(WireModel):
         default=None,
         description="Optional advertiser this account transacts for (buyer-supplied).",
     )
-    name: str | None = Field(default=None, max_length=128)
+    name: str | None = Field(
+        default=None, max_length=120, description="OpenDirect 2.1 identity name bound (120)."
+    )
     status: AccountStatus = AccountStatus.ACTIVE
     ext: dict[str, Any] | None = None
 
@@ -240,7 +242,8 @@ class Agent(WireModel):
         default_factory=list,
         description=(
             "DealType wire values the agent supports: 'PG' (Programmatic "
-            "Guaranteed), 'PD' (Preferred Deal), 'PA' (Private Auction)."
+            "Guaranteed), 'PD' (Preferred Deal), 'PA' (Private Auction), "
+            "'CUR' (curated package deal)."
         ),
     )
     trust_status: TrustStatus = Field(

@@ -23,10 +23,10 @@ Vector modes (see :mod:`iab_agentic_primitives.conformance.runner`):
 Determinism: every timestamp and identifier is pinned — regeneration is
 byte-stable, so ``--regenerate`` never produces noise diffs.
 
-Acronyms: FD = flagged decision; PG/PD/PA = Programmatic Guaranteed /
-Preferred Deal / Private Auction; GRP = gross rating point; CPM/CPP =
-cost per mille / cost per point; GPP = Global Privacy Platform;
-TCF = Transparency & Consent Framework.
+Acronyms: FD = flagged decision; PG/PD/PA/CUR = Programmatic Guaranteed /
+Preferred Deal / Private Auction / curated package deal; GRP = gross
+rating point; CPM/CPP = cost per mille / cost per point; GPP = Global
+Privacy Platform; TCF = Transparency & Consent Framework.
 """
 
 from __future__ import annotations

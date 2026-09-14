@@ -51,7 +51,7 @@
     "name": {
       "anyOf": [
         {
-          "maxLength": 128,
+          "maxLength": 120,
           "type": "string"
         },
         {
@@ -59,6 +59,7 @@
         }
       ],
       "default": null,
+      "description": "OpenDirect 2.1 identity name bound (120).",
       "title": "Name"
     },
     "seller_organization_id": {

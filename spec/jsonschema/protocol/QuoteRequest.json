@@ -238,11 +238,12 @@
       "type": "object"
     },
     "DealType": {
-      "description": "Programmatic deal types. The short wire encoding is canonical.\n\n- ``PG`` = Programmatic Guaranteed: fixed price, guaranteed impressions\n- ``PD`` = Preferred Deal: fixed price, non-guaranteed first look\n- ``PA`` = Private Auction: auction with floor price, invited buyers\n\nMapping from the seller repo's retired long-form encoding\n(``models/core.py``): ``programmaticguaranteed`` -> ``PG``,\n``preferreddeal`` -> ``PD``, ``privateauction`` -> ``PA``. The\nlong-form strings are NOT valid wire values.",
+      "description": "Programmatic deal types. The short wire encoding is canonical.\n\n- ``PG`` = Programmatic Guaranteed: fixed price, guaranteed impressions\n- ``PD`` = Preferred Deal: fixed price, non-guaranteed first look\n- ``PA`` = Private Auction: auction with floor price, invited buyers.\n  This is the general private-marketplace tier \u2014 bare \"PMP\" in\n  industry usage most often means this.\n- ``CUR`` = curated package deal: a floor-priced, bid-based deal that\n  bundles curated inventory (single- or multi-publisher) under one\n  deal ID via an SSP-native (supply-side platform) curation product \u2014\n  e.g. Index Exchange Inventory/Auction Packages, PubMatic Auction\n  Packages, Magnite Curate. Mechanically closest to ``PA`` (floor +\n  competitive bid) but a commercially distinct, separately sold\n  product, so it is kept as a sibling value rather than folded into\n  ``PA``. Named ``CUR`` rather than \"PMP\" specifically because\n  bare \"PMP\" is ambiguous in industry usage \u2014 it is also the term\n  commonly used for the ``PA`` private-auction tier \u2014 so this value\n  deliberately avoids reusing that string on the wire. Seller-internal\n  \"PMP curated deals\" terminology maps to ``CUR`` here, not to ``PA``.\n\nMapping from the seller repo's retired long-form encoding\n(``models/core.py``): ``programmaticguaranteed`` -> ``PG``,\n``preferreddeal`` -> ``PD``, ``privateauction`` -> ``PA``. The\nlong-form strings are NOT valid wire values.",
       "enum": [
         "PG",
         "PD",
-        "PA"
+        "PA",
+        "CUR"
       ],
       "title": "DealType",
       "type": "string"
@@ -452,7 +453,7 @@
     },
     "deal_type": {
       "$ref": "#/$defs/DealType",
-      "description": "'PG' (Programmatic Guaranteed), 'PD' (Preferred Deal), 'PA' (Private Auction). Typed \u2014 the retired long-form strings are not valid wire values."
+      "description": "'PG' (Programmatic Guaranteed), 'PD' (Preferred Deal), 'PA' (Private Auction), 'CUR' (curated package deal). Typed \u2014 the retired long-form strings are not valid wire values."
     },
     "flight_end": {
       "anyOf": [
