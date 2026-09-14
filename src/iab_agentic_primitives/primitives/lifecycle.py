@@ -21,6 +21,7 @@ from pydantic import Field, model_validator
 from ._util import Money, WireModel, utc_now
 from .identity import AccessTier, BuyerIdentity, ConsentContext
 from .pricing import (
+    Curation,
     DealType,
     LinearTVQuoteDetails,
     MediaType,
@@ -334,6 +335,12 @@ class Deal(WireModel):
         default=None,
         description="OpenRTB supply chain (schain) for transparency (EP-10.3); "
         "optional so pre-schain deals still validate.",
+    )
+    curation: Curation | None = Field(
+        default=None,
+        description="IAB Deals API v1.0 Curation object, present when this deal "
+        "is a curated package (see the DealType docstring: curation is "
+        "orthogonal to deal_type, not a value of it).",
     )
 
 

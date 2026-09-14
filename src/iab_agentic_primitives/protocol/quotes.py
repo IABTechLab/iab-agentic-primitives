@@ -54,8 +54,8 @@ class QuoteRequest(IdempotentRequest):
     product_id: str = Field(description="Seller-issued product to quote.")
     deal_type: DealType = Field(
         description="'PG' (Programmatic Guaranteed), 'PD' (Preferred Deal), "
-        "'PA' (Private Auction), 'CUR' (curated package deal). Typed — the "
-        "retired long-form strings are not valid wire values."
+        "'PA' (Private Auction). Typed — the retired long-form strings "
+        "are not valid wire values."
     )
     impressions: int | None = Field(
         default=None, ge=0, description="Requested volume; required for PG."

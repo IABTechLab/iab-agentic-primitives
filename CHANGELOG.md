@@ -21,14 +21,18 @@ major version bump.
 - `NegotiationMessage.agent_url` (optional): the sender's registered A2A
   agent URL, for registry trust-tier verification. Optional for backward
   compatibility with callers that predate this field.
-- `DealType.CUR`: curated package deal (floor-priced, bid-based, curated
-  inventory bundled under one deal ID via an SSP-native curation
-  product — e.g. Index Inventory/Auction Packages, PubMatic Auction
-  Packages, Magnite Curate). Distinct from `PA` (private auction, the
-  general private-marketplace tier); named `CUR` rather than "PMP"
-  because bare "PMP" is ambiguous in industry usage and commonly refers
-  to the `PA` tier instead. Seller-internal "PMP curated deals" map to
-  `CUR` on the wire. See the `DealType` docstring for the full
+- `Deal.curation` (optional): an IAB Deals API v1.0 `Curation` object
+  (`deal-api` spec, `deal1.0.md`) — `curator` (canonical domain of the
+  packaging entity), `curator_deal_id` (the curator's own deal id, spec
+  `cdealid`), `curation_fee_type` (spec `curfeetype`; 0=undisclosed,
+  1=percent of spend, 2=flat fee, 3=CPM, 4=no fee), and an `ext` slot.
+  Curated packages (Index Inventory/Auction Packages, PubMatic Auction
+  Packages, Magnite Curate, and the like) are represented by this object
+  riding alongside any `DealType`, not by a new `DealType` value:
+  pricing mechanic and packaging structure are orthogonal per the
+  published spec. Two candidate `DealType` wire values, `CUR` and the
+  industry term "PMP", were considered and rejected in favor of this
+  spec-aligned object; see the `DealType` docstring for the full
   disambiguation.
 
 ## [0.5.1] - 2026-08-10

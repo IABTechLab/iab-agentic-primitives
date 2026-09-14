@@ -10,9 +10,8 @@ generator).
 
 Acronyms used below (defined on first use): IAB = Interactive Advertising
 Bureau; JSON = JavaScript Object Notation; FD = flagged decision (the
-remediation plan's decision register); PG / PD / PA / CUR = Programmatic
-Guaranteed / Preferred Deal / Private Auction / curated package deal;
-GRP = gross rating point;
+remediation plan's decision register); PG / PD / PA = Programmatic
+Guaranteed / Preferred Deal / Private Auction; GRP = gross rating point;
 CPM / CPP = cost per mille / cost per point; A2A = Agent-to-Agent
 protocol; JSON-RPC = JSON Remote Procedure Call; AAMP = the IAB Tech Lab
 agent discovery and trust registry; AdCOM = Advertising Common Object

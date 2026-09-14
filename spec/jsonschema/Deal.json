@@ -148,6 +148,77 @@
       "title": "ConsentContext",
       "type": "object"
     },
+    "Curation": {
+      "description": "IAB Deals API v1.0 ``Curation`` object (``deal-api`` spec,\n``deal1.0.md``): identifies the entity that packaged inventory,\ntechnology, and/or data into a deal.\n\nOrthogonal to :class:`DealType` (see its docstring) \u2014 a curated deal\nstill has a pricing mechanic (``PG``/``PD``/``PA``); this object\nlayers packaging provenance on top and can accompany any of them.\nEvery field is optional per the published spec, matching the\nspec's own all-optional ``Curation`` object.",
+      "properties": {
+        "curation_fee_type": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CurationFeeType"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Fee-structure classification for curation services (spec ``curfeetype``); see :class:`CurationFeeType`."
+        },
+        "curator": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Canonical domain of the business entity that did the packaging of inventory, technology and/or data (spec ``curator``).",
+          "title": "Curator"
+        },
+        "curator_deal_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Deal id in the curator's own namespace (spec ``cdealid``).",
+          "title": "Curator Deal Id"
+        },
+        "ext": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Extension slot (spec placeholder for deal-specific ext).",
+          "title": "Ext"
+        }
+      },
+      "title": "Curation",
+      "type": "object"
+    },
+    "CurationFeeType": {
+      "description": "Deals API v1.0 ``Curation.curfeetype``: how the curator's fee is\nstructured. Communicates fee STRUCTURE only, never the fee amount\nitself (per the published spec).\n\n- ``0`` = undisclosed\n- ``1`` = percentage of spend\n- ``2`` = flat fee\n- ``3`` = CPM (cost per mille)\n- ``4`` = no fee",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "title": "CurationFeeType",
+      "type": "integer"
+    },
     "DealStatus": {
       "description": "ONE deal status vocabulary, unioned from the four competing sets.\n\nSources: buyer ``DealResponse.status`` (proposed/active/rejected/\nexpired/completed), seller ``DealBookingStatus`` (proposed/active/\nexpired/cancelled), buyer ``BuyerDealStatus`` (quoted/negotiating/\naccepted/booking/booked/delivering/... + linear TV extensions).\n\nRecorded aliases (retired values, NOT valid on the wire):\n``delivering`` -> ``active``; ``booking`` -> ``booked``;\n``quoted`` -> represented by QuoteStatus, not a deal state;\n``partially_canceled`` -> ``partially_cancelled``.",
       "enum": [
@@ -168,12 +239,11 @@
       "type": "string"
     },
     "DealType": {
-      "description": "Programmatic deal types. The short wire encoding is canonical.\n\n- ``PG`` = Programmatic Guaranteed: fixed price, guaranteed impressions\n- ``PD`` = Preferred Deal: fixed price, non-guaranteed first look\n- ``PA`` = Private Auction: auction with floor price, invited buyers.\n  This is the general private-marketplace tier \u2014 bare \"PMP\" in\n  industry usage most often means this.\n- ``CUR`` = curated package deal: a floor-priced, bid-based deal that\n  bundles curated inventory (single- or multi-publisher) under one\n  deal ID via an SSP-native (supply-side platform) curation product \u2014\n  e.g. Index Exchange Inventory/Auction Packages, PubMatic Auction\n  Packages, Magnite Curate. Mechanically closest to ``PA`` (floor +\n  competitive bid) but a commercially distinct, separately sold\n  product, so it is kept as a sibling value rather than folded into\n  ``PA``. Named ``CUR`` rather than \"PMP\" specifically because\n  bare \"PMP\" is ambiguous in industry usage \u2014 it is also the term\n  commonly used for the ``PA`` private-auction tier \u2014 so this value\n  deliberately avoids reusing that string on the wire. Seller-internal\n  \"PMP curated deals\" terminology maps to ``CUR`` here, not to ``PA``.\n\nMapping from the seller repo's retired long-form encoding\n(``models/core.py``): ``programmaticguaranteed`` -> ``PG``,\n``preferreddeal`` -> ``PD``, ``privateauction`` -> ``PA``. The\nlong-form strings are NOT valid wire values.",
+      "description": "Programmatic deal types. The short wire encoding is canonical.\n\n- ``PG`` = Programmatic Guaranteed: fixed price, guaranteed impressions\n- ``PD`` = Preferred Deal: fixed price, non-guaranteed first look\n- ``PA`` = Private Auction: auction with floor price, invited buyers.\n  This is the general private-marketplace tier \u2014 bare \"PMP\" in\n  industry usage most often means this.\n\nCurated packages are NOT a fourth deal type. A curated deal (Index\nExchange Inventory/Auction Packages, PubMatic Auction Packages,\nMagnite Curate, and the like) is represented by the optional\n:class:`Curation` object riding alongside a deal, not by a distinct\n``DealType`` value \u2014 pricing mechanic and packaging structure are\northogonal, and the ``Curation`` object can accompany any\n``DealType`` (curated deals are typically ``PA``-mechanics \u2014 floor +\ncompetitive bid \u2014 but a curated deal can equally be ``PG``). Two\nwire-value candidates for a fourth deal type, ``CUR`` and the\nindustry term \"PMP\", were considered and rejected during design: both\nwould have collapsed a packaging/provenance concept into the\npricing-mechanic enum, which the published IAB Deals API v1.0\n``Curation`` object (``deal-api`` spec, ``deal1.0.md``) deliberately\nkeeps separate. See :class:`Curation` for the wire shape; seller-\ninternal \"PMP curated deals\" terminology maps to a deal carrying a\npopulated ``Curation`` object, not to a dedicated ``DealType`` value.\n\nMapping from the seller repo's retired long-form encoding\n(``models/core.py``): ``programmaticguaranteed`` -> ``PG``,\n``preferreddeal`` -> ``PD``, ``privateauction`` -> ``PA``. The\nlong-form strings are NOT valid wire values.",
       "enum": [
         "PG",
         "PD",
-        "PA",
-        "CUR"
+        "PA"
       ],
       "title": "DealType",
       "type": "string"
@@ -738,6 +808,18 @@
       "format": "date-time",
       "title": "Created At",
       "type": "string"
+    },
+    "curation": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Curation"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "IAB Deals API v1.0 Curation object, present when this deal is a curated package (see the DealType docstring: curation is orthogonal to deal_type, not a value of it)."
     },
     "deal_id": {
       "description": "Seller-issued deal identifier.",

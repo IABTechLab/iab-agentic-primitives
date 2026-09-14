@@ -98,7 +98,11 @@ STANDARDS: tuple[StandardEntry, ...] = (
         missing=(
             "No vectors derived from the published Deals API v1.0 "
             "examples/schemas. Internal vectors cover our reconciled "
-            "quote->book envelopes only."
+            "quote->book envelopes only. The Curation object (deal-api "
+            "spec, deal1.0.md) is now modeled as Deal.curation, but "
+            "against this repo's own transcription of the field table, "
+            "not against a hash-pinned copy of the publication or its "
+            "example payloads."
         ),
     ),
     StandardEntry(

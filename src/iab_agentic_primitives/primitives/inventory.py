@@ -37,8 +37,7 @@ class CommercialTerms(WireModel):
     supported_deal_types: list[DealType] = Field(
         default_factory=list,
         description="Supported deal types: 'PG' (Programmatic Guaranteed), "
-        "'PD' (Preferred Deal), 'PA' (Private Auction), 'CUR' (curated "
-        "package deal).",
+        "'PD' (Preferred Deal), 'PA' (Private Auction).",
     )
     supported_pricing_models: list[PricingModel] = Field(default_factory=list)
     minimum_deal_value: Money | None = None

@@ -242,8 +242,7 @@ class Agent(WireModel):
         default_factory=list,
         description=(
             "DealType wire values the agent supports: 'PG' (Programmatic "
-            "Guaranteed), 'PD' (Preferred Deal), 'PA' (Private Auction), "
-            "'CUR' (curated package deal)."
+            "Guaranteed), 'PD' (Preferred Deal), 'PA' (Private Auction)."
         ),
     )
     trust_status: TrustStatus = Field(
