@@ -1,0 +1,31 @@
+# A verified credential is constructed only by the code that verified it, so
+# holding one means the check ran. Tests get one by verifying a real message.
+id: verified-credentials-constructed-by-owner
+language: Python
+severity: error
+message: VerifiedRequest and VerifiedResponse are constructed only in verifier.py.
+files:
+  - "src/iab_agentic_primitives/web_bot_auth/**/*.py"
+  - "tests/web_bot_auth/**/*.py"
+ignores:
+  - "src/iab_agentic_primitives/web_bot_auth/verifier.py"
+rule:
+  any:
+    - pattern: VerifiedRequest($$$A)
+    - pattern: $M.VerifiedRequest($$$A)
+    - pattern: VerifiedResponse($$$A)
+    - pattern: $M.VerifiedResponse($$$A)
+---
+id: verified-directory-constructed-by-owner
+language: Python
+severity: error
+message: VerifiedDirectory is constructed only in directory.py; tests verify a real signed directory.
+files:
+  - "src/iab_agentic_primitives/web_bot_auth/**/*.py"
+  - "tests/web_bot_auth/**/*.py"
+ignores:
+  - "src/iab_agentic_primitives/web_bot_auth/directory.py"
+rule:
+  any:
+    - pattern: VerifiedDirectory($$$A)
+    - pattern: $M.VerifiedDirectory($$$A)

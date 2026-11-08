@@ -36,9 +36,7 @@ class SupplyChainNode(WireModel):
     system's sellers.json.
     """
 
-    asi: str = Field(
-        description="Advertising system identifier (canonical domain of the system)."
-    )
+    asi: str = Field(description="Advertising system identifier (canonical domain of the system).")
     sid: str = Field(
         description="Seller id within the ``asi`` system; matches its sellers.json seller_id."
     )
@@ -107,9 +105,7 @@ class SellersJsonEntry(WireModel):
     translate at the edge.
     """
 
-    seller_id: str = Field(
-        description="Opaque seller id, unique within the publishing system."
-    )
+    seller_id: str = Field(description="Opaque seller id, unique within the publishing system.")
     name: str | None = Field(
         default=None, description="Seller business name; None when confidential."
     )

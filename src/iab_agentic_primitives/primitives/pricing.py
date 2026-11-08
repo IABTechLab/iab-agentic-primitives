@@ -151,12 +151,8 @@ class CancellationTerms(WireModel):
     cancellable_pct: float = Field(
         ge=0.0, le=1.0, description="Portion of the deal that can be cancelled (0.0-1.0)."
     )
-    deadline: date | None = Field(
-        default=None, description="Absolute deadline for cancellation."
-    )
-    force_majeure: bool = Field(
-        default=True, description="Whether force majeure exceptions apply."
-    )
+    deadline: date | None = Field(default=None, description="Absolute deadline for cancellation.")
+    force_majeure: bool = Field(default=True, description="Whether force majeure exceptions apply.")
 
 
 class LinearTVQuoteDetails(WireModel):
@@ -314,9 +310,7 @@ class QuoteTerms(WireModel):
         default=None, description="Linear TV volume in GRPs (gross rating points)."
     )
     guaranteed_grps: int | None = None
-    target_demo: str | None = Field(
-        default=None, description="Linear TV target demographic."
-    )
+    target_demo: str | None = Field(default=None, description="Linear TV target demographic.")
 
 
 class QuoteAvailability(WireModel):

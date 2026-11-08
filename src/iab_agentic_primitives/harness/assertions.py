@@ -45,8 +45,7 @@ def assert_quote_roundtrips(result: TransactionResult) -> None:
         quote = ex.response.quote
         assert quote.quote_id, "quote is missing a seller-minted quote_id"
         assert quote.product.product_id == request.product_id, (
-            f"quote product {quote.product.product_id!r} != requested "
-            f"{request.product_id!r}"
+            f"quote product {quote.product.product_id!r} != requested {request.product_id!r}"
         )
         assert quote.deal_type == request.deal_type, (
             f"quote deal_type {quote.deal_type} != requested {request.deal_type}"
@@ -140,9 +139,7 @@ def assert_auth_tier_enforced(result: TransactionResult, *, expected_tier: Acces
 
     assert result.quote is not None, "no quote to check the tier on"
     granted = result.quote.buyer_tier
-    assert granted == expected_tier, (
-        f"granted tier {granted} != expected {expected_tier}"
-    )
+    assert granted == expected_tier, f"granted tier {granted} != expected {expected_tier}"
     assert TIER_ORDER[granted] <= TIER_ORDER[result.tier_ceiling], (
         f"granted tier {granted} exceeds the registry ceiling {result.tier_ceiling}"
     )
@@ -152,8 +149,7 @@ def assert_idempotent_booking(result: TransactionResult) -> None:
     """Re-booking with the same idempotency key returned the SAME single deal."""
     assert result.deal is not None, "no deal to check idempotency on"
     assert result.replay_deal is not None, (
-        "idempotency probe did not run: replay_deal is None "
-        "(set brief.idempotent_double_book=True)"
+        "idempotency probe did not run: replay_deal is None (set brief.idempotent_double_book=True)"
     )
     assert result.replay_deal.deal_id == result.deal.deal_id, (
         f"replay minted a different deal: {result.replay_deal.deal_id!r} != "
@@ -169,14 +165,10 @@ def assert_state_consistent(result: TransactionResult) -> None:
     assert result.reconciliation.outcome is ReconciliationOutcome.CONSISTENT, (
         f"deal state reconciled as {result.reconciliation.outcome.value}, not consistent"
     )
-    assert result.disagreement is None, (
-        f"unexpected DisagreementReport: {result.disagreement}"
-    )
+    assert result.disagreement is None, f"unexpected DisagreementReport: {result.disagreement}"
 
 
-def assert_structural_rejection(
-    result: TransactionResult, surface: str, code: ErrorCode
-) -> None:
+def assert_structural_rejection(result: TransactionResult, surface: str, code: ErrorCode) -> None:
     """A given surface produced at least one structured rejection with ``code``.
 
     Useful for the FD-6 checks (linear_tv / unsupported deal type): the

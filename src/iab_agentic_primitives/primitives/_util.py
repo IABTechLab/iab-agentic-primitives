@@ -65,7 +65,5 @@ class Money(WireModel):
         """
         micros = Decimal(amount) * 1_000_000
         if micros != micros.to_integral_value():
-            raise ValueError(
-                f"{amount!r} has more precision than micros can represent"
-            )
+            raise ValueError(f"{amount!r} has more precision than micros can represent")
         return cls(amount_micros=int(micros), currency=currency)

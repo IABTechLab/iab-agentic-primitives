@@ -108,9 +108,7 @@ class GapReport(BaseModel):
         vectors: set[tuple[str, str, str]] = set()
         targets: set[tuple[str, str]] = set()
         for record in self.checks:
-            area = areas.setdefault(
-                record.area, {status.value: 0 for status in CheckStatus}
-            )
+            area = areas.setdefault(record.area, {status.value: 0 for status in CheckStatus})
             area[record.status.value] += 1
             targets.add((record.area, record.target))
             if record.vector is not None:
@@ -149,13 +147,11 @@ class GapReport(BaseModel):
         lines.append(f"generated: {self.generated_at.isoformat()}")
         lines.append("")
         lines.append(
-            "checks: {checks} total | {passed} passed | {failed} failed | "
-            "{skipped} skipped".format(**summary)
+            "checks: {checks} total | {passed} passed | {failed} failed | {skipped} skipped".format(
+                **summary
+            )
         )
-        lines.append(
-            f"coverage: {summary['vectors']} vectors across "
-            f"{summary['targets']} targets"
-        )
+        lines.append(f"coverage: {summary['vectors']} vectors across {summary['targets']} targets")
         for area, counts in sorted(summary["by_area"].items()):
             lines.append(
                 f"  {area:<11} pass={counts['pass']:<4} fail={counts['fail']:<3} "

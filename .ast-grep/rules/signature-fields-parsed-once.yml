@@ -1,0 +1,30 @@
+# Signature and Signature-Input are parsed by one wire-seam function. Any
+# other module that reads them by name is a second parser whose rules can
+# drift from the first.
+id: signature-fields-parsed-once
+language: Python
+severity: error
+message: Signature / Signature-Input are parsed by one L2 function; nothing else reads them by name.
+files:
+  - "src/iab_agentic_primitives/web_bot_auth/**/*.py"
+ignores:
+  - "src/iab_agentic_primitives/web_bot_auth/_wire.py"
+  # Fixture data: a scenario appends raw members to these fields after signing.
+  - "src/iab_agentic_primitives/web_bot_auth/conformance/scenarios.py"
+rule:
+  all:
+    - kind: string
+    - regex: '^b?["'']signature(-input)?["'']$'
+    - inside:
+        kind: call
+        stopBy: end
+    # component_id("signature", {"req": True, ...}) names the covered
+    # component, not the field; component-literals-only-in-rules owns it.
+    - not:
+        inside:
+          kind: argument_list
+          inside:
+            kind: call
+            has:
+              field: function
+              regex: '^component_id$'

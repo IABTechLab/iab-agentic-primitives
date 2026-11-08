@@ -1,0 +1,30 @@
+# Invariant 5: signer and verifier agree on every rule. The profile's
+# component lists are stated once, in rules.py, and both roles read them.
+# A component identifier written anywhere else is a second copy of a rule.
+id: component-literals-only-in-rules
+language: Python
+severity: error
+message: Component identifiers are stated once, in rules.py; signer, verifier, and directory read them from there.
+files:
+  - "src/iab_agentic_primitives/web_bot_auth/**/*.py"
+ignores:
+  - "src/iab_agentic_primitives/web_bot_auth/rules.py"
+  # Fixture data: the scenarios list deliberately wrong components, as scenarios.json spells them.
+  - "src/iab_agentic_primitives/web_bot_auth/conformance/scenarios.py"
+rule:
+  kind: string
+  any:
+    # The first argument of component_id("content-digest"), _key("@method"),
+    # and the like.
+    - all:
+        - nthChild: 1
+        - inside:
+            kind: argument_list
+            inside:
+              kind: call
+              has:
+                field: function
+                regex: '^(component_id|component_key|_key)$'
+    # A bare derived-component name such as "@target-uri" or '"@method";req'.
+    # A docstring opens with three quotes, so the regex never matches one.
+    - regex: '^["'']"?@[a-z-]+'

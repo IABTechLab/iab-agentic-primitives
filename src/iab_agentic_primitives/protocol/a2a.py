@@ -51,9 +51,7 @@ class A2APart(A2AWireModel):
 
     kind: Literal["text", "data"]
     text: str | None = Field(default=None, description="Set when kind == 'text'.")
-    data: dict[str, Any] | None = Field(
-        default=None, description="Set when kind == 'data'."
-    )
+    data: dict[str, Any] | None = Field(default=None, description="Set when kind == 'data'.")
 
     @model_validator(mode="after")
     def _kind_consistency(self) -> "A2APart":
@@ -67,9 +65,7 @@ class A2APart(A2AWireModel):
 class A2AMessage(A2AWireModel):
     """An A2A message (the A2A-spec shape the buyer already sent)."""
 
-    message_id: str = Field(
-        alias="messageId", description="Sender-minted unique message id."
-    )
+    message_id: str = Field(alias="messageId", description="Sender-minted unique message id.")
     role: Literal["user", "agent"] = "user"
     parts: list[A2APart] = Field(min_length=1)
 

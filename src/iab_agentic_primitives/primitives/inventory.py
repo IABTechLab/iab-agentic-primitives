@@ -157,9 +157,7 @@ class Package(WireModel):
         description="Audience capability declaration. Kept as an open object here; "
         "the typed model lands with the audience-plan bead.",
     )
-    device_types: list[int] = Field(
-        default_factory=list, description="AdCOM DeviceType integers."
-    )
+    device_types: list[int] = Field(default_factory=list, description="AdCOM DeviceType integers.")
     ad_formats: list[str] = Field(default_factory=list)
     geo_targets: list[str] = Field(
         default_factory=list, description='ISO 3166-2 codes, e.g. ["US", "US-NY"].'

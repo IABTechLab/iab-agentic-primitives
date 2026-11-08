@@ -1,0 +1,25 @@
+# The RFC 9421 seam hands the library the components the profile requires and
+# the covered body, so the library checks them as well as the profile does
+# (invariant 1). The profile's own checks run first, so no behavior test can
+# tell the library's checks apart; this rule keeps them in place.
+id: library-verify-checks-components-and-body
+language: Python
+severity: error
+message: The seam's call to the library verifier passes require_components= and body=.
+files:
+  - "src/iab_agentic_primitives/web_bot_auth/_sig.py"
+rule:
+  pattern: $V.verify($$$ARGS)
+  any:
+    - not:
+        has:
+          kind: argument_list
+          has:
+            kind: keyword_argument
+            regex: "^require_components="
+    - not:
+        has:
+          kind: argument_list
+          has:
+            kind: keyword_argument
+            regex: "^body="

@@ -38,12 +38,8 @@ class ProductListRequest(WireModel):
     ``$skip``/``$top`` query convention.
     """
 
-    limit: int = Field(
-        default=50, ge=1, le=500, description="Maximum products to return."
-    )
-    offset: int = Field(
-        default=0, ge=0, description="Zero-based index of the first product."
-    )
+    limit: int = Field(default=50, ge=1, le=500, description="Maximum products to return.")
+    offset: int = Field(default=0, ge=0, description="Zero-based index of the first product.")
 
 
 class ProductListResponse(WireModel):

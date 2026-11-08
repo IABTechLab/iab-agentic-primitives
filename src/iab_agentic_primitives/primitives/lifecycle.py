@@ -232,9 +232,7 @@ class NegotiationRound(WireModel):
         description="What the seller countered (or accepted at) this round."
     )
     action: NegotiationAction
-    concession_pct: float = Field(
-        default=0.0, description="Seller concession this round (0-1)."
-    )
+    concession_pct: float = Field(default=0.0, description="Seller concession this round (0-1).")
     cumulative_concession_pct: float = Field(
         default=0.0, description="Total seller concession so far (0-1)."
     )
@@ -257,13 +255,9 @@ class Negotiation(WireModel):
     proposal_id: str | None = Field(
         default=None, description="Proposal under negotiation, if proposal-led."
     )
-    quote_id: str | None = Field(
-        default=None, description="Quote under negotiation, if quote-led."
-    )
+    quote_id: str | None = Field(default=None, description="Quote under negotiation, if quote-led.")
     product_id: str | None = None
-    package_id: str | None = Field(
-        default=None, description="Set when negotiating on a package."
-    )
+    package_id: str | None = Field(default=None, description="Set when negotiating on a package.")
     buyer_tier: AccessTier = AccessTier.PUBLIC
     rounds: list[NegotiationRound] = Field(default_factory=list)
     status: NegotiationStatus = NegotiationStatus.ACTIVE
@@ -287,9 +281,7 @@ class OpenRTBParams(WireModel):
     )
     at: int = Field(default=3, description="Auction type (3 = fixed price).")
     wseat: list[str] = Field(default_factory=list, description="Allowed buyer seats.")
-    wadomain: list[str] = Field(
-        default_factory=list, description="Allowed advertiser domains."
-    )
+    wadomain: list[str] = Field(default_factory=list, description="Allowed advertiser domains.")
 
 
 class Deal(WireModel):
@@ -358,9 +350,7 @@ class Order(WireModel):
     proposal_id: str | None = Field(
         default=None, description="Proposal this order materializes, if any."
     )
-    deal_id: str | None = Field(
-        default=None, description="Deal this order fulfils, if deal-led."
-    )
+    deal_id: str | None = Field(default=None, description="Deal this order fulfils, if deal-led.")
     name: str = Field(max_length=200)
     budget: Money = Field(description="Estimated budget (exact micros; FD-11).")
     start_date: date

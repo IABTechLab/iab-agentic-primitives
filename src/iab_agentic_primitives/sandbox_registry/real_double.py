@@ -94,8 +94,12 @@ def _error(status: int, message: str, refresh: str | None = None) -> JSONRespons
 
 
 def _normalize_domain(domain: str) -> str:
-    return domain.lower().replace("https://", "").replace("http://", "").rstrip("/").removeprefix(
-        "www."
+    return (
+        domain.lower()
+        .replace("https://", "")
+        .replace("http://", "")
+        .rstrip("/")
+        .removeprefix("www.")
     )
 
 
@@ -278,7 +282,11 @@ def create_registry_double(
             return _error(400, "Domain is required")
         norm = _normalize_domain(domain)
         match = next(
-            (a for a in store.agents.values() if _normalize_domain(a.get("primary_domain", "")) == norm),
+            (
+                a
+                for a in store.agents.values()
+                if _normalize_domain(a.get("primary_domain", "")) == norm
+            ),
             None,
         )
         if match:
@@ -326,13 +334,16 @@ def create_registry_double(
     def verification_badge(agent_id: int) -> Response:
         agent = store.agents.get(agent_id)
         if agent is None:
-            return Response(content=_error_badge("Agent Not Found"), status_code=404,
-                            media_type="image/svg+xml")
+            return Response(
+                content=_error_badge("Agent Not Found"), status_code=404, media_type="image/svg+xml"
+            )
         if not agent.get("iab_member"):
-            return Response(content=_error_badge("Not Verified"), status_code=404,
-                            media_type="image/svg+xml")
-        return Response(content=_verified_badge(agent.get("agent_name", "Unknown")),
-                        media_type="image/svg+xml")
+            return Response(
+                content=_error_badge("Not Verified"), status_code=404, media_type="image/svg+xml"
+            )
+        return Response(
+            content=_verified_badge(agent.get("agent_name", "Unknown")), media_type="image/svg+xml"
+        )
 
     return app
 

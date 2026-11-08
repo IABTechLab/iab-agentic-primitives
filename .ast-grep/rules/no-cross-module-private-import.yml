@@ -1,0 +1,44 @@
+# A private name belongs to its module. Another module reaches it only
+# through a public seam, so the layer order cannot be bypassed by an import,
+# and a test reaches the module only through its public surface.
+id: no-cross-module-private-import
+language: Python
+severity: error
+message: A private name belongs to its module; another module imports it only through a public seam.
+files:
+  - "src/iab_agentic_primitives/web_bot_auth/**/*.py"
+rule:
+  kind: dotted_name
+  regex: '^_[a-z]'
+  inside:
+    kind: import_from_statement
+    any:
+      # from .directory import _checked_max_age
+      - has:
+          kind: relative_import
+          regex: '^\.+[a-z]'
+      # from iab_agentic_primitives.web_bot_auth.verifier import _select
+      - has:
+          field: module_name
+          regex: '^iab_agentic_primitives\.web_bot_auth(\.[a-z][a-z_]*)+$'
+---
+id: no-cross-module-private-import-in-tests
+language: Python
+severity: error
+message: A test reaches a private name; test the behavior through the public API instead.
+files:
+  - "tests/web_bot_auth/**/*.py"
+rule:
+  kind: dotted_name
+  regex: '^_[a-z]'
+  inside:
+    kind: import_from_statement
+    any:
+      # from .directory import _checked_max_age
+      - has:
+          kind: relative_import
+          regex: '^\.+[a-z]'
+      # from iab_agentic_primitives.web_bot_auth.verifier import _select
+      - has:
+          field: module_name
+          regex: '^iab_agentic_primitives\.web_bot_auth(\.[a-z][a-z_]*)+$'

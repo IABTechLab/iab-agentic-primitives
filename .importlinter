@@ -1,0 +1,160 @@
+# Import contracts for the Web Bot Auth module (`make imports`). Every one blocks.
+[importlinter]
+root_package = iab_agentic_primitives
+include_external_packages = True
+
+[importlinter:contract:wba-roles-no-network]
+name = values, seams, rules, directory, ports, and roles import no network client (only the fetcher, the edges, and testing do)
+type = forbidden
+source_modules =
+    iab_agentic_primitives.web_bot_auth.presentation
+    iab_agentic_primitives.web_bot_auth.roles
+    iab_agentic_primitives.web_bot_auth.signer
+    iab_agentic_primitives.web_bot_auth.verifier
+    iab_agentic_primitives.web_bot_auth.ports
+    iab_agentic_primitives.web_bot_auth.replay
+    iab_agentic_primitives.web_bot_auth.directory
+    iab_agentic_primitives.web_bot_auth.keys
+    iab_agentic_primitives.web_bot_auth.values
+    iab_agentic_primitives.web_bot_auth.errors
+    iab_agentic_primitives.web_bot_auth.message
+    iab_agentic_primitives.web_bot_auth._wire
+    iab_agentic_primitives.web_bot_auth._sig
+    iab_agentic_primitives.web_bot_auth.rules
+forbidden_modules =
+    httpx
+allow_indirect_imports = True
+
+[importlinter:contract:wba-l0-no-io]
+name = the value, error, key, message, wire, rules, directory, presentation, and ports modules do no I/O (no network, filesystem, event loop, threads)
+type = forbidden
+source_modules =
+    iab_agentic_primitives.web_bot_auth.keys
+    iab_agentic_primitives.web_bot_auth.presentation
+    iab_agentic_primitives.web_bot_auth.ports
+    iab_agentic_primitives.web_bot_auth.directory
+    iab_agentic_primitives.web_bot_auth.rules
+    iab_agentic_primitives.web_bot_auth.values
+    iab_agentic_primitives.web_bot_auth.errors
+    iab_agentic_primitives.web_bot_auth.message
+    iab_agentic_primitives.web_bot_auth._wire
+    iab_agentic_primitives.web_bot_auth._sig
+forbidden_modules =
+    httpx
+    asyncio
+    os
+    pathlib
+    threading
+    subprocess
+allow_indirect_imports = True
+
+[importlinter:contract:wba-seam-libs]
+name = only the L2 seams import the RFC 9421 and Structured Fields libraries
+type = forbidden
+source_modules =
+    iab_agentic_primitives.web_bot_auth.keyfile
+    iab_agentic_primitives.web_bot_auth.presentation
+    iab_agentic_primitives.web_bot_auth.roles
+    iab_agentic_primitives.web_bot_auth.signer
+    iab_agentic_primitives.web_bot_auth.verifier
+    iab_agentic_primitives.web_bot_auth.directory
+    iab_agentic_primitives.web_bot_auth.rules
+    iab_agentic_primitives.web_bot_auth.asgi
+    iab_agentic_primitives.web_bot_auth.resolver
+    iab_agentic_primitives.web_bot_auth.ports
+    iab_agentic_primitives.web_bot_auth.fetcher
+    iab_agentic_primitives.web_bot_auth.testing
+    iab_agentic_primitives.web_bot_auth.httpx
+    iab_agentic_primitives.web_bot_auth.replay
+    iab_agentic_primitives.web_bot_auth.keys
+    iab_agentic_primitives.web_bot_auth.values
+    iab_agentic_primitives.web_bot_auth.errors
+    iab_agentic_primitives.web_bot_auth.message
+    iab_agentic_primitives.web_bot_auth.conformance
+    iab_agentic_primitives.web_bot_auth._unchecked
+forbidden_modules =
+    http_message_signatures
+    http_sf
+allow_indirect_imports = True
+
+[importlinter:contract:wba-roles-no-loop]
+name = the roles run no event loop or thread; the sync facade owns the one loop
+type = forbidden
+source_modules =
+    iab_agentic_primitives.web_bot_auth.roles
+    iab_agentic_primitives.web_bot_auth.signer
+    iab_agentic_primitives.web_bot_auth.verifier
+forbidden_modules =
+    asyncio
+    concurrent
+    threading
+allow_indirect_imports = True
+
+[importlinter:contract:wba-conformance-public-only]
+name = conformance reaches the seams only through the public signers and verifiers
+type = forbidden
+source_modules =
+    iab_agentic_primitives.web_bot_auth.conformance
+forbidden_modules =
+    iab_agentic_primitives.web_bot_auth._sig
+    iab_agentic_primitives.web_bot_auth._wire
+allow_indirect_imports = True
+
+[importlinter:contract:wba-unchecked-only-in-conformance]
+name = only conformance signs raw, through _unchecked; no production module can
+type = forbidden
+source_modules =
+    iab_agentic_primitives.web_bot_auth.asgi
+    iab_agentic_primitives.web_bot_auth.httpx
+    iab_agentic_primitives.web_bot_auth.testing
+    iab_agentic_primitives.web_bot_auth.keyfile
+    iab_agentic_primitives.web_bot_auth.sync
+    iab_agentic_primitives.web_bot_auth.roles
+    iab_agentic_primitives.web_bot_auth.verifier
+    iab_agentic_primitives.web_bot_auth.signer
+    iab_agentic_primitives.web_bot_auth.resolver
+    iab_agentic_primitives.web_bot_auth.fetcher
+    iab_agentic_primitives.web_bot_auth.ports
+    iab_agentic_primitives.web_bot_auth.replay
+    iab_agentic_primitives.web_bot_auth.directory
+    iab_agentic_primitives.web_bot_auth.presentation
+    iab_agentic_primitives.web_bot_auth.rules
+    iab_agentic_primitives.web_bot_auth._sig
+    iab_agentic_primitives.web_bot_auth._wire
+    iab_agentic_primitives.web_bot_auth.message
+    iab_agentic_primitives.web_bot_auth.keys
+    iab_agentic_primitives.web_bot_auth.values
+    iab_agentic_primitives.web_bot_auth.errors
+    iab_agentic_primitives.web_bot_auth.extra
+forbidden_modules =
+    iab_agentic_primitives.web_bot_auth._unchecked
+allow_indirect_imports = False
+
+# The layer order, top to bottom. Every module has a place (exhaustive), so a new
+# module must take one. sync sits below the edges because the httpx edge and the
+# façades run on its loop; roles holds the ports the edges take. resolver composes
+# the ports and builds the default fetcher, so the fetcher sits below it; the
+# verifiers see only the KeyResolver port. _sig sits above _wire: it verifies the
+# SignatureMember that _wire parses.
+[importlinter:contract:wba-layers]
+name = web_bot_auth layer order (edges > roles > resolution > directory > seams > values)
+type = layers
+containers = iab_agentic_primitives.web_bot_auth
+exhaustive = True
+layers =
+    conformance
+    asgi | httpx | testing | keyfile | _unchecked
+    sync
+    roles
+    verifier | signer
+    resolver
+    fetcher
+    ports | replay
+    directory
+    presentation
+    rules
+    _sig
+    _wire
+    message | keys
+    values
+    errors | extra
