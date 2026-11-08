@@ -125,9 +125,7 @@ class CreativeApproval(WireModel):
     approval_id: str = Field(description="Seller-issued approval decision identifier.")
     creative_id: str = Field(description="Seller-issued id of the creative reviewed.")
     status: ReviewStatus = Field(description="Outcome of this review decision.")
-    reviewer: str = Field(
-        description="Actor id: 'system', 'human:<id>', or 'agent:<id>'."
-    )
+    reviewer: str = Field(description="Actor id: 'system', 'human:<id>', or 'agent:<id>'.")
     reason: str | None = Field(
         default=None,
         description="Rationale, required in practice for a rejection.",

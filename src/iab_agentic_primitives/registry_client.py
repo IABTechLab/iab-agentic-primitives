@@ -398,7 +398,9 @@ class RegistryClient:
 
     async def validate_domain(self, domain: str) -> DomainValidation:
         """Validate domain ownership (``POST /api/agents/validate/domain``, public)."""
-        response = await self._request("POST", f"{API_AGENTS}/validate/domain", json={"domain": domain})
+        response = await self._request(
+            "POST", f"{API_AGENTS}/validate/domain", json={"domain": domain}
+        )
         payload = response.json()
         return DomainValidation.model_validate(payload)
 

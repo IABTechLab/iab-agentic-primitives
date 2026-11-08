@@ -1,0 +1,21 @@
+# The module is self-contained: it reaches its siblings through relative
+# imports only, so it can be vendored or moved without edits.
+id: no-absolute-self-import
+language: Python
+severity: error
+message: web_bot_auth is self-contained and uses relative imports only.
+files:
+  - "src/iab_agentic_primitives/web_bot_auth/**/*.py"
+rule:
+  any:
+    # import iab_agentic_primitives, import iab_agentic_primitives.x as y
+    - kind: import_statement
+      has:
+        stopBy: end
+        kind: dotted_name
+        regex: '^iab_agentic_primitives(\.|$)'
+    # from iab_agentic_primitives.x import y
+    - kind: import_from_statement
+      has:
+        field: module_name
+        regex: '^iab_agentic_primitives(\.|$)'

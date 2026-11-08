@@ -109,7 +109,9 @@ MAX_SELLER_ROUNDS = 6
 DEFAULT_NEGOTIATION_BAND_PER_MILLE = 1250
 
 
-def _err(code: ErrorCode, message: str, unsupported: list[UnsupportedItem] | None = None) -> ErrorEnvelope:
+def _err(
+    code: ErrorCode, message: str, unsupported: list[UnsupportedItem] | None = None
+) -> ErrorEnvelope:
     return ErrorEnvelope(
         detail=ErrorDetail(error=code, message=message, unsupported=unsupported or [])
     )
@@ -130,7 +132,16 @@ class _QuoteState:
 class _NegState:
     """Seller-internal negotiation record (guardrails stay off the wire)."""
 
-    __slots__ = ("negotiation_id", "quote_id", "seller_price", "floor_micros", "rounds", "status", "last_buyer_price", "start_price")
+    __slots__ = (
+        "negotiation_id",
+        "quote_id",
+        "seller_price",
+        "floor_micros",
+        "rounds",
+        "status",
+        "last_buyer_price",
+        "start_price",
+    )
 
     def __init__(self, negotiation_id: str, quote_id: str, seller_price: int, floor_micros: int):
         self.negotiation_id = negotiation_id
@@ -263,7 +274,11 @@ class ReferenceSeller(SellerRole):
                 [UnsupportedItem(capability=request.media_type.value)],
             )
         terms = product.commercial_terms
-        if terms and terms.supported_deal_types and request.deal_type not in terms.supported_deal_types:
+        if (
+            terms
+            and terms.supported_deal_types
+            and request.deal_type not in terms.supported_deal_types
+        ):
             return _err(
                 ErrorCode.UNSUPPORTED_CAPABILITY,
                 f"deal_type {request.deal_type.value!r} not supported for this product",
@@ -317,7 +332,9 @@ class ReferenceSeller(SellerRole):
         if isinstance(neg, ErrorEnvelope):
             return neg
         if neg.status is not NegotiationStatus.ACTIVE:
-            return _err(ErrorCode.NEGOTIATION_CLOSED, f"negotiation {neg.negotiation_id} is terminal")
+            return _err(
+                ErrorCode.NEGOTIATION_CLOSED, f"negotiation {neg.negotiation_id} is terminal"
+            )
 
         response = self._advance(neg, message)
         self._neg_replay[message.idempotency_key] = response
@@ -339,7 +356,10 @@ class ReferenceSeller(SellerRole):
             return _err(ErrorCode.NOT_FOUND, f"unknown quote {message.quote_id!r}")
         neg_id = self._mint("neg")
         neg = _NegState(
-            neg_id, message.quote_id, qstate.quote.pricing.final_cpm.amount_micros, qstate.floor_micros
+            neg_id,
+            message.quote_id,
+            qstate.quote.pricing.final_cpm.amount_micros,
+            qstate.floor_micros,
         )
         self._negotiations[neg_id] = neg
         self._neg_by_quote[message.quote_id] = neg_id
@@ -355,14 +375,22 @@ class ReferenceSeller(SellerRole):
         if message.action is NegotiationAction.ACCEPT:
             neg.status = NegotiationStatus.ACCEPTED
             return self._record_round(
-                neg, round_number, neg.last_buyer_price, neg.seller_price,
-                NegotiationAction.ACCEPT, currency,
+                neg,
+                round_number,
+                neg.last_buyer_price,
+                neg.seller_price,
+                NegotiationAction.ACCEPT,
+                currency,
             )
         if message.action is NegotiationAction.REJECT:
             neg.status = NegotiationStatus.REJECTED
             return self._record_round(
-                neg, round_number, neg.last_buyer_price, neg.seller_price,
-                NegotiationAction.REJECT, currency,
+                neg,
+                round_number,
+                neg.last_buyer_price,
+                neg.seller_price,
+                NegotiationAction.REJECT,
+                currency,
             )
 
         # counter / final_offer: buyer_price is required by the envelope
@@ -390,7 +418,9 @@ class ReferenceSeller(SellerRole):
             new_price = max(neg.floor_micros, (neg.seller_price + bp) // 2)
             if new_price <= bp:
                 neg.status = NegotiationStatus.ACCEPTED
-                return self._record_round(neg, round_number, bp, bp, NegotiationAction.ACCEPT, currency)
+                return self._record_round(
+                    neg, round_number, bp, bp, NegotiationAction.ACCEPT, currency
+                )
             neg.seller_price = new_price
             action = (
                 NegotiationAction.FINAL_OFFER
@@ -410,12 +440,15 @@ class ReferenceSeller(SellerRole):
         )
 
     def _record_round(
-        self, neg: _NegState, round_number: int, buyer_micros: int, seller_micros: int,
-        action: NegotiationAction, currency: str,
+        self,
+        neg: _NegState,
+        round_number: int,
+        buyer_micros: int,
+        seller_micros: int,
+        action: NegotiationAction,
+        currency: str,
     ) -> NegotiationRoundResponse:
-        concession = (
-            (neg.start_price - seller_micros) / neg.start_price if neg.start_price else 0.0
-        )
+        concession = (neg.start_price - seller_micros) / neg.start_price if neg.start_price else 0.0
         rnd = NegotiationRound(
             round_number=round_number,
             buyer_price=Money(amount_micros=buyer_micros, currency=currency),
@@ -584,9 +617,7 @@ class ReferenceBuyer(BuyerRole):
 
     # -- driver ------------------------------------------------------------
 
-    def transact(
-        self, brief: CampaignBrief, sellers: Sequence[SellerChannel]
-    ) -> BuyerOutcome:
+    def transact(self, brief: CampaignBrief, sellers: Sequence[SellerChannel]) -> BuyerOutcome:
         best = self._discover_cheapest(brief, sellers)
         if best is None:
             return BuyerOutcome(walked_away=True, walk_reason="no affordable quote under max_cpm")
@@ -598,9 +629,7 @@ class ReferenceBuyer(BuyerRole):
         # brings it down to the ceiling, so negotiation is REQUIRED for it —
         # the brief's ``negotiate`` flag only governs voluntary negotiation
         # on quotes already at/below the ceiling.
-        must_negotiate = (
-            quote.pricing.final_cpm.amount_micros > brief.max_cpm.amount_micros
-        )
+        must_negotiate = quote.pricing.final_cpm.amount_micros > brief.max_cpm.amount_micros
         effective_cpm = quote.pricing.final_cpm
         if brief.negotiate or must_negotiate:
             negotiation, agreed = self._negotiate(
@@ -630,9 +659,7 @@ class ReferenceBuyer(BuyerRole):
         cost = cpm_cost(effective_cpm, brief.impressions)
         if cost.amount_micros > brief.budget.amount_micros:
             outcome.walked_away = True
-            outcome.walk_reason = (
-                f"budget ceiling exceeded: cost {cost.amount_micros} > budget {brief.budget.amount_micros}"
-            )
+            outcome.walk_reason = f"budget ceiling exceeded: cost {cost.amount_micros} > budget {brief.budget.amount_micros}"
             return outcome
 
         return self._book(brief, channel, quote, outcome)
@@ -675,7 +702,11 @@ class ReferenceBuyer(BuyerRole):
             if brief.ad_format and brief.ad_format not in product.ad_formats:
                 continue
             terms = product.commercial_terms
-            if terms and terms.supported_deal_types and brief.deal_type not in terms.supported_deal_types:
+            if (
+                terms
+                and terms.supported_deal_types
+                and brief.deal_type not in terms.supported_deal_types
+            ):
                 continue
             if product.base_price is None:
                 continue

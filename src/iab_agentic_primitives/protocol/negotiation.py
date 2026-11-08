@@ -95,9 +95,7 @@ class NegotiationMessage(IdempotentRequest):
     proposal_id: str | None = Field(
         default=None, description="Proposal under negotiation, if proposal-led."
     )
-    quote_id: str | None = Field(
-        default=None, description="Quote under negotiation, if quote-led."
-    )
+    quote_id: str | None = Field(default=None, description="Quote under negotiation, if quote-led.")
     round_number: int | None = Field(
         default=None,
         ge=1,
@@ -117,9 +115,7 @@ class NegotiationMessage(IdempotentRequest):
     @model_validator(mode="after")
     def _consistency(self) -> "NegotiationMessage":
         if self.negotiation_id is None and self.proposal_id is None and self.quote_id is None:
-            raise ValueError(
-                "NegotiationMessage requires negotiation_id, proposal_id, or quote_id"
-            )
+            raise ValueError("NegotiationMessage requires negotiation_id, proposal_id, or quote_id")
         if self.action in PRICED_ACTIONS and self.buyer_price is None:
             raise ValueError(f"action '{self.action.value}' requires buyer_price")
         if self.action is NegotiationAction.REJECT and self.buyer_price is not None:

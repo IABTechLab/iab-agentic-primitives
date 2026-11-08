@@ -244,9 +244,7 @@ async def run_scenario(
 
         transactions: list[TransactionResult] = []
         for participant in buyers:
-            transactions.append(
-                await _run_one(client, participant, seller_by_id)
-            )
+            transactions.append(await _run_one(client, participant, seller_by_id))
 
     return ScenarioResult(transactions=transactions)
 

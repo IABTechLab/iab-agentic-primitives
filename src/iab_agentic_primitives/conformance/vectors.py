@@ -173,6 +173,7 @@ def _doc(area: str, target: str, vectors: list[dict[str, Any]]) -> dict[str, Any
         "vectors": vectors,
     }
 
+
 # Pinned timestamps -- regeneration must be byte-stable.
 T0 = datetime(2026, 7, 1, 12, 0, 0, tzinfo=UTC)
 T1 = datetime(2026, 7, 2, 9, 30, 0, tzinfo=UTC)
@@ -307,9 +308,7 @@ def _quote_pg_digital() -> Quote:
             flight_end=date(2026, 8, 31),
             guaranteed=True,
         ),
-        availability=QuoteAvailability(
-            inventory_available=True, estimated_fill_rate=0.95
-        ),
+        availability=QuoteAvailability(inventory_available=True, estimated_fill_rate=0.95),
         buyer_tier=AccessTier.ADVERTISER,
         rate_card_id="rc-001",
         expires_at=T_EXPIRES,
@@ -323,9 +322,7 @@ def _quote_linear_tv() -> Quote:
     return Quote(
         quote_id="q-ltv-002",
         deal_type=DealType.PROGRAMMATIC_GUARANTEED,
-        product=ProductRef(
-            product_id="prod-ltv-9", name="Primetime National Spots"
-        ),
+        product=ProductRef(product_id="prod-ltv-9", name="Primetime National Spots"),
         pricing=QuotePricing(
             pricing_model=PricingModel.CPP,
             base_cpp=Money.from_decimal_str("475.00"),
@@ -688,8 +685,7 @@ def primitive_fixture_docs() -> dict[str, dict[str, Any]]:
             _valid("pg_digital_guaranteed", "Happy-path PG digital quote", _quote_pg_digital()),
             _valid(
                 "linear_tv_primetime",
-                "FD-6 linear TV quote: CPP pricing, GRP terms, structured "
-                "linear_tv details",
+                "FD-6 linear TV quote: CPP pricing, GRP terms, structured linear_tv details",
                 _quote_linear_tv(),
             ),
             _valid(
@@ -871,9 +867,7 @@ def primitive_fixture_docs() -> dict[str, dict[str, Any]]:
                     deal_type=DealType.PROGRAMMATIC_GUARANTEED,
                     status=DealStatus.MAKEGOOD_PENDING,
                     quote_id="q-ltv-002",
-                    product=ProductRef(
-                        product_id="prod-ltv-9", name="Primetime National Spots"
-                    ),
+                    product=ProductRef(product_id="prod-ltv-9", name="Primetime National Spots"),
                     pricing=QuotePricing(
                         pricing_model=PricingModel.CPP,
                         base_cpp=Money.from_decimal_str("475.00"),
@@ -1027,9 +1021,7 @@ def primitive_fixture_docs() -> dict[str, dict[str, Any]]:
                     requested_by="human:ops-42",
                     requested_at=T0,
                     reason="Campaign paused by advertiser",
-                    diffs=[
-                        FieldDiff(field="status", old_value="booked", new_value="cancelled")
-                    ],
+                    diffs=[FieldDiff(field="status", old_value="booked", new_value="cancelled")],
                     proposed_values={
                         "cancel_pct": 1.0,
                         "reason": "advertiser pause",
@@ -1063,9 +1055,7 @@ def primitive_fixture_docs() -> dict[str, dict[str, Any]]:
                 "Active session with revealed buyer identity",
                 Session(
                     session_id="sess-001",
-                    buyer_identity=BuyerIdentity(
-                        seat_id="ttd-seat-123", agency_id="omnicom-456"
-                    ),
+                    buyer_identity=BuyerIdentity(seat_id="ttd-seat-123", agency_id="omnicom-456"),
                     messages=[
                         SessionMessage(
                             role="user",
@@ -1453,9 +1443,7 @@ def protocol_fixture_docs() -> dict[str, dict[str, Any]]:
             _valid(
                 "one_product",
                 "Catalog page with a single product",
-                ProductListResponse(
-                    products=[product], total_count=1, limit=50, offset=0
-                ),
+                ProductListResponse(products=[product], total_count=1, limit=50, offset=0),
             ),
             _valid(
                 "empty_catalog",
@@ -1667,11 +1655,8 @@ def protocol_fixture_docs() -> dict[str, dict[str, Any]]:
         [
             _valid(
                 "fully_available",
-                "Full requested volume available: availsstatus Available, "
-                "no reason",
-                _spec_avails(
-                    "prod-001", 500_000, AvailsStatusValue.AVAILABLE, None
-                ),
+                "Full requested volume available: availsstatus Available, no reason",
+                _spec_avails("prod-001", 500_000, AvailsStatusValue.AVAILABLE, None),
             ),
             _valid(
                 "partially_available_booked",
@@ -1736,8 +1721,7 @@ def protocol_fixture_docs() -> dict[str, dict[str, Any]]:
             ),
             _valid(
                 "empty_collection",
-                "No matching availability: the avails array is empty, "
-                "never absent",
+                "No matching availability: the avails array is empty, never absent",
                 AvailsCollection(avails=[]),
             ),
             _must_ignore(
@@ -1800,8 +1784,7 @@ def protocol_fixture_docs() -> dict[str, dict[str, Any]]:
             ),
             _invalid(
                 "missing_idempotency_key",
-                "FD-12: a money-mutating request without idempotency_key "
-                "must be rejected",
+                "FD-12: a money-mutating request without idempotency_key must be rejected",
                 {"product_id": "prod-001", "deal_type": "PG", "impressions": 1000000},
                 "idempotency_key",
             ),
@@ -1818,8 +1801,7 @@ def protocol_fixture_docs() -> dict[str, dict[str, Any]]:
             ),
             _invalid(
                 "linear_tv_missing_params",
-                "FD-6: media_type linear_tv without linear_tv params must "
-                "be rejected",
+                "FD-6: media_type linear_tv without linear_tv params must be rejected",
                 {
                     "idempotency_key": _idem(4),
                     "product_id": "prod-ltv-9",
@@ -1927,8 +1909,7 @@ def protocol_fixture_docs() -> dict[str, dict[str, Any]]:
             ),
             _valid(
                 "cancellation_create",
-                "Cancellation as a typed change request (retired per-deal "
-                "cancel route)",
+                "Cancellation as a typed change request (retired per-deal cancel route)",
                 ChangeRequestCreate(
                     idempotency_key=_idem(8),
                     order_id="ord-001",
@@ -1944,8 +1925,7 @@ def protocol_fixture_docs() -> dict[str, dict[str, Any]]:
             ),
             _invalid(
                 "makegood_missing_details",
-                "change_type makegood without a makegood payload must be "
-                "rejected",
+                "change_type makegood without a makegood payload must be rejected",
                 {
                     "idempotency_key": _idem(9),
                     "deal_id": "deal-ltv-002",
@@ -2028,8 +2008,7 @@ def protocol_fixture_docs() -> dict[str, dict[str, Any]]:
             ),
             _must_ignore(
                 "message_with_unknown_fields",
-                "FD-13: unknown + x_ fields on a negotiation message are "
-                "ignored",
+                "FD-13: unknown + x_ fields on a negotiation message are ignored",
                 open_counter,
             ),
             _invalid(
@@ -2138,8 +2117,7 @@ def protocol_fixture_docs() -> dict[str, dict[str, Any]]:
             ),
             _must_ignore(
                 "request_with_unknown_fields",
-                "FD-13: unknown + x_ fields on the JSON-RPC envelope are "
-                "ignored",
+                "FD-13: unknown + x_ fields on the JSON-RPC envelope are ignored",
                 rpc_request,
             ),
         ],
@@ -2265,8 +2243,7 @@ def protocol_fixture_docs() -> dict[str, dict[str, Any]]:
                 ErrorEnvelope(
                     detail=ErrorDetail(
                         error=ErrorCode.IDEMPOTENCY_CONFLICT,
-                        message="idempotency_key was already used with a "
-                        "different request body",
+                        message="idempotency_key was already used with a different request body",
                     )
                 ),
             ),

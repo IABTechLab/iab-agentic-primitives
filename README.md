@@ -28,6 +28,14 @@ implementation.**
   spec fixtures in CI (continuous integration) like any other
   implementation.
 
+The Web Bot Auth vectors are the one exception: they live in the package, in
+`src/iab_agentic_primitives/web_bot_auth/vectors/`, beside the adapter
+protocol they are graded with (`conformance/PROTOCOL.md`). The module is
+self-contained so it can be lifted into another repository, and an installed
+wheel carries everything its conformance CLI reads. Regenerate them with
+`python -m iab_agentic_primitives.web_bot_auth.conformance --regenerate`, the
+same flag as the package's own conformance CLI.
+
 ## Package layout
 
 | Module | Role |
@@ -37,6 +45,7 @@ implementation.**
 | `iab_agentic_primitives.state` | Canonical lifecycle state machines (one state vocabulary per exchanged primitive) |
 | `iab_agentic_primitives.events` | Shared event types crossing the buyer/seller boundary |
 | `iab_agentic_primitives.conformance` | Schema validators, golden vectors, standards checklist |
+| `iab_agentic_primitives.web_bot_auth` | The OpenProposal § 2.8 Web Bot Auth profile: signed requests and responses, the signed key directory, verification, conformance vectors, and an interop harness. Needs the `wba` extra; see [WEB_BOT_AUTH.md](WEB_BOT_AUTH.md) |
 
 The subpackages are scaffolded but intentionally empty of domain models:
 primitive and protocol definitions land in subsequent work items.
@@ -56,11 +65,12 @@ This library follows semantic versioning (semver):
 
 ## Development
 
-Requires Python >= 3.11 and [uv](https://docs.astral.sh/uv/).
+Requires Python >= 3.12 and [uv](https://docs.astral.sh/uv/).
 
 ```bash
 uv run pytest        # tests
 uv run ruff check .  # lint
+make quality         # Web Bot Auth gates
 ```
 
 The only runtime dependency is `pydantic>=2`.

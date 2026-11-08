@@ -1,0 +1,24 @@
+# The Web Bot Auth lint gate (`make lint-wba`). Scoped to
+# src/iab_agentic_primitives/web_bot_auth and tests/web_bot_auth.
+#
+# This set lives in its own file, not in pyproject.toml's [tool.ruff.lint],
+# because it reports findings in upstream modules, and `uv run ruff check .`
+# must keep passing for them as it does today.
+extend = "pyproject.toml"
+
+[lint]
+select = ["E", "W", "F", "I", "B", "C4", "UP", "C90", "PLR", "RUF100", "RUF022", "TID251"]
+ignore = [
+    "PLR2004", # magic values: protocol constants, each named where reused
+]
+
+# C901 has no baseline: the module is new. A per-file ignore is allowed only
+# for a fixture-heavy test function, with its reason beside it.
+
+[lint.mccabe]
+max-complexity = 10
+
+[lint.pylint]
+max-branches = 12
+max-statements = 50
+max-args = 5

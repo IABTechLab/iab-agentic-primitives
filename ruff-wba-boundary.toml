@@ -1,0 +1,29 @@
+# The Web Bot Auth seam boundary (`make boundary`), run over
+# src/iab_agentic_primitives/web_bot_auth only.
+#
+# The RFC 9421 and Structured Fields libraries are reached through the wire
+# seams alone, and the network through the fetcher and the httpx edge alone.
+# A ban fires on the import, so a module that reaches past its seam fails
+# where it reaches.
+#
+# Relative imports are not banned here: ruff resolves them to absolute names,
+# so a ban on iab_agentic_primitives fires on every one of them. The ast-grep
+# rule no-absolute-self-import covers that case instead.
+extend = "pyproject.toml"
+
+[lint]
+select = ["TID251"]
+
+[lint.flake8-tidy-imports.banned-api]
+"http_message_signatures".msg = "Only the RFC 9421 seam (_sig.py) imports http_message_signatures."
+"http_sf".msg = "Only the Structured Fields seam (_wire.py) imports http_sf."
+"httpx".msg = "Only the directory fetcher and the httpx edge (httpx.py) import httpx."
+
+[lint.per-file-ignores]
+# The seams themselves.
+"**/web_bot_auth/_sig.py" = ["TID251"]
+"**/web_bot_auth/_wire.py" = ["TID251"]
+# The network edges: the directory fetcher, the httpx Auth, and test support.
+"**/web_bot_auth/fetcher.py" = ["TID251"]
+"**/web_bot_auth/httpx.py" = ["TID251"]
+"**/web_bot_auth/testing.py" = ["TID251"]

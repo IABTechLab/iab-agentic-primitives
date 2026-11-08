@@ -1,0 +1,7 @@
+# Structural rules for the Web Bot Auth module (`make guards`), for the
+# checks ruff and import-linter cannot express. Each rule scopes itself to the
+# web_bot_auth paths with its own `files:`.
+#
+# Every rule is `severity: error`, so any finding fails the scan.
+ruleDirs:
+  - .ast-grep/rules

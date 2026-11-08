@@ -6,6 +6,28 @@ major version bump.
 
 ## [Unreleased]
 
+### Changed
+
+- The package requires Python 3.12 or later, and CI runs on 3.12. Before
+  3.12, pydantic refuses the `typing.TypedDict` types that the Web Bot Auth
+  conformance documents validate, so the 3.11 floor didn't hold.
+
+### Added
+
+- `iab_agentic_primitives.web_bot_auth`, the OpenProposal 3.0 § 2.8 Web Bot
+  Auth profile, behind the new `wba` extra: `RequestSigner` and
+  `ResponseSigner`, `RequestVerifier` and `ResponseVerifier` with typed
+  credentials, the signed key directory and its resolver, ASGI and httpx
+  edges, a sync façade, and the `Refusal` vocabulary. Its conformance vectors
+  ship as package data, with a runner, a typed adapter protocol
+  (`conformance/PROTOCOL.md`), and a Node harness that grades it against
+  Cloudflare's `web-bot-auth` library rule by rule. `make quality` runs its
+  gates; WEB_BOT_AUTH.md states the rules and the API.
+- The package ships a `py.typed` marker (PEP 561), so a type checker reads
+  its inline annotations instead of reporting `import-untyped`. The marker
+  covers the whole package, the existing modules as well as
+  `iab_agentic_primitives.web_bot_auth`.
+
 ## [0.5.1] - 2026-08-10
 
 First tagged release published on GitHub.

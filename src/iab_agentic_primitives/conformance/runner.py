@@ -101,9 +101,7 @@ class ConformanceRunner:
         diff: list[dict[str, str]] | None = None,
     ) -> None:
         """Record one check; ``ok=None`` means the check was skipped."""
-        status = (
-            CheckStatus.SKIP if ok is None else CheckStatus.PASS if ok else CheckStatus.FAIL
-        )
+        status = CheckStatus.SKIP if ok is None else CheckStatus.PASS if ok else CheckStatus.FAIL
         self.report.checks.append(
             CheckRecord(
                 area=area,
@@ -208,9 +206,7 @@ class ConformanceRunner:
         if mode == "must_ignore":
             expected = vector.get("expected", data)
             check = "must_ignore"
-            failure = (
-                "unknown/x_ extension fields were not ignored on re-serialization (FD-13)"
-            )
+            failure = "unknown/x_ extension fields were not ignored on re-serialization (FD-13)"
         else:
             expected = data
             check = "roundtrip"
@@ -449,10 +445,7 @@ class ConformanceRunner:
                         return
                 elif index == fails_at:
                     if json_legal:
-                        fail(
-                            f"illegal transition ACCEPTED at step {index}: "
-                            f"{src!r} -> {dst!r}"
-                        )
+                        fail(f"illegal transition ACCEPTED at step {index}: {src!r} -> {dst!r}")
                         return
                     break  # rejected exactly where expected
         else:
@@ -498,11 +491,7 @@ class ConformanceRunner:
                 vector=None,
                 check="state_spec_sync",
                 ok=ok,
-                message=(
-                    ""
-                    if ok
-                    else f"state machine has drifted from checked-in {path.name}"
-                ),
+                message=("" if ok else f"state machine has drifted from checked-in {path.name}"),
             )
 
     # -- entry point -----------------------------------------------------------
@@ -514,9 +503,7 @@ class ConformanceRunner:
         return self.report
 
 
-def run_conformance(
-    fixtures_dir: Path | None = None, schema_dir: Path | None = None
-) -> GapReport:
+def run_conformance(fixtures_dir: Path | None = None, schema_dir: Path | None = None) -> GapReport:
     """Run every conformance check and return the assembled GapReport."""
     return ConformanceRunner(fixtures_dir=fixtures_dir, schema_dir=schema_dir).run()
 

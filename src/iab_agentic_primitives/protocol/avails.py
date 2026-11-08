@@ -113,9 +113,7 @@ class AvailsRequest(AvailsWireModel):
     """
 
     product_id: str = Field(alias="productid", description="Product to check.")
-    start_date: datetime = Field(
-        alias="startdate", description="Flight start (ISO-8601)."
-    )
+    start_date: datetime = Field(alias="startdate", description="Flight start (ISO-8601).")
     end_date: datetime = Field(
         alias="enddate",
         description="Flight end (ISO-8601); must be after startdate.",
@@ -196,8 +194,7 @@ class AvailsResponse(AvailsWireModel):
         default=None,
         alias="guaranteedImpressions",
         ge=0,
-        description="Present ONLY for PG-capable products (policy 3); "
-        "omitted otherwise.",
+        description="Present ONLY for PG-capable products (policy 3); omitted otherwise.",
     )
     estimated_cpm: float = Field(
         alias="estimatedCpm",
@@ -288,28 +285,22 @@ class ProductTargeting(AvailsWireModel):
         "Investment, or Prohibitions."
     )
     type: TargetingUnit = Field(
-        description="How it is quantified: Frames, Audience, Investment, "
-        "or Total."
+        description="How it is quantified: Frames, Audience, Investment, or Total."
     )
     datasource: str = Field(
         max_length=255,
         description="Data source that defines the target vocabulary "
         "(third-party schemas welcome by design).",
     )
-    target: str = Field(
-        max_length=255, description="The targeted metric within datasource."
-    )
+    target: str = Field(max_length=255, description="The targeted metric within datasource.")
     target_values: list[str] = Field(
         alias="targetvalues",
         description="One or more values for the target (strings on the wire).",
     )
     selectable: bool = Field(
-        description="Whether a buyer may select from targetvalues or the "
-        "values are fixed."
+        description="Whether a buyer may select from targetvalues or the values are fixed."
     )
-    count: float | None = Field(
-        default=None, description="Count of targetvalues."
-    )
+    count: float | None = Field(default=None, description="Count of targetvalues.")
     minimum: float | None = Field(
         default=None, description="Minimum number of selectable targetvalues."
     )
@@ -328,17 +319,12 @@ class ProductTargeting(AvailsWireModel):
 class AvailsStatus(AvailsWireModel):
     """Spec ``Object: AvailsStatus`` — availability grouping for a product."""
 
-    status: AvailsStatusValue = Field(
-        description="Available, Partially Available, or Unavailable."
-    )
+    status: AvailsStatusValue = Field(description="Available, Partially Available, or Unavailable.")
     reason: AvailsStatusReason | None = Field(
         default=None,
-        description="Spec-enumerated reason when Partially Available or "
-        "Unavailable.",
+        description="Spec-enumerated reason when Partially Available or Unavailable.",
     )
-    comment: str | None = Field(
-        default=None, description="Free-text availability comment."
-    )
+    comment: str | None = Field(default=None, description="Free-text availability comment.")
     context: list[ProductTargeting] | None = Field(
         default=None,
         description="ProductTargeting entries describing the context of a "
@@ -364,19 +350,16 @@ class ProductAvailsSearch(AvailsWireModel):
     product_ids: list[str] = Field(
         alias="productids",
         min_length=1,
-        description="Products to get availability + pricing for "
-        "(spec-required, non-empty).",
+        description="Products to get availability + pricing for (spec-required, non-empty).",
     )
     targeting: list[dict[str, Any]] | None = Field(
         default=None,
-        description="AdCOM Segment object array "
-        '({"name": <dimension>, "value": <value>}).',
+        description='AdCOM Segment object array ({"name": <dimension>, "value": <value>}).',
     )
     product_targeting: list[ProductTargeting] | None = Field(
         default=None,
         alias="producttargeting",
-        description="ProductTargeting entries to target for the "
-        "availability request.",
+        description="ProductTargeting entries to target for the availability request.",
     )
     account_id: str = Field(
         alias="accountid",
@@ -384,9 +367,7 @@ class ProductAvailsSearch(AvailsWireModel):
         description="Account identifying the buyer, advertiser, and other "
         "stakeholders (spec-required).",
     )
-    currency: str | None = Field(
-        default=None, max_length=3, description="ISO-4217 currency code."
-    )
+    currency: str | None = Field(default=None, max_length=3, description="ISO-4217 currency code.")
     advertiser_brand_id: str = Field(
         alias="advertiserbrandid",
         max_length=36,
@@ -399,8 +380,7 @@ class ProductAvailsSearch(AvailsWireModel):
     )
     grouping: list[ProductTargeting] | None = Field(
         default=None,
-        description="ProductTargeting metrics the availability output is "
-        "grouped by.",
+        description="ProductTargeting metrics the availability output is grouped by.",
     )
     start_date: datetime = Field(
         alias="startdate", description="Desired delivery start (ISO-8601)."
@@ -471,8 +451,7 @@ class Avails(AvailsWireModel):
     product_id: str = Field(
         alias="productid",
         max_length=36,
-        description="Product the availability + pricing is for "
-        "(spec-required).",
+        description="Product the availability + pricing is for (spec-required).",
     )
     account_id: str = Field(
         alias="accountid",
@@ -487,12 +466,9 @@ class Avails(AvailsWireModel):
     avails_status: AvailsStatus | None = Field(
         default=None,
         alias="availsstatus",
-        description="Availability grouping (Available / Partially "
-        "Available / Unavailable).",
+        description="Availability grouping (Available / Partially Available / Unavailable).",
     )
-    currency: str | None = Field(
-        default=None, max_length=3, description="ISO-4217 currency code."
-    )
+    currency: str | None = Field(default=None, max_length=3, description="ISO-4217 currency code.")
     price: float = Field(
         description="The product's price (spec-required; OpenDirect 2.1 "
         "float dialect, FD-11 exception)."
@@ -539,9 +515,7 @@ class AvailsCollection(AvailsWireModel):
     (one record per requested product; empty when nothing matches).
     """
 
-    avails: list[Avails] = Field(
-        description="One Avails record per product in the request."
-    )
+    avails: list[Avails] = Field(description="One Avails record per product in the request.")
 
 
 # ---------------------------------------------------------------------------
@@ -598,9 +572,7 @@ def _legacy_request_to_spec(
             values = request.targeting[name]
             if not isinstance(values, list):
                 values = [values]
-            targeting.extend(
-                {"name": name, "value": str(value)} for value in values
-            )
+            targeting.extend({"name": name, "value": str(value)} for value in values)
         targeting = targeting or None
 
     return ProductAvailsSearch(

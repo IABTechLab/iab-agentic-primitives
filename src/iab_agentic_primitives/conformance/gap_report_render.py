@@ -152,19 +152,16 @@ def render_markdown(report: dict[str, Any]) -> str:
         "IAB = Interactive Advertising Bureau. This report answers a single "
         "question honestly: for each standard the shared contract claims "
         "alignment with, have we actually *verified* it, and if not, exactly "
-        "what is missing and how to close the gap. \"We model a field named "
-        "after a standard\" is never treated as \"we verified conformance "
-        "against the published standard\"."
+        'what is missing and how to close the gap. "We model a field named '
+        'after a standard" is never treated as "we verified conformance '
+        'against the published standard".'
     )
     lines.append("")
 
     # ---- Executive summary --------------------------------------------------
     lines.append("## Executive summary")
     lines.append("")
-    lines.append(
-        f"- **{len(standards)} standards tracked** (library version "
-        f"`{version}`)."
-    )
+    lines.append(f"- **{len(standards)} standards tracked** (library version `{version}`).")
     lines.append(
         f"- **{len(conformant)} fully self-conformant** — the contract's own "
         "guarantees (primitives, protocol, state, events, money, idempotency, "
@@ -198,12 +195,10 @@ def render_markdown(report: dict[str, Any]) -> str:
     top = next((s for s in standards if s["id"] == HIGHEST_PRIORITY_GAP_ID), None)
     if top is not None:
         lines.append(
-            f"**Highest-priority gap: {top['name']} "
-            f"{top.get('version', '')}".strip()
+            f"**Highest-priority gap: {top['name']} {top.get('version', '')}".strip()
             + "** — field-level fidelity for the core commercial booking "
             "surface (Orders / Lines / Products) is the most consequential "
-            "unverified claim. "
-            + REMEDIATION.get(top["id"], "")
+            "unverified claim. " + REMEDIATION.get(top["id"], "")
         )
         lines.append("")
 

@@ -1,0 +1,17 @@
+# Invariant 3: the server's own authority comes from configuration, never
+# from the request. Reading Host, Forwarded, or the ASGI server tuple to
+# decide what the server is would let a client choose the authority a
+# signature is checked against.
+id: no-host-derived-authority
+language: Python
+severity: error
+message: The server's authority comes from configuration (base_url / authorities), never from Host, Forwarded, or scope["server"].
+files:
+  - "src/iab_agentic_primitives/web_bot_auth/**/*.py"
+rule:
+  any:
+    - pattern: $S["server"]
+    - pattern: $S.get("server")
+    - all:
+        - kind: string
+        - regex: '^b?["''](host|x-forwarded-host|forwarded)["'']$'

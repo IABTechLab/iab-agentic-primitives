@@ -304,9 +304,7 @@ class BuyerRole(ABC):
         """The buyer's Agent Card, as registered for discovery/trust."""
 
     @abstractmethod
-    def transact(
-        self, brief: CampaignBrief, sellers: Sequence[SellerChannel]
-    ) -> BuyerOutcome:
+    def transact(self, brief: CampaignBrief, sellers: Sequence[SellerChannel]) -> BuyerOutcome:
         """Run the brief against the discovered sellers; return the outcome."""
 
 

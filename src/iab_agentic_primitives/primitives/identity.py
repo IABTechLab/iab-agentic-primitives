@@ -86,9 +86,7 @@ class Account(WireModel):
     """
 
     account_id: str = Field(description="Seller-issued account identifier.")
-    buyer_organization_id: str = Field(
-        description="Registry-issued id of the buying organization."
-    )
+    buyer_organization_id: str = Field(description="Registry-issued id of the buying organization.")
     seller_organization_id: str = Field(
         description="Registry-issued id of the selling organization."
     )

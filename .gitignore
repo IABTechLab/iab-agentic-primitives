@@ -6,6 +6,10 @@ build/
 *.egg-info/
 .pytest_cache/
 .ruff_cache/
+# Web Bot Auth quality gates (make quality)
+.mypy_cache/
+.import_linter_cache/
+.coverage
 
 # Secrets hygiene
 .env

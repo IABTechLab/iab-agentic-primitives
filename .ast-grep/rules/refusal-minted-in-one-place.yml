@@ -1,0 +1,28 @@
+# Invariant 4: every refusal is a typed WebBotAuthError with a status from
+# the profile's table. A refusal is minted from that table in one place, so
+# no call site can pick its own status or reason.
+id: refusal-minted-in-one-place
+language: Python
+severity: error
+message: A refusal is minted in errors.py from a Refusal member; elsewhere, raise refuse(Refusal.X, detail).
+files:
+  - "src/iab_agentic_primitives/web_bot_auth/**/*.py"
+ignores:
+  - "src/iab_agentic_primitives/web_bot_auth/errors.py"
+rule:
+  any:
+    - pattern: WebBotAuthError($$$A)
+    - pattern: $M.WebBotAuthError($$$A)
+---
+# A test asserts a refusal by its Refusal member, through the one helper that
+# checks the member and its status together.
+id: refusal-asserted-through-expect-refusal
+language: Python
+severity: error
+message: Assert a refusal with expect_refusal(call, Refusal.X), not pytest.raises(WebBotAuthError).
+files:
+  - "tests/web_bot_auth/**/*.py"
+rule:
+  any:
+    - pattern: pytest.raises(WebBotAuthError $$$A)
+    - pattern: raises(WebBotAuthError $$$A)
